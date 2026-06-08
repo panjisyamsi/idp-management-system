@@ -1097,7 +1097,7 @@ function renderJadwal() {
 
   let content = `<div class="card"><div class="table-wrap"><table>
     <thead><tr>
-      <th>Date</th><th>Competency</th><th>Trainer</th>
+      <th>Date</th><th>Time</th><th>Competency</th><th>Trainer</th>
       <th>Location</th><th>Type</th><th>Status</th><th>Action</th>
     </tr></thead><tbody>`;
 
@@ -1121,6 +1121,7 @@ function renderJadwal() {
 
     content += `<tr>
       <td style="white-space:nowrap;">${dateDisplay}</td>
+      <td style="white-space:nowrap;color:var(--text-secondary);">${s.time || '-'}</td>
       <td><strong>${s.competency_name || s.competency_id}</strong><br>
           <span style="font-size:11px;color:var(--text-muted);">${s.competency_id}</span></td>
       <td>${s.trainer || '-'}</td>
