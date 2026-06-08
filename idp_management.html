@@ -717,12 +717,17 @@ async function loadDashboard() {
   const u = state.user;
   el('dash-greeting').textContent = `${u.name} · ${u.position || u.grade} · ${u.department}`;
 
-  const res = await api('getDashboard', { nik: u.nik });
+  // Fire both requests in parallel
+  const [res, adminRes] = await Promise.all([
+    api('getDashboard', { nik: u.nik }),
+    api('getAdminDashboard', {}),
+  ]);
+
   if (!res.success) { html('dash-content', `<p class="text-muted">${res.message}</p>`); return; }
 
-  const d = res.data;
-  const totalM = d.mandatory_total;
-  const doneM  = d.mandatory_completed;
+  const d        = res.data;
+  const totalM   = d.mandatory_total;
+  const doneM    = d.mandatory_completed;
   const pipeline = d.pipeline || [];
   const isLeader = u.role && u.role.includes('leader');
 
@@ -760,6 +765,11 @@ async function loadDashboard() {
       <div style="margin-top:8px;"><span class="badge ${gradeColor(u.grade)}" style="font-size:14px;padding:5px 14px;">${u.grade}</span></div>
     </div>
   </div>`;
+
+  // ── LEADERBOARD ──────────────────────────────────────────
+  if (adminRes.success) {
+    content += renderRaceLeaderboard(adminRes.data, u.division || u.department);
+  }
 
   if (totalM > 0) {
     content += `<div class="card" style="margin-bottom:16px;">
@@ -820,6 +830,261 @@ async function loadDashboard() {
   }
 
   html('dash-content', content);
+}
+
+// ── RACE LEADERBOARD ──────────────────────────────────────────
+function renderRaceLeaderboard(adminData, myDivision) {
+  const deptStats = adminData.department_stats || {};
+
+  // Group departments → divisions using broad mapping
+  // Division is already stored in Users sheet; deptStats keys are Department names.
+  // We use the keys directly as "division" labels since admin dashboard groups by Department.
+  // Filter out empty keys and sort by completion rate desc.
+  const entries = Object.entries(deptStats)
+    .filter(([name]) => name && name.trim() !== '')
+    .map(([name, stat]) => {
+      const mandatoryDone  = stat.completed  || 0;
+      const mandatoryTotal = stat.assigned   || 0;
+      // Progress = mandatory completion rate; fallback to assessment rate if no mandatory data yet
+      const progressPct = mandatoryTotal > 0
+        ? Math.round((mandatoryDone / mandatoryTotal) * 100)
+        : 0;
+      return { name, progressPct, total: stat.total || 0, assessed: stat.assessed || 0, mandatoryDone, mandatoryTotal };
+    })
+    .sort((a, b) => b.progressPct - a.progressPct);
+
+  if (entries.length === 0) return '';
+
+  // Check if any racing has started (any division has > 0 progress)
+  const anyProgress = entries.some(e => e.progressPct > 0);
+
+  // Avatar colors — one per division slot, cycling
+  const avatarColors = [
+    '#E84855','#0A2463','#F4A827','#2D6A4F','#5C4B8A',
+    '#1B7A8C','#E07B39','#2E86AB','#A23B72','#F18F01',
+    '#C73E1D','#3B1F2B','#44BBA4',
+  ];
+
+  // Short name for label (max 12 chars)
+  const shortName = name => name.length > 12 ? name.slice(0, 11) + '…' : name;
+
+  // Build avatar SVG characters
+  // Each avatar: running pose if progress > 0, ready pose if 0, celebrate if 100
+  const avatarSVG = (color, state, idx) => {
+    if (state === 'celebrate') {
+      // Arms up celebrate
+      return `
+        <g>
+          <!-- body -->
+          <ellipse cx="16" cy="22" rx="5" ry="7" fill="${color}" opacity="0.9"/>
+          <!-- head -->
+          <circle cx="16" cy="11" r="5" fill="${color}"/>
+          <!-- left arm up -->
+          <line x1="11" y1="20" x2="6" y2="12" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- right arm up -->
+          <line x1="21" y1="20" x2="26" y2="12" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- left leg -->
+          <line x1="13" y1="28" x2="10" y2="36" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- right leg -->
+          <line x1="19" y1="28" x2="22" y2="36" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- star -->
+          <text x="16" y="7" text-anchor="middle" font-size="8">⭐</text>
+        </g>`;
+    }
+    if (state === 'ready') {
+      // Crouch ready at start line
+      return `
+        <g>
+          <!-- body leaning forward -->
+          <ellipse cx="16" cy="24" rx="5" ry="6" fill="${color}" opacity="0.9" transform="rotate(-15,16,24)"/>
+          <!-- head -->
+          <circle cx="19" cy="13" r="5" fill="${color}"/>
+          <!-- left arm back -->
+          <line x1="13" y1="22" x2="8" y2="28" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- right arm forward -->
+          <line x1="19" y1="21" x2="25" y2="17" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- left leg back -->
+          <line x1="13" y1="29" x2="8" y2="36" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- right leg crouched -->
+          <line x1="18" y1="29" x2="22" y2="36" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- eyes focused -->
+          <circle cx="21" cy="12" r="1.2" fill="white"/>
+          <circle cx="21.4" cy="12" r="0.6" fill="#111"/>
+        </g>`;
+    }
+    // Running pose — alternate leg based on idx for visual variety
+    const legPhase = idx % 2 === 0;
+    return `
+      <g>
+        <!-- body leaning -->
+        <ellipse cx="16" cy="22" rx="5" ry="7" fill="${color}" opacity="0.9" transform="rotate(-10,16,22)"/>
+        <!-- head -->
+        <circle cx="18" cy="11" r="5" fill="${color}"/>
+        <!-- arm back -->
+        <line x1="12" y1="20" x2="6" y2="${legPhase ? 26 : 24}" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- arm forward -->
+        <line x1="20" y1="19" x2="26" y2="${legPhase ? 14 : 16}" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- leg stride forward -->
+        <line x1="15" y1="28" x2="${legPhase ? 22 : 10}" y2="36" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- leg stride back -->
+        <line x1="18" y1="28" x2="${legPhase ? 10 : 24}" y2="36" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- motion dots -->
+        <circle cx="${legPhase ? 4 : 3}" cy="22" r="1.5" fill="${color}" opacity="0.4"/>
+        <circle cx="${legPhase ? 2 : 1}" cy="19" r="1" fill="${color}" opacity="0.25"/>
+      </g>`;
+  };
+
+  // Track dimensions
+  const TRACK_W    = 860;
+  const TRACK_H    = 80;
+  const START_X    = 60;   // start line x
+  const FINISH_X   = 820;  // finish line x
+  const USABLE_W   = FINISH_X - START_X;
+  const AVATAR_W   = 32;
+  const n          = entries.length;
+  const laneH      = Math.max(44, Math.min(60, Math.floor((n * 44 + 40) / n)));
+  const totalH     = n * laneH + 60; // 60 for header area
+
+  // Build SVG rows
+  let avatarRows = '';
+  entries.forEach((entry, i) => {
+    const y         = 50 + i * laneH;
+    const color     = avatarColors[i % avatarColors.length];
+    const isMe      = myDivision && entry.name.toLowerCase().includes(myDivision.toLowerCase());
+    const avatarX   = START_X + Math.round((entry.progressPct / 100) * USABLE_W) - AVATAR_W / 2;
+    const clampedX  = Math.max(START_X - 4, Math.min(FINISH_X - AVATAR_W, avatarX));
+    const runState  = entry.progressPct >= 100 ? 'celebrate' : entry.progressPct > 0 ? 'running' : 'ready';
+    const animClass = runState === 'running' ? `runner-anim-${i}` : '';
+
+    // Rank medal
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
+
+    // Lane background — highlight my division
+    avatarRows += `
+      <!-- Lane ${i} -->
+      <rect x="0" y="${y - 4}" width="${TRACK_W}" height="${laneH - 2}"
+        fill="${isMe ? 'rgba(244,168,39,0.10)' : i % 2 === 0 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.04)'}"
+        rx="4"/>
+
+      <!-- Lane stripe (track feel) -->
+      <line x1="${START_X}" y1="${y + laneH - 6}" x2="${FINISH_X}" y2="${y + laneH - 6}"
+        stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="6,6"/>
+
+      <!-- Progress trail -->
+      ${entry.progressPct > 0 ? `
+        <rect x="${START_X}" y="${y + laneH/2 - 3}" width="${Math.round((entry.progressPct/100) * USABLE_W)}" height="4"
+          fill="${color}" opacity="0.25" rx="2"/>
+      ` : ''}
+
+      <!-- Rank + name label (left) -->
+      <text x="8" y="${y + laneH / 2 - 4}" font-family="Plus Jakarta Sans,sans-serif"
+        font-size="13" font-weight="700" fill="${isMe ? '#F4A827' : 'rgba(255,255,255,0.85)'}">
+        ${typeof medal === 'string' && medal.length > 2 ? '' : medal}
+      </text>
+      ${typeof medal === 'number' || medal.length <= 2 ? `
+        <text x="8" y="${y + laneH / 2 + 10}" font-family="Plus Jakarta Sans,sans-serif"
+          font-size="10" fill="rgba(255,255,255,0.5)">${medal}</text>
+      ` : ''}
+      <text x="32" y="${y + laneH / 2 - 3}" font-family="Plus Jakarta Sans,sans-serif"
+        font-size="11" font-weight="${isMe ? '700' : '500'}" fill="${isMe ? '#F4A827' : 'rgba(255,255,255,0.8)'}">
+        ${shortName(entry.name)}
+      </text>
+      <text x="32" y="${y + laneH / 2 + 10}" font-family="Plus Jakarta Sans,sans-serif"
+        font-size="9.5" fill="rgba(255,255,255,0.45)">
+        ${entry.progressPct}% · ${entry.mandatoryDone}/${entry.mandatoryTotal > 0 ? entry.mandatoryTotal : '?'} done
+      </text>
+
+      <!-- Avatar SVG -->
+      <g transform="translate(${clampedX}, ${y + laneH/2 - 20})" class="${animClass}">
+        <svg width="32" height="40" viewBox="0 0 32 40" overflow="visible">
+          ${avatarSVG(color, runState, i)}
+        </svg>
+      </g>
+
+      ${isMe ? `
+        <!-- "YOU" tag -->
+        <rect x="${clampedX + 34}" y="${y + laneH/2 - 18}" width="30" height="14" rx="7"
+          fill="#F4A827"/>
+        <text x="${clampedX + 49}" y="${y + laneH/2 - 8}" text-anchor="middle"
+          font-family="Plus Jakarta Sans,sans-serif" font-size="8.5" font-weight="700" fill="#0A2463">YOU</text>
+      ` : ''}
+    `;
+  });
+
+  // Finish line decorations
+  const finishDecor = `
+    <!-- Finish post left -->
+    <rect x="${FINISH_X}" y="30" width="4" height="${totalH - 50}" fill="#E84855" rx="2"/>
+    <!-- Checkered pattern on finish -->
+    ${Array.from({length: 8}, (_, i) => `
+      <rect x="${FINISH_X + (i % 2 === 0 ? 0 : 4)}" y="${30 + Math.floor(i/2)*10}" width="4" height="10"
+        fill="${i % 2 === 0 ? '#fff' : '#111'}" opacity="0.9"/>
+    `).join('')}
+    <!-- Finish label -->
+    <text x="${FINISH_X + 10}" y="45" font-family="Plus Jakarta Sans,sans-serif"
+      font-size="10" font-weight="700" fill="#E84855" transform="rotate(90,${FINISH_X + 10},45)">FINISH</text>
+  `;
+
+  // Start line
+  const startDecor = `
+    <line x1="${START_X}" y1="30" x2="${START_X}" y2="${totalH - 20}"
+      stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="4,4"/>
+    <text x="${START_X}" y="24" text-anchor="middle" font-family="Plus Jakarta Sans,sans-serif"
+      font-size="9" fill="rgba(255,255,255,0.4)">START</text>
+  `;
+
+  // Running animation keyframes (CSS injected once)
+  const runningCSS = entries.map((_, i) => {
+    if (entries[i].progressPct > 0 && entries[i].progressPct < 100) {
+      // Bobbing up-down run cycle
+      return `
+        .runner-anim-${i} {
+          animation: runBob 0.45s ease-in-out infinite alternate;
+          animation-delay: ${i * 0.07}s;
+          transform-origin: center bottom;
+        }`;
+    }
+    return '';
+  }).join('');
+
+  const phaseLabel = anyProgress
+    ? `<span style="color:#2D6A4F;font-weight:700;">Race in progress</span>`
+    : `<span style="color:#8896AB;">All teams at the starting line — race begins when first training completes!</span>`;
+
+  return `
+    <style>
+      @keyframes runBob {
+        from { transform: translateY(0px) rotate(-2deg); }
+        to   { transform: translateY(-3px) rotate(2deg); }
+      }
+      ${runningCSS}
+    </style>
+    <div class="card" style="margin-bottom:20px;overflow:hidden;">
+      <div class="card-header" style="background:linear-gradient(135deg,#0A2463,#1B3F8B);border-bottom:none;padding:16px 20px;">
+        <div>
+          <div class="card-title" style="color:#fff;font-size:16px;">Division Race Track</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:2px;">Mandatory training completion · ${phaseLabel}</div>
+        </div>
+        <div style="font-size:22px;">🏁</div>
+      </div>
+      <div style="background:linear-gradient(180deg,#0e1f4a 0%,#0a1836 100%);padding:0;overflow-x:auto;">
+        <svg width="${TRACK_W}" height="${totalH}" viewBox="0 0 ${TRACK_W} ${totalH}"
+          style="display:block;min-width:${TRACK_W}px;">
+
+          <!-- Background subtle grid -->
+          <defs>
+            <pattern id="trackGrid" width="40" height="${totalH}" patternUnits="userSpaceOnUse">
+              <line x1="0" y1="0" x2="0" y2="${totalH}" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+            </pattern>
+          </defs>
+          <rect width="${TRACK_W}" height="${totalH}" fill="url(#trackGrid)"/>
+
+          ${startDecor}
+          ${avatarRows}
+          ${finishDecor}
+        </svg>
+      </div>
+    </div>`;
 }
 
 // ── ASSESSMENT ────────────────────────────────────────────────
