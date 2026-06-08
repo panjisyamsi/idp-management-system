@@ -41,9 +41,7 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 html { font-size: 14px; }
-
 body {
   font-family: var(--font);
   background: var(--bg);
@@ -52,7 +50,6 @@ body {
   overflow-x: hidden;
 }
 
-/* ── UTILITIES ── */
 .hidden { display: none !important; }
 .flex { display: flex; }
 .flex-col { flex-direction: column; }
@@ -70,7 +67,6 @@ body {
 .text-muted { color: var(--text-muted); }
 .text-secondary { color: var(--text-secondary); }
 
-/* ── TOAST ── */
 #toast-container {
   position: fixed; top: 20px; right: 20px;
   z-index: 9999; display: flex; flex-direction: column; gap: 8px;
@@ -89,7 +85,6 @@ body {
 @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 @keyframes slideOut { to { transform: translateX(120%); opacity: 0; } }
 
-/* ── LOADING OVERLAY ── */
 #loading-overlay {
   position: fixed; inset: 0; background: rgba(255,255,255,0.85);
   display: flex; align-items: center; justify-content: center;
@@ -104,7 +99,6 @@ body {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── LOGIN PAGE ── */
 #page-login {
   min-height: 100vh;
   display: flex; align-items: center; justify-content: center;
@@ -124,10 +118,7 @@ body {
   box-shadow: 0 24px 64px rgba(0,0,0,0.25);
   position: relative; z-index: 1;
 }
-.login-logo {
-  display: flex; align-items: center; gap: 12px;
-  margin-bottom: 32px;
-}
+.login-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
 .login-logo-icon {
   width: 44px; height: 44px;
   background: linear-gradient(135deg, var(--primary), var(--primary-light));
@@ -141,7 +132,6 @@ body {
 .login-card h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
 .login-card p { color: var(--text-secondary); font-size: 13px; margin-bottom: 28px; }
 
-/* ── FORM ELEMENTS ── */
 .form-group { margin-bottom: 16px; }
 .form-label {
   display: block; font-size: 12px; font-weight: 600;
@@ -161,10 +151,8 @@ body {
   box-shadow: 0 0 0 3px rgba(10,36,99,0.08);
 }
 .form-input.mono { font-family: var(--mono); letter-spacing: 1px; }
-
 select.form-input { cursor: pointer; }
 
-/* ── BUTTONS ── */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   padding: 10px 20px; border-radius: var(--radius-sm);
@@ -172,9 +160,7 @@ select.form-input { cursor: pointer; }
   border: none; cursor: pointer; transition: all var(--transition);
   white-space: nowrap; text-decoration: none;
 }
-.btn-primary {
-  background: var(--primary); color: #fff;
-}
+.btn-primary { background: var(--primary); color: #fff; }
 .btn-primary:hover { background: var(--primary-light); transform: translateY(-1px); box-shadow: var(--shadow); }
 .btn-accent { background: var(--accent); color: #fff; }
 .btn-accent:hover { opacity: 0.9; transform: translateY(-1px); }
@@ -187,10 +173,8 @@ select.form-input { cursor: pointer; }
 .btn-full { width: 100%; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
 
-/* ── APP LAYOUT ── */
 #app-layout { display: none; min-height: 100vh; }
 
-/* Top Nav */
 .top-nav {
   position: fixed; top: 0; left: 0; right: 0;
   height: var(--nav-height); z-index: 100;
@@ -199,99 +183,31 @@ select.form-input { cursor: pointer; }
   padding: 0 20px;
   box-shadow: 0 2px 16px rgba(0,0,0,0.2);
 }
-.nav-brand {
-  display: flex; align-items: center; gap: 10px;
-  color: #fff; font-weight: 700; font-size: 15px;
-  margin-right: 20px;
-}
-.nav-brand-icon {
-  width: 32px; height: 32px;
-  background: rgba(255,255,255,0.15);
-  border-radius: 7px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; font-weight: 800; color: #fff;
-}
-.nav-user {
-  margin-left: auto;
-  display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,0.9);
-}
+.nav-brand { display: flex; align-items: center; gap: 10px; color: #fff; font-weight: 700; font-size: 15px; margin-right: 20px; }
+.nav-brand-icon { width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; }
+.nav-user { margin-left: auto; display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,0.9); }
 .nav-user-info { text-align: right; line-height: 1.3; }
 .nav-user-name { font-size: 13px; font-weight: 600; }
 .nav-user-role { font-size: 11px; color: rgba(255,255,255,0.6); }
-.nav-avatar {
-  width: 34px; height: 34px; border-radius: 50%;
-  background: rgba(255,255,255,0.2);
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 700; font-size: 13px; color: #fff;
-  cursor: pointer; transition: background var(--transition);
-}
+.nav-avatar { width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #fff; cursor: pointer; transition: background var(--transition); }
 .nav-avatar:hover { background: rgba(255,255,255,0.3); }
 
-/* Bottom Nav (Mobile) */
-.bottom-nav {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  display: flex; z-index: 100;
-  box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
-}
-.bottom-nav-item {
-  flex: 1; padding: 10px 4px 12px;
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
-  cursor: pointer; transition: color var(--transition);
-  color: var(--text-muted); font-size: 10px; font-weight: 500;
-  border: none; background: none; font-family: var(--font);
-}
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; z-index: 100; box-shadow: 0 -4px 16px rgba(0,0,0,0.08); }
+.bottom-nav-item { flex: 1; padding: 10px 4px 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: color var(--transition); color: var(--text-muted); font-size: 10px; font-weight: 500; border: none; background: none; font-family: var(--font); }
 .bottom-nav-item.active { color: var(--primary); }
-.bottom-nav-icon {
-  width: 22px; height: 22px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px; line-height: 1;
-}
-.bottom-nav-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--accent); margin-top: -2px;
-}
+.bottom-nav-icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 18px; line-height: 1; }
 
-/* Sidebar (Desktop) */
-.sidebar {
-  position: fixed; top: var(--nav-height); left: 0; bottom: 0;
-  width: var(--sidebar-width);
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  padding: 16px 12px;
-  overflow-y: auto; z-index: 50;
-  display: none;
-}
-.sidebar-section { margin-bottom: 8px; }
-.sidebar-label {
-  font-size: 10px; font-weight: 700; color: var(--text-muted);
-  letter-spacing: 0.8px; text-transform: uppercase;
-  padding: 0 8px; margin-bottom: 4px; margin-top: 12px;
-}
-.sidebar-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 9px 10px; border-radius: var(--radius-sm);
-  cursor: pointer; transition: all var(--transition);
-  color: var(--text-secondary); font-size: 13px; font-weight: 500;
-  border: none; background: none; font-family: var(--font);
-  width: 100%; text-align: left;
-}
+.sidebar { position: fixed; top: var(--nav-height); left: 0; bottom: 0; width: var(--sidebar-width); background: var(--surface); border-right: 1px solid var(--border); padding: 16px 12px; overflow-y: auto; z-index: 50; display: none; }
+.sidebar-label { font-size: 10px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.8px; text-transform: uppercase; padding: 0 8px; margin-bottom: 4px; margin-top: 12px; }
+.sidebar-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius-sm); cursor: pointer; transition: all var(--transition); color: var(--text-secondary); font-size: 13px; font-weight: 500; border: none; background: none; font-family: var(--font); width: 100%; text-align: left; }
 .sidebar-item:hover { background: var(--surface2); color: var(--text); }
 .sidebar-item.active { background: rgba(10,36,99,0.08); color: var(--primary); font-weight: 600; }
 .sidebar-icon { width: 18px; text-align: center; font-size: 15px; }
 
-/* Main Content */
-.main-content {
-  padding-top: var(--nav-height);
-  min-height: 100vh;
-}
-
-/* ── PAGE VIEWS ── */
+.main-content { padding-top: var(--nav-height); min-height: 100vh; }
 .page-view { display: none; padding: 24px 20px 100px; }
 .page-view.active { display: block; }
 
-/* Desktop adjustments */
 @media (min-width: 768px) {
   .sidebar { display: block; }
   .bottom-nav { display: none; }
@@ -299,51 +215,23 @@ select.form-input { cursor: pointer; }
   .page-view { padding: 28px 32px 40px; }
 }
 
-/* ── CARDS ── */
-.card {
-  background: var(--surface);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-}
-.card-header {
-  padding: 20px 24px 16px;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-}
+.card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+.card-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
 .card-title { font-size: 15px; font-weight: 700; }
 .card-body { padding: 20px 24px; }
 
-/* ── PAGE HEADER ── */
 .page-header { margin-bottom: 24px; }
 .page-header h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
 .page-header p { color: var(--text-secondary); font-size: 13px; }
 
-/* ── STAT CARDS ── */
-.stats-grid {
-  display: grid; gap: 16px;
-  grid-template-columns: repeat(2, 1fr);
-}
-@media (min-width: 768px) {
-  .stats-grid { grid-template-columns: repeat(4, 1fr); }
-}
-.stat-card {
-  background: var(--surface);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  padding: 20px;
-  box-shadow: var(--shadow-sm);
-}
+.stats-grid { display: grid; gap: 16px; grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 768px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
+.stat-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; box-shadow: var(--shadow-sm); }
 .stat-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
 .stat-value { font-size: 28px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
 .stat-sub { font-size: 11px; color: var(--text-muted); }
 
-/* ── BADGES ── */
-.badge {
-  display: inline-flex; align-items: center; gap: 4px;
-  padding: 3px 10px; border-radius: 100px;
-  font-size: 11px; font-weight: 600;
-}
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; }
 .badge-blue { background: rgba(10,36,99,0.08); color: var(--primary); }
 .badge-green { background: var(--green-soft); color: var(--green); }
 .badge-red { background: var(--accent-soft); color: var(--accent); }
@@ -352,198 +240,67 @@ select.form-input { cursor: pointer; }
 .badge-teal { background: var(--teal-soft); color: var(--teal); }
 .badge-gray { background: var(--surface2); color: var(--text-muted); }
 
-/* ── PROGRESS BAR ── */
 .progress-wrap { background: var(--border); border-radius: 100px; overflow: hidden; }
 .progress-bar { height: 100%; border-radius: 100px; transition: width 0.5s ease; }
 .progress-bar.blue { background: var(--primary); }
 .progress-bar.green { background: var(--green); }
 .progress-bar.gold { background: var(--gold); }
 
-/* ── PIPELINE ── */
-.pipeline-item {
-  display: flex; align-items: flex-start; gap: 14px;
-  padding: 16px 0; border-bottom: 1px solid var(--border);
-}
+.pipeline-item { display: flex; align-items: flex-start; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--border); }
 .pipeline-item:last-child { border-bottom: none; }
-.pipeline-icon {
-  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px;
-}
+.pipeline-icon { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; }
 .pipeline-info { flex: 1; min-width: 0; }
 .pipeline-name { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
 .pipeline-meta { font-size: 12px; color: var(--text-muted); }
 .pipeline-status { flex-shrink: 0; }
 
-/* ── ASSESSMENT FORM ── */
-.assessment-section {
-  background: var(--surface);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  margin-bottom: 16px;
-  overflow: hidden;
-}
-.assessment-section-header {
-  padding: 16px 20px;
-  display: flex; align-items: center; justify-content: space-between;
-  cursor: pointer;
-  background: var(--surface2);
-  border-bottom: 1px solid var(--border);
-}
+.assessment-section { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 16px; overflow: hidden; }
+.assessment-section-header { padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: var(--surface2); border-bottom: 1px solid var(--border); }
 .competency-block { padding: 20px; border-bottom: 1px solid var(--border); }
 .competency-block:last-child { border-bottom: none; }
-.competency-header {
-  display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
-}
+.competency-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
 .competency-title { font-weight: 700; font-size: 15px; }
 .level-block { margin-bottom: 16px; }
-.level-label {
-  font-size: 11px; font-weight: 700; color: var(--text-muted);
-  text-transform: uppercase; letter-spacing: 0.5px;
-  margin-bottom: 10px;
-}
-.indicator-item {
-  display: flex; align-items: flex-start; gap: 10px;
-  padding: 10px 12px; border-radius: var(--radius-sm);
-  margin-bottom: 6px; border: 1.5px solid var(--border);
-  cursor: pointer; transition: all var(--transition);
-}
+.level-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+.indicator-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: var(--radius-sm); margin-bottom: 6px; border: 1.5px solid var(--border); cursor: pointer; transition: all var(--transition); }
 .indicator-item:hover { border-color: var(--primary); background: rgba(10,36,99,0.02); }
 .indicator-item.checked { border-color: var(--primary); background: rgba(10,36,99,0.05); }
-.indicator-checkbox {
-  width: 18px; height: 18px; border-radius: 4px;
-  border: 2px solid var(--border-strong); flex-shrink: 0; margin-top: 1px;
-  display: flex; align-items: center; justify-content: center;
-  transition: all var(--transition);
-  background: var(--surface);
-}
-.indicator-item.checked .indicator-checkbox {
-  background: var(--primary); border-color: var(--primary); color: #fff;
-}
+.indicator-checkbox { width: 18px; height: 18px; border-radius: 4px; border: 2px solid var(--border-strong); flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; transition: all var(--transition); background: var(--surface); }
+.indicator-item.checked .indicator-checkbox { background: var(--primary); border-color: var(--primary); color: #fff; }
 .indicator-text { font-size: 13px; line-height: 1.5; flex: 1; }
-.indicator-example {
-  font-size: 11px; color: var(--text-muted); font-style: italic;
-  margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--border);
-}
+.indicator-example { font-size: 11px; color: var(--text-muted); font-style: italic; margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--border); }
 
-/* ── TABLE ── */
 .table-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
-thead th {
-  padding: 10px 14px; text-align: left;
-  font-size: 11px; font-weight: 700; color: var(--text-muted);
-  text-transform: uppercase; letter-spacing: 0.5px;
-  background: var(--surface2); border-bottom: 1px solid var(--border);
-  white-space: nowrap;
-}
-tbody td {
-  padding: 12px 14px; border-bottom: 1px solid var(--border);
-  vertical-align: middle;
-}
+thead th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; background: var(--surface2); border-bottom: 1px solid var(--border); white-space: nowrap; }
+tbody td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
 tbody tr:last-child td { border-bottom: none; }
 tbody tr:hover { background: var(--surface2); }
 
-/* ── MODAL ── */
-.modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
-  z-index: 200; display: flex; align-items: flex-end; justify-content: center;
-  backdrop-filter: blur(2px);
-  animation: fadeIn 0.2s ease;
-}
-@media (min-width: 640px) {
-  .modal-overlay { align-items: center; }
-}
-.modal {
-  background: var(--surface);
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  width: 100%; max-width: 600px;
-  max-height: 90vh; overflow-y: auto;
-  animation: slideUp 0.3s cubic-bezier(0.4,0,0.2,1);
-}
-@media (min-width: 640px) {
-  .modal { border-radius: var(--radius-lg); }
-}
-.modal-header {
-  padding: 20px 24px 16px;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-  position: sticky; top: 0; background: var(--surface); z-index: 1;
-}
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; display: flex; align-items: flex-end; justify-content: center; backdrop-filter: blur(2px); animation: fadeIn 0.2s ease; }
+@media (min-width: 640px) { .modal-overlay { align-items: center; } }
+.modal { background: var(--surface); border-radius: var(--radius-lg) var(--radius-lg) 0 0; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s cubic-bezier(0.4,0,0.2,1); }
+@media (min-width: 640px) { .modal { border-radius: var(--radius-lg); } }
+.modal-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--surface); z-index: 1; }
 .modal-title { font-size: 16px; font-weight: 700; }
-.modal-close {
-  width: 32px; height: 32px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; border: none; background: var(--surface2);
-  font-size: 18px; color: var(--text-muted); transition: all var(--transition);
-}
+.modal-close { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; background: var(--surface2); font-size: 18px; color: var(--text-muted); transition: all var(--transition); }
 .modal-close:hover { background: var(--border); color: var(--text); }
 .modal-body { padding: 20px 24px; }
-.modal-footer {
-  padding: 16px 24px;
-  border-top: 1px solid var(--border);
-  display: flex; gap: 10px; justify-content: flex-end;
-  position: sticky; bottom: 0; background: var(--surface);
-}
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; position: sticky; bottom: 0; background: var(--surface); }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-/* ── EMPTY STATE ── */
-.empty-state {
-  text-align: center; padding: 60px 24px;
-}
+.empty-state { text-align: center; padding: 60px 24px; }
 .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.4; }
 .empty-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
 .empty-desc { font-size: 13px; color: var(--text-muted); }
 
-/* ── STEP INDICATOR ── */
-.step-bar {
-  display: flex; align-items: center; gap: 0; margin-bottom: 28px;
-}
-.step-item {
-  display: flex; align-items: center; flex: 1;
-}
-.step-circle {
-  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 700; transition: all var(--transition);
-  border: 2px solid var(--border); background: var(--surface); color: var(--text-muted);
-}
-.step-circle.active { border-color: var(--primary); background: var(--primary); color: #fff; }
-.step-circle.done { border-color: var(--green); background: var(--green); color: #fff; }
-.step-line { flex: 1; height: 2px; background: var(--border); }
-.step-line.done { background: var(--green); }
-.step-label { display: none; }
-@media (min-width: 640px) {
-  .step-circle { width: 32px; height: 32px; font-size: 13px; }
-}
-
-/* ── ACCORDION ── */
-.accordion-header {
-  padding: 14px 16px;
-  display: flex; align-items: center; justify-content: space-between;
-  cursor: pointer; border-radius: var(--radius-sm);
-  transition: background var(--transition);
-  font-weight: 600; font-size: 13px;
-}
-.accordion-header:hover { background: var(--surface2); }
-.accordion-body { padding: 0 16px 16px; }
-.accordion-arrow { transition: transform var(--transition); font-size: 12px; color: var(--text-muted); }
-.accordion-arrow.open { transform: rotate(180deg); }
-
-/* ── CHART SIMPLE ── */
 .bar-chart { display: flex; flex-direction: column; gap: 10px; }
 .bar-row { display: flex; align-items: center; gap: 12px; }
 .bar-name { font-size: 12px; color: var(--text-secondary); width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
 .bar-track { flex: 1; height: 8px; background: var(--border); border-radius: 100px; overflow: hidden; }
 .bar-fill { height: 100%; border-radius: 100px; background: var(--primary); transition: width 0.6s ease; }
 .bar-val { font-size: 11px; font-weight: 600; color: var(--text-muted); width: 40px; text-align: right; flex-shrink: 0; }
-
-/* ── CHANGE PASSWORD PAGE ── */
-#page-change-password {
-  min-height: 100vh;
-  display: none; align-items: center; justify-content: center;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-}
 </style>
 </head>
 <body>
@@ -551,9 +308,7 @@ tbody tr:hover { background: var(--surface2); }
 <div id="toast-container"></div>
 <div id="loading-overlay" class="hidden"><div class="spinner"></div></div>
 
-<!-- ══════════════════════════════════════════
-     LOGIN PAGE
-══════════════════════════════════════════ -->
+<!-- LOGIN -->
 <div id="page-login">
   <div class="login-card">
     <div class="login-logo">
@@ -583,9 +338,7 @@ tbody tr:hover { background: var(--surface2); }
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     CHANGE PASSWORD PAGE
-══════════════════════════════════════════ -->
+<!-- CHANGE PASSWORD -->
 <div id="page-change-password" style="display:none; min-height:100vh; align-items:center; justify-content:center; background:linear-gradient(135deg,var(--primary),var(--primary-light)); position:fixed; inset:0; z-index:500;">
   <div class="login-card">
     <div class="login-logo">
@@ -609,12 +362,8 @@ tbody tr:hover { background: var(--surface2); }
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     APP LAYOUT
-══════════════════════════════════════════ -->
+<!-- APP LAYOUT -->
 <div id="app-layout">
-
-  <!-- Top Nav -->
   <nav class="top-nav">
     <div class="nav-brand">
       <div class="nav-brand-icon">IDP</div>
@@ -629,133 +378,74 @@ tbody tr:hover { background: var(--surface2); }
     </div>
   </nav>
 
-  <!-- Sidebar (Desktop) -->
   <aside class="sidebar" id="sidebar"></aside>
-
-  <!-- Bottom Nav (Mobile) -->
   <nav class="bottom-nav" id="bottom-nav"></nav>
 
-  <!-- Main Content -->
   <main class="main-content">
-
-    <!-- DASHBOARD -->
     <div id="view-dashboard" class="page-view">
-      <div class="page-header">
-        <h1>Dashboard</h1>
-        <p id="dash-greeting">Welcome kembali</p>
-      </div>
+      <div class="page-header"><h1>Dashboard</h1><p id="dash-greeting">Welcome kembali</p></div>
       <div id="dash-content"></div>
     </div>
-
-    <!-- ASSESSMENT -->
     <div id="view-assessment" class="page-view">
-      <div class="page-header">
-        <h1>Self Assessment</h1>
-        <p>Rate your competencies honestly based on behavioral indicators</p>
-      </div>
+      <div class="page-header"><h1>Self Assessment</h1><p>Rate your competencies honestly based on behavioral indicators</p></div>
       <div id="assessment-content"></div>
     </div>
-
-    <!-- JADWAL -->
     <div id="view-jadwal" class="page-view">
-      <div class="page-header">
-        <h1>Training Schedule</h1>
-        <p>View and enroll in available training sessions</p>
-      </div>
+      <div class="page-header"><h1>Training Schedule</h1><p>View and enroll in available training sessions</p></div>
       <div style="display:flex;gap:8px;margin-bottom:20px;" id="jadwal-tabs">
         <button class="btn btn-primary btn-sm" onclick="setJadwalTab('my')" id="tab-my">My Mandatory</button>
         <button class="btn btn-ghost btn-sm" onclick="setJadwalTab('all')" id="tab-all">All Schedules</button>
       </div>
       <div id="jadwal-content"></div>
     </div>
-
-    <!-- PROGRESS -->
     <div id="view-progress" class="page-view">
-      <div class="page-header">
-        <h1>IDP Progress</h1>
-        <p>Track your individual development program progress</p>
-      </div>
+      <div class="page-header"><h1>IDP Progress</h1><p>Track your individual development program progress</p></div>
       <div id="progress-content"></div>
     </div>
-
-    <!-- LEADER: ASSESSMENT TIM -->
     <div id="view-team-assessment" class="page-view">
-      <div class="page-header">
-        <h1>Team Assessment</h1>
-        <p>Review self-assessment results and set development priorities</p>
-      </div>
+      <div class="page-header"><h1>Team Assessment</h1><p>Review self-assessment results and set development priorities</p></div>
       <div id="team-assessment-content"></div>
     </div>
-
-    <!-- LEADER: MONITOR TIM -->
     <div id="view-team-monitor" class="page-view">
-      <div class="page-header">
-        <h1>Team Monitor</h1>
-        <p>Monitor training progress of all team members</p>
-      </div>
+      <div class="page-header"><h1>Team Monitor</h1><p>Monitor training progress of all team members</p></div>
       <div id="team-monitor-content"></div>
     </div>
-
-    <!-- ADMIN DASHBOARD -->
     <div id="view-admin" class="page-view">
-      <div class="page-header">
-        <h1>Admin Dashboard</h1>
-        <p>Overall IDP program summary</p>
-      </div>
+      <div class="page-header"><h1>Admin Dashboard</h1><p>Overall IDP program summary</p></div>
       <div id="admin-content"></div>
     </div>
-
-    <!-- ADMIN: KELOLA USER -->
     <div id="view-admin-users" class="page-view">
-      <div class="page-header">
-        <h1>Manage Users</h1>
-        <p>Employee data and system access management</p>
-      </div>
+      <div class="page-header"><h1>Manage Users</h1><p>Employee data and system access management</p></div>
       <div id="admin-users-content"></div>
     </div>
-
-    <!-- AKUN -->
     <div id="view-account" class="page-view">
-      <div class="page-header">
-        <h1>My Account</h1>
-        <p>Profile information and account settings</p>
-      </div>
+      <div class="page-header"><h1>My Account</h1><p>Profile information and account settings</p></div>
       <div id="account-content"></div>
     </div>
-
   </main>
 </div>
 
-<!-- ══════════════════════════════════════════
-     MODALS (injected dynamically)
-══════════════════════════════════════════ -->
 <div id="modal-container"></div>
 
 <script>
-// ════════════════════════════════════════════════════════════
-// CONFIG
-// ════════════════════════════════════════════════════════════
+// ── CONFIG ───────────────────────────────────────────────────
 const API_URL = 'https://script.google.com/macros/s/AKfycbzKKGVMAZqRnW--CoMuXKdXTLnJ6EXwqhReeuWxS3sLY4UhNx6Hmq_mF79lLtu2CMSu/exec';
 
-// ════════════════════════════════════════════════════════════
-// STATE
-// ════════════════════════════════════════════════════════════
+// ── STATE ────────────────────────────────────────────────────
 let state = {
   user: null,
   currentView: 'dashboard',
   jadwalTab: 'my',
   compLibrary: null,
-  assessmentScores: {},   // { competency_id: level_achieved }
-  assessmentChecks: {},   // { competency_id: { level: [bool,bool,...] } }
+  assessmentScores: {},
+  assessmentChecks: {},
   teamData: null,
   enrollments: [],
   jadwal: [],
   mandatoryCompIds: [],
 };
 
-// ════════════════════════════════════════════════════════════
-// API HELPER
-// ════════════════════════════════════════════════════════════
+// ── API HELPER ───────────────────────────────────────────────
 async function api(action, payload = {}) {
   showLoading(true);
   try {
@@ -773,9 +463,7 @@ async function api(action, payload = {}) {
   }
 }
 
-// ════════════════════════════════════════════════════════════
-// UI HELPERS
-// ════════════════════════════════════════════════════════════
+// ── UI HELPERS ───────────────────────────────────────────────
 function showLoading(v) {
   document.getElementById('loading-overlay').classList.toggle('hidden', !v);
 }
@@ -792,10 +480,10 @@ function toast(msg, type = 'default', duration = 3500) {
   }, duration);
 }
 
-function openModal(html) {
+function openModal(htmlContent) {
   closeModal();
   const c = document.getElementById('modal-container');
-  c.innerHTML = `<div class="modal-overlay" id="active-modal" onclick="handleModalOverlayClick(event)">${html}</div>`;
+  c.innerHTML = `<div class="modal-overlay" id="active-modal" onclick="handleModalOverlayClick(event)">${htmlContent}</div>`;
 }
 
 function closeModal() {
@@ -816,7 +504,7 @@ function initials(name) {
 
 function roleLabel(role) {
   if (role === 'admin') return 'Admin';
-  if (role && role.includes('leader')) return 'LEADER & Employee';
+  if (role && role.includes('leader')) return 'Leader & Employee';
   return 'Employee';
 }
 
@@ -830,13 +518,13 @@ function gradeColor(grade) {
 
 function statusBadge(status) {
   const map = {
-    assigned: ['badge-gold','Assigned'],
-    enrolled: ['badge-teal','Enrolled'],
-    completed: ['badge-green','Completed'],
-    submitted: ['badge-green','Submitted'],
-    pending: ['badge-gray','Not enrolled'],
-    mandatory: ['badge-red','Mandatory'],
-    additional: ['badge-blue','Additional'],
+    assigned:  ['badge-gold',   'Assigned'],
+    enrolled:  ['badge-teal',   'Enrolled'],
+    completed: ['badge-green',  'Completed'],
+    submitted: ['badge-green',  'Submitted'],
+    pending:   ['badge-gray',   'Not enrolled'],
+    mandatory: ['badge-red',    'Mandatory'],
+    additional:['badge-blue',   'Additional'],
   };
   const [cls, label] = map[status] || ['badge-gray', status];
   return `<span class="badge ${cls}">${label}</span>`;
@@ -851,9 +539,7 @@ function progressBar(val, max, color = 'blue', height = 8) {
   </div>`;
 }
 
-// ════════════════════════════════════════════════════════════
-// AUTH
-// ════════════════════════════════════════════════════════════
+// ── AUTH ─────────────────────────────────────────────────────
 async function doLogin() {
   const nik = el('login-nik').value.trim();
   const pwd = el('login-password').value.trim();
@@ -897,9 +583,35 @@ function doLogout() {
   el('login-password').value = '';
 }
 
-// ════════════════════════════════════════════════════════════
-// APP INIT
-// ════════════════════════════════════════════════════════════
+function showForgotPassword() {
+  openModal(`<div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">Forgot Password</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">Enter your NIK. A password reset link will be sent to your registered email.</p>
+      <div class="form-group">
+        <label class="form-label">Employee ID (NIK)</label>
+        <input type="text" id="forgot-nik" class="form-input mono" placeholder="Enter your NIK">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="doForgotPassword()">Send Reset Link</button>
+    </div>
+  </div>`);
+}
+
+async function doForgotPassword() {
+  const nik = el('forgot-nik').value.trim();
+  if (!nik) { toast('NIK is required', 'error'); return; }
+  const res = await api('forgotPassword', { nik });
+  if (res.success) { toast(res.message, 'success'); closeModal(); }
+  else toast(res.message, 'error');
+}
+
+// ── APP INIT ─────────────────────────────────────────────────
 function initApp() {
   el('page-login').style.display = 'none';
   el('app-layout').style.display = 'block';
@@ -915,8 +627,8 @@ function initApp() {
 
 function buildNav() {
   const u = state.user;
-  const isLEADER = u.role && u.role.includes('leader');
-  const isAdmin = u.role === 'admin';
+  const isLeader = u.role && u.role.includes('leader');
+  const isAdmin  = u.role === 'admin';
 
   const employeeItems = [
     { id: 'dashboard',  icon: '🏠', label: 'Dashboard' },
@@ -924,31 +636,23 @@ function buildNav() {
     { id: 'jadwal',     icon: '📅', label: 'Schedule' },
     { id: 'progress',   icon: '📈', label: 'Progress' },
   ];
-
   const leaderItems = [
     { id: 'team-assessment', icon: '👥', label: 'Team' },
     { id: 'team-monitor',    icon: '📊', label: 'Monitor' },
   ];
-
   const adminItems = [
     { id: 'admin',       icon: '🛡️', label: 'Admin' },
     { id: 'admin-users', icon: '👤', label: 'Users' },
   ];
-
   const accountItem = { id: 'account', icon: '⚙️', label: 'Account' };
 
-  // Sidebar
-  let sidebarHtml = '';
-  sidebarHtml += `<div class="sidebar-label">MAIN MENU</div>`;
-  employeeItems.forEach(item => {
-    sidebarHtml += sidebarItem(item);
-  });
+  let sidebarHtml = `<div class="sidebar-label">MAIN MENU</div>`;
+  employeeItems.forEach(item => { sidebarHtml += sidebarItem(item); });
 
-  if (isLEADER) {
+  if (isLeader) {
     sidebarHtml += `<div class="sidebar-label">LEADER</div>`;
     leaderItems.forEach(item => { sidebarHtml += sidebarItem(item); });
   }
-
   if (isAdmin) {
     sidebarHtml += `<div class="sidebar-label">ADMIN</div>`;
     adminItems.forEach(item => { sidebarHtml += sidebarItem(item); });
@@ -961,11 +665,9 @@ function buildNav() {
       <span class="sidebar-icon">🚪</span> Sign Out
     </button>
   </div>`;
-
   el('sidebar').innerHTML = sidebarHtml;
 
-  // Bottom nav (mobile — max 5 items)
-  const mobileItems = [...employeeItems.slice(0,4), accountItem];
+  const mobileItems = [...employeeItems.slice(0, 4), accountItem];
   let bottomHtml = '';
   mobileItems.forEach(item => {
     bottomHtml += `<button class="bottom-nav-item" id="bnav-${item.id}" onclick="navigateTo('${item.id}')">
@@ -983,14 +685,11 @@ function sidebarItem(item) {
 }
 
 function navigateTo(viewId) {
-  // Deactivate all
   document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.sidebar-item, .bottom-nav-item').forEach(i => i.classList.remove('active'));
 
-  // Activate target
   const view = el(`view-${viewId}`);
   if (view) view.classList.add('active');
-
   const sNav = el(`snav-${viewId}`);
   if (sNav) sNav.classList.add('active');
   const bNav = el(`bnav-${viewId}`);
@@ -998,7 +697,6 @@ function navigateTo(viewId) {
 
   state.currentView = viewId;
 
-  // Load content
   const loaders = {
     'dashboard':       loadDashboard,
     'assessment':      loadAssessment,
@@ -1011,13 +709,10 @@ function navigateTo(viewId) {
     'account':         loadAccount,
   };
   if (loaders[viewId]) loaders[viewId]();
-
   window.scrollTo(0, 0);
 }
 
-// ════════════════════════════════════════════════════════════
-// DASHBOARD
-// ════════════════════════════════════════════════════════════
+// ── DASHBOARD ─────────────────────────────────────────────────
 async function loadDashboard() {
   const u = state.user;
   el('dash-greeting').textContent = `${u.name} · ${u.position || u.grade} · ${u.department}`;
@@ -1027,13 +722,12 @@ async function loadDashboard() {
 
   const d = res.data;
   const totalM = d.mandatory_total;
-  const doneM = d.mandatory_completed;
+  const doneM  = d.mandatory_completed;
   const pipeline = d.pipeline || [];
-  const isLEADER = u.role && u.role.includes('leader');
+  const isLeader = u.role && u.role.includes('leader');
 
   let content = '';
 
-  // Status card
   if (d.assessment_status === 'pending') {
     content += `<div class="card" style="margin-bottom:16px; border-left:4px solid var(--gold);">
       <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
@@ -1046,7 +740,6 @@ async function loadDashboard() {
     </div>`;
   }
 
-  // Stats
   content += `<div class="stats-grid" style="margin-bottom:20px;">
     <div class="stat-card">
       <div class="stat-label">Assessment Status</div>
@@ -1059,7 +752,7 @@ async function loadDashboard() {
     </div>
     <div class="stat-card">
       <div class="stat-label">Enrolled</div>
-      <div class="stat-value" style="color:var(--teal);">${pipeline.filter(p=>p.status==='enrolled').length}</div>
+      <div class="stat-value" style="color:var(--teal);">${pipeline.filter(p => p.status === 'enrolled').length}</div>
       <div class="stat-sub">Active sessions</div>
     </div>
     <div class="stat-card">
@@ -1068,12 +761,11 @@ async function loadDashboard() {
     </div>
   </div>`;
 
-  // Progress bar
   if (totalM > 0) {
     content += `<div class="card" style="margin-bottom:16px;">
       <div class="card-header">
         <div class="card-title">Mandatory Progress</div>
-        <span style="font-size:13px;font-weight:700;color:var(--primary);">${pct(doneM,totalM)}%</span>
+        <span style="font-size:13px;font-weight:700;color:var(--primary);">${pct(doneM, totalM)}%</span>
       </div>
       <div class="card-body">
         ${progressBar(doneM, totalM, 'green', 10)}
@@ -1082,18 +774,15 @@ async function loadDashboard() {
     </div>`;
   }
 
-  // Pipeline
   if (pipeline.length > 0) {
     content += `<div class="card">
       <div class="card-header"><div class="card-title">My Competencies</div></div>
       <div class="card-body" style="padding:0 24px;">`;
     pipeline.forEach(p => {
-      const icons = { assigned:'🎯', enrolled:'📚', completed:'✅' };
-      const colors = { assigned:'var(--gold-soft)', enrolled:'var(--teal-soft)', completed:'var(--green-soft)' };
+      const icons  = { assigned: '🎯', enrolled: '📚', completed: '✅' };
+      const colors = { assigned: 'var(--gold-soft)', enrolled: 'var(--teal-soft)', completed: 'var(--green-soft)' };
       content += `<div class="pipeline-item">
-        <div class="pipeline-icon" style="background:${colors[p.status]||'var(--surface2)'};">
-          ${icons[p.status]||'📋'}
-        </div>
+        <div class="pipeline-icon" style="background:${colors[p.status] || 'var(--surface2)'};">${icons[p.status] || '📋'}</div>
         <div class="pipeline-info">
           <div class="pipeline-name">${p.competency_name || p.competency_id}</div>
           <div class="pipeline-meta">${p.competency_id} · Gap: ${p.gap} level · Target: Level ${p.target_level} · Current: Level ${p.self_score}</div>
@@ -1109,18 +798,17 @@ async function loadDashboard() {
     content += `<div class="card"><div class="card-body">
       <div class="empty-state">
         <div class="empty-icon">⏳</div>
-        <div class="empty-title">Menunggu LEADER</div>
-        <div class="empty-desc">LEADER Anda belum menetapkan prioritas pengembangan. Harap tunggu.</div>
+        <div class="empty-title">Waiting for Leader</div>
+        <div class="empty-desc">Your leader has not set development priorities yet. Please wait.</div>
       </div>
     </div></div>`;
   }
 
-  // LEADER quick panel
-  if (isLEADER) {
+  if (isLeader) {
     content += `<div class="card" style="margin-top:16px; border-left:4px solid var(--primary);">
       <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
         <div>
-          <div style="font-weight:700;margin-bottom:4px;">Menu LEADER</div>
+          <div style="font-weight:700;margin-bottom:4px;">Leader Menu</div>
           <div style="font-size:13px;color:var(--text-secondary);">Review team assessment and monitor progress</div>
         </div>
         <div style="display:flex;gap:8px;">
@@ -1134,52 +822,43 @@ async function loadDashboard() {
   html('dash-content', content);
 }
 
-// ════════════════════════════════════════════════════════════
-// ASSESSMENT
-// ════════════════════════════════════════════════════════════
+// ── ASSESSMENT ────────────────────────────────────────────────
 async function loadAssessment() {
   const u = state.user;
 
-  // Check if already submitted final
   const statusRes = await api('getAssessmentStatus', { nik: u.nik });
   if (statusRes.success && statusRes.data.has_submitted_final) {
     html('assessment-content', `<div class="card"><div class="card-body">
       <div class="empty-state">
         <div class="empty-icon">✅</div>
-        <div class="empty-title">Assessment Done Completed</div>
+        <div class="empty-title">Assessment Completed</div>
         <div class="empty-desc">You have completed your self assessment. Results are being reviewed by your leader.</div>
       </div>
     </div></div>`);
     return;
   }
 
-  // Load competency library
   if (!state.compLibrary) {
     const libRes = await api('getCompetencyLibrary', {
-      department: u.department,
-      division: u.division,
-      grade: u.grade,
+      department:       u.department,
+      division:         u.division,
+      grade:            u.grade,
       has_subordinates: u.has_subordinates,
     });
-    if (!libRes.success) {
-      html('assessment-content', `<p class="text-muted">${libRes.message}</p>`);
-      return;
-    }
+    if (!libRes.success) { html('assessment-content', `<p class="text-muted">${libRes.message}</p>`); return; }
     state.compLibrary = libRes.data;
 
-    // Init assessment state
     state.compLibrary.forEach(comp => {
       if (!state.assessmentChecks[comp.competency_id]) {
         state.assessmentChecks[comp.competency_id] = {};
         for (let l = 1; l <= 5; l++) {
-          const indicators = (comp.levels[l] || []);
+          const indicators = comp.levels[l] || [];
           state.assessmentChecks[comp.competency_id][l] = indicators.map(() => false);
         }
       }
     });
   }
 
-  // Restore draft scores if any
   if (statusRes.success && statusRes.data.scores.length > 0) {
     statusRes.data.scores.forEach(s => {
       state.assessmentScores[s.competency_id] = s.self_score;
@@ -1200,7 +879,6 @@ function renderAssessmentForm() {
   const typeLabel = { core: 'Core Competency', role: 'Role Competency', jf: 'Job Family Competency' };
   const typeColor = { core: 'var(--primary)', role: 'var(--purple)', jf: 'var(--teal)' };
 
-  // Group by type
   const grouped = {};
   lib.forEach(comp => {
     const t = comp.competency_type;
@@ -1209,17 +887,13 @@ function renderAssessmentForm() {
   });
 
   let content = `<div style="background:var(--gold-soft);border:1px solid var(--gold);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:20px;font-size:13px;">
-    <strong>Instructions:</strong> Centang semua indikator perilaku yang <strong>secara konsisten</strong> Anda tunjukkan dalam pekerjaan. Level dicapai jika semua indikator pada level tersebut dicentang.
+    <strong>Instructions:</strong> Check all behavioral indicators that you <strong>consistently</strong> demonstrate in your work. A level is achieved only if all indicators at that level are checked.
   </div>`;
 
-  Object.keys(grouped).sort((a,b) => (typeOrder[a]||0) - (typeOrder[b]||0)).forEach(type => {
+  Object.keys(grouped).sort((a, b) => (typeOrder[a] || 0) - (typeOrder[b] || 0)).forEach(type => {
     content += `<div style="margin-bottom:8px;">
-      <div style="font-size:11px;font-weight:700;color:${typeColor[type]};text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;padding:0 2px;">${typeLabel[type]||type}</div>`;
-
-    grouped[type].forEach(comp => {
-      content += renderCompetencyBlock(comp);
-    });
-
+      <div style="font-size:11px;font-weight:700;color:${typeColor[type]};text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;padding:0 2px;">${typeLabel[type] || type}</div>`;
+    grouped[type].forEach(comp => { content += renderCompetencyBlock(comp); });
     content += `</div>`;
   });
 
@@ -1232,21 +906,21 @@ function renderAssessmentForm() {
 }
 
 function renderCompetencyBlock(comp) {
-  const cid = comp.competency_id;
+  const cid          = comp.competency_id;
   const currentScore = state.assessmentScores[cid] || 0;
-  const typeColor = { core: 'badge-blue', role: 'badge-purple', jf: 'badge-teal' };
+  const typeColor    = { core: 'badge-blue', role: 'badge-purple', jf: 'badge-teal' };
 
-  let html = `<div class="assessment-section" id="comp-block-${cid}">
+  let out = `<div class="assessment-section" id="comp-block-${cid}">
     <div class="assessment-section-header" onclick="toggleCompetency('${cid}')">
       <div style="display:flex;align-items:center;gap:10px;">
-        <span class="badge ${typeColor[comp.competency_type]||'badge-gray'}">${cid}</span>
+        <span class="badge ${typeColor[comp.competency_type] || 'badge-gray'}">${cid}</span>
         <span style="font-weight:700;font-size:14px;">${comp.competency_name}</span>
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <span id="score-badge-${cid}" style="font-size:12px;font-weight:700;color:var(--primary);">
           ${currentScore > 0 ? `Level ${currentScore}` : 'Not rated'}
         </span>
-        <span class="accordion-arrow" id="arrow-${cid}">▼</span>
+        <span class="accordion-arrow" id="arrow-${cid}" style="transition:transform 0.2s;font-size:12px;color:var(--text-muted);">▼</span>
       </div>
     </div>
     <div id="comp-body-${cid}" style="display:none;">`;
@@ -1254,43 +928,38 @@ function renderCompetencyBlock(comp) {
   for (let level = 1; level <= 5; level++) {
     const indicators = comp.levels[level] || [];
     if (indicators.length === 0) continue;
-
     const checks = state.assessmentChecks[cid]?.[level] || [];
 
-    html += `<div class="competency-block">
-      <div class="level-block">
-        <div class="level-label">Level ${level}</div>`;
-
+    out += `<div class="competency-block"><div class="level-block">
+      <div class="level-label">Level ${level}</div>`;
     indicators.forEach((ind, idx) => {
       const isChecked = checks[idx] || false;
-      html += `<div class="indicator-item${isChecked?' checked':''}" onclick="toggleIndicator('${cid}',${level},${idx})">
-        <div class="indicator-checkbox">${isChecked?'✓':''}</div>
+      out += `<div class="indicator-item${isChecked ? ' checked' : ''}" onclick="toggleIndicator('${cid}',${level},${idx})">
+        <div class="indicator-checkbox">${isChecked ? '✓' : ''}</div>
         <div class="indicator-text">
           ${ind.behavioral_indicator}
           ${ind.example_note ? `<div class="indicator-example">${ind.example_note}</div>` : ''}
         </div>
       </div>`;
     });
-
-    html += `</div></div>`;
+    out += `</div></div>`;
   }
 
-  html += `</div></div>`;
-  return html;
+  out += `</div></div>`;
+  return out;
 }
 
 function toggleCompetency(cid) {
-  const body = el(`comp-body-${cid}`);
+  const body  = el(`comp-body-${cid}`);
   const arrow = el(`arrow-${cid}`);
   const isOpen = body.style.display !== 'none';
-  body.style.display = isOpen ? 'none' : 'block';
+  body.style.display   = isOpen ? 'none' : 'block';
   arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
 }
 
 function toggleIndicator(cid, level, idx) {
   if (!state.assessmentChecks[cid]) return;
   if (!state.assessmentChecks[cid][level]) return;
-
   state.assessmentChecks[cid][level][idx] = !state.assessmentChecks[cid][level][idx];
   recalcScore(cid);
   refreshCompetencyBlock(cid);
@@ -1299,12 +968,11 @@ function toggleIndicator(cid, level, idx) {
 function recalcScore(cid) {
   const comp = state.compLibrary.find(c => c.competency_id === cid);
   if (!comp) return;
-
   let achieved = 0;
   for (let l = 1; l <= 5; l++) {
     const indicators = comp.levels[l] || [];
     if (indicators.length === 0) continue;
-    const checks = state.assessmentChecks[cid][l] || [];
+    const checks     = state.assessmentChecks[cid][l] || [];
     const allChecked = indicators.every((_, i) => checks[i] === true);
     if (allChecked) achieved = l;
     else break;
@@ -1315,15 +983,11 @@ function recalcScore(cid) {
 function refreshCompetencyBlock(cid) {
   const comp = state.compLibrary.find(c => c.competency_id === cid);
   if (!comp) return;
-
-  // Update score badge
   const scoreBadge = el(`score-badge-${cid}`);
   if (scoreBadge) {
     const s = state.assessmentScores[cid] || 0;
     scoreBadge.textContent = s > 0 ? `Level ${s}` : 'Not rated';
   }
-
-  // Update indicator checkboxes
   for (let l = 1; l <= 5; l++) {
     const indicators = comp.levels[l] || [];
     indicators.forEach((_, idx) => {
@@ -1341,10 +1005,10 @@ function buildAssessmentScores() {
   if (!state.compLibrary) return scores;
   state.compLibrary.forEach(comp => {
     scores.push({
-      competency_id: comp.competency_id,
+      competency_id:   comp.competency_id,
       competency_type: comp.competency_type,
-      self_score: state.assessmentScores[comp.competency_id] || 0,
-      notes: '',
+      self_score:      state.assessmentScores[comp.competency_id] || 0,
+      notes:           '',
     });
   });
   return scores;
@@ -1358,7 +1022,6 @@ async function saveDraftAssessment() {
 }
 
 function confirmFinalSubmit() {
-  const scores = buildAssessmentScores();
   openModal(`<div class="modal" onclick="event.stopPropagation()">
     <div class="modal-header">
       <div class="modal-title">Confirm Final Submission</div>
@@ -1378,30 +1041,21 @@ async function doFinalSubmit() {
   closeModal();
   const scores = buildAssessmentScores();
   const res = await api('submitAssessment', { nik: state.user.nik, scores, is_final: true });
-  if (res.success) {
-    toast('Assessment submitted successfully!', 'success');
-    loadAssessment();
-  } else {
-    toast(res.message, 'error');
-  }
+  if (res.success) { toast('Assessment submitted successfully!', 'success'); loadAssessment(); }
+  else toast(res.message, 'error');
 }
 
-// ════════════════════════════════════════════════════════════
-// JADWAL
-// ════════════════════════════════════════════════════════════
+// ── JADWAL ────────────────────────────────────────────────────
 async function loadJadwal() {
   const u = state.user;
 
-  // Load enrollments
   const enrRes = await api('getMyEnrollments', { nik: u.nik });
   state.enrollments = enrRes.success ? enrRes.data : [];
 
-  // Get mandatory competency IDs for this employee from dashboard
   const dashRes = await api('getDashboard', { nik: u.nik });
   const pipeline = dashRes.success ? (dashRes.data.pipeline || []) : [];
   state.mandatoryCompIds = pipeline.filter(p => p.decision === 'mandatory').map(p => p.competency_id);
 
-  // Load all schedule for this grade
   const schedRes = await api('getSchedule', { grade: u.grade });
   state.jadwal = schedRes.success ? schedRes.data : [];
 
@@ -1410,11 +1064,12 @@ async function loadJadwal() {
 
 function setJadwalTab(tab) {
   state.jadwalTab = tab;
-  el('tab-my').className = tab === 'my' ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
+  el('tab-my').className  = tab === 'my'  ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
   el('tab-all').className = tab === 'all' ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
   renderJadwal();
 }
 
+// ── FIX: isOnline sekarang dideklarasikan dengan benar di dalam loop ──
 function renderJadwal() {
   const tab = state.jadwalTab;
   const enrolledSessionIds = state.enrollments.map(e => e.session_id);
@@ -1423,10 +1078,8 @@ function renderJadwal() {
   let sessions = state.jadwal;
   if (tab === 'my') {
     if (mandatoryIds.length > 0) {
-      // Show all sessions for mandatory competencies (enrolled or not)
       sessions = sessions.filter(s => mandatoryIds.includes(s.competency_id));
     } else {
-      // No mandatory assigned yet — show only enrolled sessions
       sessions = sessions.filter(s => enrolledSessionIds.includes(s.session_id));
     }
   }
@@ -1449,18 +1102,33 @@ function renderJadwal() {
     </tr></thead><tbody>`;
 
   sessions.forEach(s => {
-    const isEnrolled = enrolledSessionIds.includes(s.session_id);
-    const enrollment = state.enrollments.find(e => e.session_id === s.session_id);
-    const isSelfLearning = s.training_type === 'Self Learning';
+    const isEnrolled     = enrolledSessionIds.includes(s.session_id);
+    // FIX: deklarasi variabel di dalam scope forEach, bukan referensi undefined
+    const trainingType   = (s.training_type || '').toLowerCase();
+    const isSelfLearning = trainingType.includes('self');
+    const isOnline       = trainingType.includes('online');
+
     const dateDisplay = isSelfLearning && s.date_end ? `${s.date} – ${s.date_end}` : s.date;
+
+    let typeBadge;
+    if (isSelfLearning) {
+      typeBadge = '<span class="badge badge-purple">Self Learning</span>';
+    } else if (isOnline) {
+      typeBadge = '<span class="badge badge-teal">Online</span>';
+    } else {
+      typeBadge = '<span class="badge badge-blue">Offline</span>';
+    }
 
     content += `<tr>
       <td style="white-space:nowrap;">${dateDisplay}</td>
-      <td><strong>${s.competency_name || s.competency_id}</strong><br><span style="font-size:11px;color:var(--text-muted);">${s.competency_id}</span></td>
+      <td><strong>${s.competency_name || s.competency_id}</strong><br>
+          <span style="font-size:11px;color:var(--text-muted);">${s.competency_id}</span></td>
       <td>${s.trainer || '-'}</td>
       <td>${s.location || s.area || '-'}</td>
-      <td>${isSelfLearning ? '<span class="badge badge-purple">Self Learning</span>' : isOnline ? '<span class="badge badge-teal">Online</span>' : '<span class="badge badge-blue">Offline</span>'}</td>
-      <td>${isEnrolled ? '<span class="badge badge-green">Enrolled</span>' : '<span class="badge badge-gray">Not enrolled</span>'}</td>
+      <td>${typeBadge}</td>
+      <td>${isEnrolled
+        ? '<span class="badge badge-green">Enrolled</span>'
+        : '<span class="badge badge-gray">Not enrolled</span>'}</td>
       <td>
         ${isEnrolled
           ? `<button class="btn btn-ghost btn-sm" onclick="doCancelEnrollment('${s.session_id}')">Cancel</button>`
@@ -1486,46 +1154,42 @@ async function doCancelEnrollment(sessionId) {
   else toast(res.message, 'error');
 }
 
-// ════════════════════════════════════════════════════════════
-// PROGRESS
-// ════════════════════════════════════════════════════════════
+// ── PROGRESS ──────────────────────────────────────────────────
 async function loadProgress() {
   const res = await api('getDashboard', { nik: state.user.nik });
   if (!res.success) { html('progress-content', `<p class="text-muted">${res.message}</p>`); return; }
 
-  const d = res.data;
+  const d        = res.data;
   const pipeline = d.pipeline || [];
 
   if (pipeline.length === 0) {
     html('progress-content', `<div class="card"><div class="card-body">
       <div class="empty-state">
         <div class="empty-icon">📈</div>
-        <div class="empty-title">Not enrolled Ada Data Progress</div>
-        <div class="empty-desc">Completedkan self assessment dan tunggu assignment of leader Anda.</div>
+        <div class="empty-title">No Progress Data</div>
+        <div class="empty-desc">Complete self assessment and wait for your leader's assignment.</div>
       </div>
     </div></div>`);
     return;
   }
 
-  const mandatory = pipeline.filter(p => p.decision === 'mandatory');
+  const mandatory  = pipeline.filter(p => p.decision === 'mandatory');
   const additional = pipeline.filter(p => p.decision === 'additional');
 
-  let content = '';
-
-  const renderPipelineSection = (title, items, color) => {
+  const renderSection = (title, items, color) => {
     if (items.length === 0) return '';
     let s = `<div class="card" style="margin-bottom:16px;">
       <div class="card-header"><div class="card-title">${title}</div></div>
       <div class="card-body" style="padding:0 24px;">`;
     items.forEach(p => {
-      const pct_bar = p.status === 'completed' ? 100 : p.status === 'enrolled' ? 50 : 10;
+      const pctBar = p.status === 'completed' ? 100 : p.status === 'enrolled' ? 50 : 10;
       s += `<div class="pipeline-item">
-        <div class="pipeline-icon" style="background:${p.status==='completed'?'var(--green-soft)':p.status==='enrolled'?'var(--teal-soft)':'var(--gold-soft)'};">
-          ${p.status==='completed'?'✅':p.status==='enrolled'?'📚':'🎯'}
+        <div class="pipeline-icon" style="background:${p.status === 'completed' ? 'var(--green-soft)' : p.status === 'enrolled' ? 'var(--teal-soft)' : 'var(--gold-soft)'};">
+          ${p.status === 'completed' ? '✅' : p.status === 'enrolled' ? '📚' : '🎯'}
         </div>
         <div class="pipeline-info">
-          <div class="pipeline-name">${p.competency_id}</div>
-          <div style="margin:6px 0;">${progressBar(pct_bar, 100, color, 6)}</div>
+          <div class="pipeline-name">${p.competency_name || p.competency_id}</div>
+          <div style="margin:6px 0;">${progressBar(pctBar, 100, color, 6)}</div>
           <div class="pipeline-meta">Current Level ${p.self_score} → Target Level ${p.target_level} (Gap: ${p.gap})</div>
         </div>
         <div class="pipeline-status">${statusBadge(p.status)}</div>
@@ -1535,26 +1199,19 @@ async function loadProgress() {
     return s;
   };
 
-  content += renderPipelineSection('Competency Mandatory', mandatory, 'green');
-  content += renderPipelineSection('Competency Additional', additional, 'blue');
-
-  html('progress-content', content);
+  html('progress-content', renderSection('Mandatory Competencies', mandatory, 'green') + renderSection('Additional Competencies', additional, 'blue'));
 }
 
-// ════════════════════════════════════════════════════════════
-// TEAM ASSESSMENT
-// ════════════════════════════════════════════════════════════
+// ── TEAM ASSESSMENT ───────────────────────────────────────────
 async function loadTeamAssessment() {
   const res = await api('getTeamAssessments', { leader_nik: state.user.nik });
   if (!res.success) { html('team-assessment-content', `<p class="text-muted">${res.message}</p>`); return; }
-
   state.teamData = res.data;
   renderTeamAssessmentList();
 }
 
 function renderTeamAssessmentList() {
   const team = state.teamData;
-
   if (!team || team.length === 0) {
     html('team-assessment-content', `<div class="card"><div class="card-body">
       <div class="empty-state">
@@ -1577,8 +1234,8 @@ function renderTeamAssessmentList() {
       <td><strong>${m.name}</strong><br><span style="font-size:11px;font-family:var(--mono);color:var(--text-muted);">${m.nik}</span></td>
       <td><span class="badge ${gradeColor(m.grade)}">${m.grade}</span></td>
       <td style="font-size:12px;">${m.department}</td>
-      <td>${m.has_submitted ? '<span class="badge badge-green">Completed</span>' : '<span class="badge badge-gray">Not enrolled</span>'}</td>
-      <td>${m.already_assigned ? '<span class="badge badge-teal">Done</span>' : '<span class="badge badge-gold">Not enrolled</span>'}</td>
+      <td>${m.has_submitted ? '<span class="badge badge-green">Completed</span>' : '<span class="badge badge-gray">Pending</span>'}</td>
+      <td>${m.already_assigned ? '<span class="badge badge-teal">Done</span>' : '<span class="badge badge-gold">Pending</span>'}</td>
       <td><span style="font-weight:700;color:var(--accent);">${m.mandatory_count}</span>/2</td>
       <td>
         ${m.has_submitted
@@ -1600,12 +1257,9 @@ function openAssignModal(memberNik) {
   const decisions = {};
   member.competencies.forEach(c => { decisions[c.competency_id] = c.decision || ''; });
 
-  const mandatoryCount = () => Object.values(decisions).filter(d => d === 'mandatory').length;
-
   const typeLabel = { core: 'Core', role: 'Role', jf: 'Job Family' };
   const typeColor = { core: 'badge-blue', role: 'badge-purple', jf: 'badge-teal' };
 
-  // Group by type
   const grouped = {};
   member.competencies.forEach(c => {
     const t = c.competency_type;
@@ -1615,23 +1269,23 @@ function openAssignModal(memberNik) {
 
   let compRows = '';
   Object.keys(grouped).forEach(type => {
-    compRows += `<div style="font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:0.8px;text-transform:uppercase;margin:16px 0 8px;">${typeLabel[type]||type}</div>`;
+    compRows += `<div style="font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:0.8px;text-transform:uppercase;margin:16px 0 8px;">${typeLabel[type] || type}</div>`;
     grouped[type].forEach(c => {
-      compRows += `<div style="padding:12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;" id="comp-row-${memberNik}-${c.competency_id}">
+      compRows += `<div style="padding:12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
           <div style="display:flex;align-items:center;gap:8px;">
-            <span class="badge ${typeColor[c.competency_type]||'badge-gray'}">${c.competency_id}</span>
+            <span class="badge ${typeColor[c.competency_type] || 'badge-gray'}">${c.competency_id}</span>
             <div>
-              <div style="font-weight:600;font-size:13px;">${c.competency_id}</div>
+              <div style="font-weight:600;font-size:13px;">${c.competency_name || c.competency_id}</div>
               <div style="font-size:11px;color:var(--text-muted);">Self: L${c.self_score} → Target: L${c.target_level} · Gap: ${c.gap}</div>
             </div>
           </div>
           <div style="display:flex;gap:6px;" id="decision-btns-${memberNik}-${c.competency_id}">
-            <button class="btn btn-sm ${c.decision==='mandatory'?'btn-accent':'btn-ghost'}" 
+            <button class="btn btn-sm ${c.decision === 'mandatory' ? 'btn-accent' : 'btn-ghost'}"
               onclick="setDecision('${memberNik}','${c.competency_id}','mandatory')">Mandatory</button>
-            <button class="btn btn-sm ${c.decision==='additional'?'btn-primary':'btn-ghost'}" 
+            <button class="btn btn-sm ${c.decision === 'additional' ? 'btn-primary' : 'btn-ghost'}"
               onclick="setDecision('${memberNik}','${c.competency_id}','additional')">Additional</button>
-            <button class="btn btn-sm ${!c.decision?'btn-ghost':'btn-ghost'}" style="${!c.decision?'opacity:0.5':''}"
+            <button class="btn btn-sm btn-ghost" style="${!c.decision ? 'opacity:0.5' : ''}"
               onclick="setDecision('${memberNik}','${c.competency_id}','')">—</button>
           </div>
         </div>
@@ -1639,6 +1293,8 @@ function openAssignModal(memberNik) {
       </div>`;
     });
   });
+
+  const initCount = Object.values(decisions).filter(d => d === 'mandatory').length;
 
   openModal(`<div class="modal" style="max-width:680px;" onclick="event.stopPropagation()">
     <div class="modal-header">
@@ -1650,48 +1306,39 @@ function openAssignModal(memberNik) {
     </div>
     <div class="modal-body">
       <div style="background:var(--gold-soft);border:1px solid var(--gold);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px;font-size:13px;">
-        <strong>Rule:</strong> Maksimal <strong>2 kompetensi Mandatory</strong>. Competency yang tidak ditandai tidak akan diassign.
-        <div id="mandatory-counter" style="margin-top:4px;font-weight:600;">Mandatory selected: ${mandatoryCount()}/2</div>
+        <strong>Rule:</strong> Maximum <strong>2 Mandatory</strong> competencies. Untagged competencies will not be assigned.
+        <div id="mandatory-counter" style="margin-top:4px;font-weight:600;">Mandatory selected: ${initCount}/2</div>
       </div>
       ${compRows}
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-green" onclick="doSaveApproval('${memberNik}')">💾 Assign to My Team</button>
+      <button class="btn btn-green" onclick="doSaveApproval('${memberNik}')">💾 Save Assignment</button>
     </div>
   </div>`);
 
-  // Store decisions in closure-accessible state
   window._currentDecisions = decisions;
   window._currentMemberNik = memberNik;
 }
 
 function setDecision(memberNik, compId, decision) {
   if (!window._currentDecisions) return;
-
-  // Check mandatory limit
   if (decision === 'mandatory') {
     const currentMandatory = Object.entries(window._currentDecisions)
       .filter(([cid, d]) => d === 'mandatory' && cid !== compId).length;
-    if (currentMandatory >= 2) {
-      toast('Maximum 2 Mandatory competencies allowed', 'warning');
-      return;
-    }
+    if (currentMandatory >= 2) { toast('Maximum 2 Mandatory competencies allowed', 'warning'); return; }
   }
-
   window._currentDecisions[compId] = decision;
 
-  // Update button states
   const btnContainer = el(`decision-btns-${memberNik}-${compId}`);
   if (btnContainer) {
     const btns = btnContainer.querySelectorAll('button');
-    btns[0].className = `btn btn-sm ${decision==='mandatory'?'btn-accent':'btn-ghost'}`;
-    btns[1].className = `btn btn-sm ${decision==='additional'?'btn-primary':'btn-ghost'}`;
+    btns[0].className = `btn btn-sm ${decision === 'mandatory' ? 'btn-accent' : 'btn-ghost'}`;
+    btns[1].className = `btn btn-sm ${decision === 'additional' ? 'btn-primary' : 'btn-ghost'}`;
     btns[2].className = `btn btn-sm btn-ghost`;
     btns[2].style.opacity = !decision ? '0.5' : '1';
   }
 
-  // Update counter
   const counter = el('mandatory-counter');
   if (counter) {
     const count = Object.values(window._currentDecisions).filter(d => d === 'mandatory').length;
@@ -1702,46 +1349,30 @@ function setDecision(memberNik, compId, decision) {
 async function doSaveApproval(memberNik) {
   const decisions = Object.entries(window._currentDecisions).map(([cid, dec]) => ({
     competency_id: cid,
-    decision: dec,
-    suggestion: '',
+    decision:      dec,
+    suggestion:    '',
   }));
-
-  const res = await api('saveApproval', {
-    leader_nik: state.user.nik,
-    member_nik: memberNik,
-    decisions,
-  });
-
-  if (res.success) {
-    toast('Assignment saved successfully!', 'success');
-    closeModal();
-    loadTeamAssessment();
-  } else {
-    toast(res.message, 'error');
-  }
+  const res = await api('saveApproval', { leader_nik: state.user.nik, member_nik: memberNik, decisions });
+  if (res.success) { toast('Assignment saved successfully!', 'success'); closeModal(); loadTeamAssessment(); }
+  else toast(res.message, 'error');
 }
 
-// ════════════════════════════════════════════════════════════
-// TEAM MONITOR
-// ════════════════════════════════════════════════════════════
+// ── TEAM MONITOR ──────────────────────────────────────────────
 async function loadTeamMonitor() {
   const res = await api('getTeamProgress', { leader_nik: state.user.nik });
   if (!res.success) { html('team-monitor-content', `<p class="text-muted">${res.message}</p>`); return; }
 
   const team = res.data;
-
   if (!team || team.length === 0) {
     html('team-monitor-content', `<div class="card"><div class="card-body">
-      <div class="empty-state"><div class="empty-icon">📊</div>
-        <div class="empty-title">No Team Data</div>
-      </div>
+      <div class="empty-state"><div class="empty-icon">📊</div><div class="empty-title">No Team Data</div></div>
     </div></div>`);
     return;
   }
 
   const totalMandatory = team.reduce((s, m) => s + m.mandatory_total, 0);
   const totalCompleted = team.reduce((s, m) => s + m.mandatory_completed, 0);
-  const teamPct = pct(totalCompleted, totalMandatory);
+  const teamPct  = pct(totalCompleted, totalMandatory);
   const maxDepth = Math.max(...team.map(m => m.depth || 1));
 
   let content = `<div class="stats-grid" style="margin-bottom:20px;">
@@ -1760,17 +1391,16 @@ async function loadTeamMonitor() {
     </div>
     <div class="stat-card">
       <div class="stat-label">Active Enrollments</div>
-      <div class="stat-value" style="color:var(--teal);">${team.reduce((s,m)=>s+m.enrolled_session_ids.length,0)}</div>
+      <div class="stat-value" style="color:var(--teal);">${team.reduce((s, m) => s + m.enrolled_session_ids.length, 0)}</div>
     </div>
   </div>`;
 
-  // Depth filter tabs — only show if more than 1 level
   const depths = [...new Set(team.map(m => m.depth || 1))].sort();
   if (depths.length > 1) {
     content += `<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
       <span style="font-size:12px;color:var(--text-muted);font-weight:600;">Filter by level:</span>
       <button class="btn btn-primary btn-sm" id="depth-btn-all" onclick="filterTeamDepth('all')">All</button>
-      ${depths.map(d => `<button class="btn btn-ghost btn-sm" id="depth-btn-${d}" onclick="filterTeamDepth(${d})">Level ${d}${d===1?' (Direct)':''}</button>`).join('')}
+      ${depths.map(d => `<button class="btn btn-ghost btn-sm" id="depth-btn-${d}" onclick="filterTeamDepth(${d})">Level ${d}${d === 1 ? ' (Direct)' : ''}</button>`).join('')}
     </div>`;
   }
 
@@ -1780,18 +1410,18 @@ async function loadTeamMonitor() {
       <th>Mandatory</th><th>Progress</th><th>Enrolled</th><th>Status</th>
     </tr></thead><tbody>`;
 
+  const depthColors = ['var(--primary)', 'var(--teal)', 'var(--purple)', 'var(--green)', 'var(--gold)'];
   team.forEach(m => {
-    const p = pct(m.mandatory_completed, m.mandatory_total);
-    const color = p >= 100 ? 'green' : p >= 50 ? 'gold' : 'blue';
-    const depth = m.depth || 1;
+    const p      = pct(m.mandatory_completed, m.mandatory_total);
+    const color  = p >= 100 ? 'green' : p >= 50 ? 'gold' : 'blue';
+    const depth  = m.depth || 1;
     const indent = depth - 1;
-    const depthColors = ['var(--primary)','var(--teal)','var(--purple)','var(--green)','var(--gold)'];
-    const dc = depthColors[Math.min(indent, 4)];
+    const dc     = depthColors[Math.min(indent, 4)];
 
     content += `<tr data-depth="${depth}">
       <td>
         <div style="display:flex;align-items:center;gap:6px;">
-          ${indent > 0 ? `<div style="width:${indent*14}px;flex-shrink:0;"></div><div style="width:2px;height:30px;background:${dc};opacity:0.35;flex-shrink:0;border-radius:2px;"></div>` : ''}
+          ${indent > 0 ? `<div style="width:${indent * 14}px;flex-shrink:0;"></div><div style="width:2px;height:30px;background:${dc};opacity:0.35;flex-shrink:0;border-radius:2px;"></div>` : ''}
           <div>
             <div style="font-weight:600;">${m.name}</div>
             <div style="font-size:11px;color:var(--text-muted);">${m.department}</div>
@@ -1802,7 +1432,7 @@ async function loadTeamMonitor() {
       <td><span class="badge ${gradeColor(m.grade)}">${m.grade}</span></td>
       <td style="font-weight:700;">${m.mandatory_completed}/${m.mandatory_total}</td>
       <td style="min-width:100px;">
-        ${progressBar(m.mandatory_completed, m.mandatory_total||1, color, 6)}
+        ${progressBar(m.mandatory_completed, m.mandatory_total || 1, color, 6)}
         <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">${p}%</div>
       </td>
       <td><span class="badge badge-teal">${m.enrolled_session_ids.length}</span></td>
@@ -1820,27 +1450,22 @@ async function loadTeamMonitor() {
 }
 
 function filterTeamDepth(depth) {
-  document.querySelectorAll('[id^="depth-btn-"]').forEach(btn => {
-    btn.className = 'btn btn-ghost btn-sm';
-  });
-  const active = document.getElementById('depth-btn-' + depth);
+  document.querySelectorAll('[id^="depth-btn-"]').forEach(btn => { btn.className = 'btn btn-ghost btn-sm'; });
+  const active = el('depth-btn-' + depth);
   if (active) active.className = 'btn btn-primary btn-sm';
   document.querySelectorAll('#team-monitor-table tbody tr').forEach(row => {
     row.style.display = (depth === 'all' || row.dataset.depth == depth) ? '' : 'none';
   });
 }
 
-
-// ════════════════════════════════════════════════════════════
-// ADMIN
-// ════════════════════════════════════════════════════════════
+// ── ADMIN ─────────────────────────────────────────────────────
 async function loadAdmin() {
   const res = await api('getAdminDashboard', {});
   if (!res.success) { html('admin-content', `<p class="text-muted">${res.message}</p>`); return; }
 
-  const d = res.data;
-  const s = d.summary;
-  const deptStats = d.department_stats || {};
+  const d          = res.data;
+  const s          = d.summary;
+  const deptStats  = d.department_stats || {};
   const compDemand = d.competency_demand || {};
 
   let content = `<div class="stats-grid" style="margin-bottom:24px;">
@@ -1863,13 +1488,13 @@ async function loadAdmin() {
     </div>
   </div>`;
 
-  const depts = Object.entries(deptStats).sort((a,b) => b[1].total - a[1].total);
+  const depts = Object.entries(deptStats).sort((a, b) => b[1].total - a[1].total);
   if (depts.length > 0) {
     content += `<div style="display:grid;gap:16px;">
       <div class="card">
         <div class="card-header"><div class="card-title">Progress by Department</div></div>
         <div class="card-body"><div class="bar-chart">`;
-    depts.slice(0,15).forEach(([dept, stat]) => {
+    depts.slice(0, 15).forEach(([dept, stat]) => {
       const p = pct(stat.assessed, stat.total);
       content += `<div class="bar-row">
         <div class="bar-name" title="${dept}">${dept}</div>
@@ -1879,19 +1504,19 @@ async function loadAdmin() {
     });
     content += `</div></div></div>`;
 
-    const compEntries = Object.entries(compDemand).sort((a,b) => (b[1].mandatory+b[1].additional)-(a[1].mandatory+a[1].additional));
+    const compEntries = Object.entries(compDemand).sort((a, b) => (b[1].mandatory + b[1].additional) - (a[1].mandatory + a[1].additional));
     if (compEntries.length > 0) {
       content += `<div class="card">
         <div class="card-header"><div class="card-title">Competency Demand</div></div>
         <div class="card-body" style="padding:0 24px;"><div class="table-wrap"><table>
           <thead><tr><th>Competency</th><th>Mandatory</th><th>Additional</th><th>Total</th></tr></thead>
           <tbody>`;
-      compEntries.slice(0,10).forEach(([cid, d]) => {
+      compEntries.slice(0, 10).forEach(([cid, cd]) => {
         content += `<tr>
           <td><span class="badge badge-blue">${cid}</span></td>
-          <td><span style="font-weight:700;color:var(--accent);">${d.mandatory}</span></td>
-          <td><span style="font-weight:700;color:var(--primary);">${d.additional}</span></td>
-          <td><strong>${d.mandatory + d.additional}</strong></td>
+          <td><span style="font-weight:700;color:var(--accent);">${cd.mandatory}</span></td>
+          <td><span style="font-weight:700;color:var(--primary);">${cd.additional}</span></td>
+          <td><strong>${cd.mandatory + cd.additional}</strong></td>
         </tr>`;
       });
       content += `</tbody></table></div></div></div>`;
@@ -1902,30 +1527,27 @@ async function loadAdmin() {
   html('admin-content', content);
 }
 
-// ════════════════════════════════════════════════════════════
-// ADMIN USERS
-// ════════════════════════════════════════════════════════════
+// ── ADMIN USERS ───────────────────────────────────────────────
 async function loadAdminUsers() {
   const res = await api('getAdminUsers', {});
   if (!res.success) { html('admin-users-content', `<p class="text-muted">${res.message}</p>`); return; }
 
   const users = res.data;
-
   let content = `<div style="margin-bottom:16px;display:flex;gap:10px;align-items:center;">
     <input type="text" id="user-search" class="form-input" placeholder="Search name or NIK..." style="max-width:280px;" oninput="filterAdminUsers(this.value)">
     <span style="font-size:13px;color:var(--text-muted);">${users.length} employees</span>
   </div>
-  <div class="card"><div class="table-wrap"><table id="admin-users-table">
+  <div class="card"><div class="table-wrap"><table>
     <thead><tr><th>NIK</th><th>Name</th><th>Grade</th><th>Division</th><th>Role</th><th>Must Change</th><th>Action</th></tr></thead>
     <tbody id="admin-users-tbody">`;
 
   users.forEach(u => {
-    content += `<tr data-search="${u.nik} ${(u.name||'').toLowerCase()}">
+    content += `<tr data-search="${u.nik} ${(u.name || '').toLowerCase()}">
       <td style="font-family:var(--mono);font-size:12px;">${u.nik}</td>
-      <td><strong>${u.name}</strong><br><span style="font-size:11px;color:var(--text-muted);">${u.position||''}</span></td>
+      <td><strong>${u.name}</strong><br><span style="font-size:11px;color:var(--text-muted);">${u.position || ''}</span></td>
       <td><span class="badge ${gradeColor(u.grade)}">${u.grade}</span></td>
       <td style="font-size:12px;">${u.division}</td>
-      <td>${u.role&&u.role.includes('leader') ? '<span class="badge badge-purple">Leader</span>' : '<span class="badge badge-gray">Employee</span>'}</td>
+      <td>${u.role && u.role.includes('leader') ? '<span class="badge badge-purple">Leader</span>' : '<span class="badge badge-gray">Employee</span>'}</td>
       <td>${u.must_change_password ? '<span class="badge badge-gold">Yes</span>' : '<span class="badge badge-green">No</span>'}</td>
       <td><button class="btn btn-ghost btn-sm" onclick="openUserEditModal('${u.nik}')">Edit</button></td>
     </tr>`;
@@ -1938,12 +1560,12 @@ async function loadAdminUsers() {
 
 function filterAdminUsers(q) {
   document.querySelectorAll('#admin-users-tbody tr').forEach(row => {
-    row.style.display = (row.dataset.search||'').includes(q.toLowerCase()) ? '' : 'none';
+    row.style.display = (row.dataset.search || '').includes(q.toLowerCase()) ? '' : 'none';
   });
 }
 
 function openUserEditModal(nik) {
-  const user = (window._adminUsers||[]).find(u => u.nik === nik);
+  const user = (window._adminUsers || []).find(u => u.nik === nik);
   if (!user) return;
   openModal(`<div class="modal" onclick="event.stopPropagation()">
     <div class="modal-header">
@@ -1957,25 +1579,25 @@ function openUserEditModal(nik) {
       </div>
       <div class="form-group">
         <label class="form-label">Name</label>
-        <input class="form-input" id="edit-name" value="${user.name||''}">
+        <input class="form-input" id="edit-name" value="${user.name || ''}">
       </div>
       <div class="form-group">
         <label class="form-label">Grade</label>
         <select class="form-input" id="edit-grade">
-          ${['S0','S1','S2','S3','M1','M2','M3','G1','D1','D2','D3'].map(g=>`<option value="${g}"${user.grade===g?' selected':''}>${g}</option>`).join('')}
+          ${['S0','S1','S2','S3','M1','M2','M3','G1','D1','D2','D3'].map(g => `<option value="${g}"${user.grade === g ? ' selected' : ''}>${g}</option>`).join('')}
         </select>
       </div>
       <div class="form-group">
         <label class="form-label">Role</label>
         <select class="form-input" id="edit-role">
-          <option value="employee"${user.role==='employee'?' selected':''}>Employee</option>
-          <option value="leader,employee"${user.role&&user.role.includes('leader')?' selected':''}>Leader & Employee</option>
-          <option value="admin"${user.role==='admin'?' selected':''}>Admin</option>
+          <option value="employee"${user.role === 'employee' ? ' selected' : ''}>Employee</option>
+          <option value="leader,employee"${user.role && user.role.includes('leader') ? ' selected' : ''}>Leader & Employee</option>
+          <option value="admin"${user.role === 'admin' ? ' selected' : ''}>Admin</option>
         </select>
       </div>
       <div class="form-group">
         <label class="form-label">Supervisor NIK</label>
-        <input class="form-input mono" id="edit-spv" value="${user.spv_nik||''}">
+        <input class="form-input mono" id="edit-spv" value="${user.spv_nik || ''}">
       </div>
       <div style="padding:12px;background:var(--accent-soft);border-radius:var(--radius-sm);font-size:13px;">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
@@ -2003,9 +1625,7 @@ async function doUpdateUser(nik) {
   else toast(res.message, 'error');
 }
 
-// ════════════════════════════════════════════════════════════
-// ACCOUNT
-// ════════════════════════════════════════════════════════════
+// ── ACCOUNT ───────────────────────────────────────────────────
 function loadAccount() {
   const u = state.user;
   const content = `<div style="display:grid;gap:16px;max-width:600px;">
@@ -2014,11 +1634,11 @@ function loadAccount() {
         <div style="width:72px;height:72px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;flex-shrink:0;">${initials(u.name)}</div>
         <div>
           <div style="font-size:18px;font-weight:700;margin-bottom:4px;">${u.name}</div>
-          <div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;">${u.position||'—'}</div>
+          <div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;">${u.position || '—'}</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;">
             <span class="badge ${gradeColor(u.grade)}">${u.grade}</span>
-            <span class="badge badge-blue">${u.division||u.department}</span>
-            ${u.role&&u.role.includes('leader')?'<span class="badge badge-purple">Leader</span>':''}
+            <span class="badge badge-blue">${u.division || u.department}</span>
+            ${u.role && u.role.includes('leader') ? '<span class="badge badge-purple">Leader</span>' : ''}
           </div>
         </div>
       </div>
@@ -2026,10 +1646,10 @@ function loadAccount() {
     <div class="card">
       <div class="card-header"><div class="card-title">Account Information</div></div>
       <div class="card-body" style="display:grid;gap:0;">
-        ${[['NIK',u.nik,true],['Email',u.email||'—',false],['Department',u.department,false],['Division',u.division||'—',false],['Supervisor NIK',u.spv_nik||'—',true]].map(([label,val,mono])=>`
+        ${[['NIK', u.nik, true], ['Email', u.email || '—', false], ['Department', u.department, false], ['Division', u.division || '—', false], ['Supervisor NIK', u.spv_nik || '—', true]].map(([label, val, mono]) => `
           <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
             <span style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;">${label}</span>
-            <span style="font-size:13px;font-weight:500;${mono?'font-family:var(--mono);':''}">${val}</span>
+            <span style="font-size:13px;font-weight:500;${mono ? 'font-family:var(--mono);' : ''}">${val}</span>
           </div>`).join('')}
       </div>
     </div>
@@ -2060,33 +1680,28 @@ async function doAccountChangePassword() {
   const old = el('acc-old-pwd').value.trim();
   const np  = el('acc-new-pwd').value.trim();
   const cp  = el('acc-confirm-pwd').value.trim();
-  if (!old||!np) { toast('All fields are required','error'); return; }
-  if (np.length<6) { toast('Password must be at least 6 characters','error'); return; }
-  if (np!==cp) { toast('Password confirmation does not match','error'); return; }
-  const res = await api('changePassword',{nik:state.user.nik,old_password:old,new_password:np});
+  if (!old || !np) { toast('All fields are required', 'error'); return; }
+  if (np.length < 6) { toast('Password must be at least 6 characters', 'error'); return; }
+  if (np !== cp) { toast('Password confirmation does not match', 'error'); return; }
+  const res = await api('changePassword', { nik: state.user.nik, old_password: old, new_password: np });
   if (res.success) {
-    toast('Password changed successfully!','success');
-    el('acc-old-pwd').value=''; el('acc-new-pwd').value=''; el('acc-confirm-pwd').value='';
-  } else toast(res.message,'error');
+    toast('Password changed successfully!', 'success');
+    el('acc-old-pwd').value = ''; el('acc-new-pwd').value = ''; el('acc-confirm-pwd').value = '';
+  } else toast(res.message, 'error');
 }
 
 function showAccountModal() { navigateTo('account'); }
 
-// ════════════════════════════════════════════════════════════
-// KEYBOARD SHORTCUTS
-// ════════════════════════════════════════════════════════════
+// ── KEYBOARD SHORTCUTS ────────────────────────────────────────
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeModal();
   if (e.key === 'Enter' && el('page-login') && el('page-login').style.display !== 'none') doLogin();
 });
 
-// ════════════════════════════════════════════════════════════
-// INIT
-// ════════════════════════════════════════════════════════════
+// ── INIT ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   el('page-login').style.display = 'flex';
 });
-
 </script>
 </body>
 </html>
