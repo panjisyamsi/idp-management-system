@@ -971,34 +971,11 @@ function renderTeamAssessmentList() {
   content+=`</tbody></table></div></div>`; html('team-assessment-content',content);
 }
 
-function downloadAssignmentPDF() {
+async function downloadAssignmentPDF() {
   const team = state.teamData;
   if (!team || !team.length) return;
 
-  // Build rows: only members who have been assigned, mandatory + additional
-  const rows = [];
-  team.forEach(m => {
-    if (!m.already_assigned || !m.competencies) return;
-    const assigned = m.competencies.filter(c => c.decision === 'mandatory' || c.decision === 'additional');
-    if (!assigned.length) return;
-    assigned.forEach((c, idx) => {
-      rows.push({
-        name:       idx === 0 ? m.name : '',
-        nameFirst:  idx === 0,
-        rowspan:    assigned.length,
-        competency: c.competency_name || c.competency_id,
-        level:      c.target_level || '-',
-        decision:   c.decision,
-      });
-    });
-  });
-
-  if (!rows.length) { toast('No assignment data to export', 'warning'); return; }
-
-  const leaderName = state.user?.name || '';
-  const today = new Date().toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' });
-
-  // Build flat rows: one row per competency per member
+  // Build flat rows
   const printRows = [];
   team.forEach(m => {
     if (!m.already_assigned || !m.competencies) return;
@@ -1009,7 +986,7 @@ function downloadAssignmentPDF() {
         nik:        idx === 0 ? m.nik   : '',
         name:       idx === 0 ? m.name  : '',
         grade:      idx === 0 ? m.grade : '',
-        position:   idx === 0 ? (m.position || m.grade) : '',
+        position:   idx === 0 ? (m.position || m.grade || '') : '',
         isFirst:    idx === 0,
         competency: c.competency_name || c.competency_id,
         actual:     c.self_score ?? '-',
@@ -1021,76 +998,96 @@ function downloadAssignmentPDF() {
 
   if (!printRows.length) { toast('No assignment data to export', 'warning'); return; }
 
-  const win = window.open('', '_blank', 'width=900,height=700');
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
-  <title>IDP Assignment — ${leaderName}</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Calibri', Arial, sans-serif; font-size: 11pt; color: #000; padding: 32px 40px; }
-    .header { margin-bottom: 20px; }
-    .header h2 { font-size: 14pt; font-weight: bold; color: #0A2463; margin-bottom: 4px; }
-    .header p { font-size: 10pt; color: #555; }
-    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-    th {
-      background: #0A2463; color: #fff;
-      padding: 8px 10px; text-align: center;
-      font-size: 10pt; font-weight: bold;
-      border: 1px solid #0A2463;
+  // Load jsPDF from CDN
+  showLoading(true);
+  try {
+    if (!window.jspdf) {
+      await new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+        s.onload = resolve; s.onerror = reject;
+        document.head.appendChild(s);
+      });
+      await new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js';
+        s.onload = resolve; s.onerror = reject;
+        document.head.appendChild(s);
+      });
     }
-    th.left { text-align: left; }
-    td { padding: 6px 10px; border: 1px solid #C8D0E0; font-size: 10pt; vertical-align: middle; }
-    td.center { text-align: center; }
-    .divider td { background: #E8EDF8; font-weight: bold; font-size: 9pt; color: #0A2463; padding: 3px 10px; border-color: #B0BEDD; }
-    .mandatory { color: #E84855; font-weight: bold; }
-    .additional { color: #1B7A8C; }
-    .footer { margin-top: 24px; font-size: 9pt; color: #999; border-top: 1px solid #E2E7F0; padding-top: 10px; }
-    .print-btn { margin-top: 16px; padding: 10px 24px; background: #0A2463; color: #fff; border: none; border-radius: 6px; font-size: 11pt; cursor: pointer; }
-    @media print {
-      body { padding: 12px 20px; }
-      .print-btn { display: none; }
-    }
-  </style>
-  </head><body>
-  <div class="header">
-    <h2>IDP Competency Assignment Report</h2>
-    <p>Leader: <strong>${leaderName}</strong> &nbsp;·&nbsp; Generated: ${today} &nbsp;·&nbsp; PT. Amerta Indah Otsuka</p>
-  </div>
-  <table>
-    <thead>
-      <tr>
-        <th class="left" style="width:10%">NIK</th>
-        <th class="left" style="width:22%">Name</th>
-        <th style="width:7%">Grade</th>
-        <th class="left" style="width:16%">Position</th>
-        <th class="left" style="width:28%">Competency</th>
-        <th style="width:8%">Actual</th>
-        <th style="width:9%">Target</th>
-      </tr>
-    </thead>
-    <tbody>`);
 
-  printRows.forEach((r, i) => {
-    // Add subtle divider row before each new person (except first)
-    if (r.isFirst && i > 0) {
-      win.document.write(`<tr class="divider"><td colspan="7"></td></tr>`);
-    }
-    win.document.write(`<tr>
-      <td style="font-family:monospace;font-size:9pt;">${r.nik}</td>
-      <td>${r.name ? `<strong>${r.name}</strong>` : ''}</td>
-      <td class="center">${r.grade ? `<span style="background:#D6EEF2;color:#1B7A8C;padding:2px 8px;border-radius:20px;font-size:9pt;font-weight:bold;">${r.grade}</span>` : ''}</td>
-      <td style="font-size:9.5pt;color:#555;">${r.position}</td>
-      <td>${r.competency}</td>
-      <td class="center" style="font-weight:bold;">${r.actual}</td>
-      <td class="center" style="font-weight:bold;color:#0A2463;">${r.target}</td>
-    </tr>`);
-  });
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
 
-  win.document.write(`</tbody></table>
-  <div class="footer">IDP Management System &nbsp;·&nbsp; PT. Amerta Indah Otsuka &nbsp;·&nbsp; ${today}</div>
-  <br>
-  <button class="print-btn" onclick="window.print()">🖨 Print / Save as PDF</button>
-  </body></html>`);
-  win.document.close();
+    const leaderName = state.user?.name || '';
+    const today = new Date().toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' });
+
+    // Header
+    doc.setFillColor(10, 36, 99);
+    doc.rect(0, 0, 297, 22, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(13); doc.setFont('helvetica', 'bold');
+    doc.text('IDP Competency Assignment Report', 14, 10);
+    doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+    doc.text(`Leader: ${leaderName}   ·   Generated: ${today}   ·   PT. Amerta Indah Otsuka`, 14, 17);
+
+    // Table body
+    const tableRows = printRows.map(r => [
+      r.nik, r.name, r.grade, r.position, r.competency,
+      String(r.actual), String(r.target)
+    ]);
+
+    doc.autoTable({
+      startY: 26,
+      head: [['NIK', 'Name', 'Grade', 'Position', 'Competency', 'Actual', 'Target']],
+      body: tableRows,
+      styles: {
+        fontSize: 9, cellPadding: 3,
+        lineColor: [200, 208, 224], lineWidth: 0.3,
+        textColor: [13, 27, 42],
+      },
+      headStyles: {
+        fillColor: [10, 36, 99], textColor: [255,255,255],
+        fontStyle: 'bold', halign: 'center',
+      },
+      columnStyles: {
+        0: { cellWidth: 22, fontStyle: 'normal', font: 'courier', fontSize: 8 },
+        1: { cellWidth: 48, fontStyle: 'bold' },
+        2: { cellWidth: 18, halign: 'center' },
+        3: { cellWidth: 38 },
+        4: { cellWidth: 80 },
+        5: { cellWidth: 18, halign: 'center', fontStyle: 'bold' },
+        6: { cellWidth: 18, halign: 'center', fontStyle: 'bold', textColor: [10, 36, 99] },
+      },
+      didParseCell: (data) => {
+        // Stripe rows per person (isFirst = new person)
+        if (data.section === 'body' && printRows[data.row.index]?.isFirst && data.row.index > 0) {
+          data.cell.styles.lineColor = [10, 36, 99];
+          data.cell.styles.lineWidth = { top: 0.6, right: 0.3, bottom: 0.3, left: 0.3 };
+        }
+      },
+      alternateRowStyles: { fillColor: [244, 246, 251] },
+      margin: { left: 14, right: 14 },
+    });
+
+    // Footer
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8); doc.setTextColor(136, 150, 171);
+      doc.text(`IDP Management System  ·  PT. Amerta Indah Otsuka  ·  ${today}`, 14, doc.internal.pageSize.height - 8);
+      doc.text(`Page ${i} of ${pageCount}`, 283, doc.internal.pageSize.height - 8, { align: 'right' });
+    }
+
+    const filename = `IDP_Assignment_${leaderName.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+    doc.save(filename);
+    toast('PDF downloaded successfully!', 'success');
+
+  } catch(err) {
+    toast('Failed to generate PDF: ' + err.message, 'error');
+  } finally {
+    showLoading(false);
+  }
 }
 
 function openAssignModal(memberNik) {
