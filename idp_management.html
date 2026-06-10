@@ -946,7 +946,18 @@ async function loadTeamAssessment() {
 function renderTeamAssessmentList() {
   const team=state.teamData;
   if(!team||!team.length){html('team-assessment-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">No Direct Reports</div></div></div></div>`);return;}
-  let content=`<div class="card"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Grade</th><th>Department</th><th>Assessment</th><th>Assignment</th><th>Mandatory</th><th>Action</th></tr></thead><tbody>`;
+
+  const allAssigned = team.filter(m=>m.has_submitted).every(m=>m.already_assigned);
+  const pendingCount = team.filter(m=>m.has_submitted&&!m.already_assigned).length;
+
+  let content=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+    <button class="btn btn-green" onclick="downloadAssignmentPDF()" ${!allAssigned?'disabled':''} style="${!allAssigned?'opacity:0.45;cursor:not-allowed;':''}">
+      ⬇ Download Assignment PDF
+    </button>
+    ${!allAssigned?`<span style="font-size:12px;color:var(--text-muted);">${pendingCount} member(s) not yet assigned</span>`:''}
+  </div>`;
+
+  content+=`<div class="card"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Grade</th><th>Department</th><th>Assessment</th><th>Assignment</th><th>Mandatory</th><th>Action</th></tr></thead><tbody>`;
   team.forEach(m=>{
     content+=`<tr>
       <td><strong>${m.name}</strong><br><span style="font-size:11px;font-family:var(--mono);color:var(--text-muted);">${m.nik}</span></td>
@@ -958,6 +969,128 @@ function renderTeamAssessmentList() {
     </tr>`;
   });
   content+=`</tbody></table></div></div>`; html('team-assessment-content',content);
+}
+
+function downloadAssignmentPDF() {
+  const team = state.teamData;
+  if (!team || !team.length) return;
+
+  // Build rows: only members who have been assigned, mandatory + additional
+  const rows = [];
+  team.forEach(m => {
+    if (!m.already_assigned || !m.competencies) return;
+    const assigned = m.competencies.filter(c => c.decision === 'mandatory' || c.decision === 'additional');
+    if (!assigned.length) return;
+    assigned.forEach((c, idx) => {
+      rows.push({
+        name:       idx === 0 ? m.name : '',
+        nameFirst:  idx === 0,
+        rowspan:    assigned.length,
+        competency: c.competency_name || c.competency_id,
+        level:      c.target_level || '-',
+        decision:   c.decision,
+      });
+    });
+  });
+
+  if (!rows.length) { toast('No assignment data to export', 'warning'); return; }
+
+  const leaderName = state.user?.name || '';
+  const today = new Date().toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' });
+
+  // Build flat rows: one row per competency per member
+  const printRows = [];
+  team.forEach(m => {
+    if (!m.already_assigned || !m.competencies) return;
+    const assigned = m.competencies.filter(c => c.decision === 'mandatory' || c.decision === 'additional');
+    if (!assigned.length) return;
+    assigned.forEach((c, idx) => {
+      printRows.push({
+        nik:        idx === 0 ? m.nik   : '',
+        name:       idx === 0 ? m.name  : '',
+        grade:      idx === 0 ? m.grade : '',
+        position:   idx === 0 ? (m.position || m.grade) : '',
+        isFirst:    idx === 0,
+        competency: c.competency_name || c.competency_id,
+        actual:     c.self_score ?? '-',
+        target:     c.target_level ?? '-',
+        decision:   c.decision,
+      });
+    });
+  });
+
+  if (!printRows.length) { toast('No assignment data to export', 'warning'); return; }
+
+  const win = window.open('', '_blank', 'width=900,height=700');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <title>IDP Assignment — ${leaderName}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Calibri', Arial, sans-serif; font-size: 11pt; color: #000; padding: 32px 40px; }
+    .header { margin-bottom: 20px; }
+    .header h2 { font-size: 14pt; font-weight: bold; color: #0A2463; margin-bottom: 4px; }
+    .header p { font-size: 10pt; color: #555; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th {
+      background: #0A2463; color: #fff;
+      padding: 8px 10px; text-align: center;
+      font-size: 10pt; font-weight: bold;
+      border: 1px solid #0A2463;
+    }
+    th.left { text-align: left; }
+    td { padding: 6px 10px; border: 1px solid #C8D0E0; font-size: 10pt; vertical-align: middle; }
+    td.center { text-align: center; }
+    .divider td { background: #E8EDF8; font-weight: bold; font-size: 9pt; color: #0A2463; padding: 3px 10px; border-color: #B0BEDD; }
+    .mandatory { color: #E84855; font-weight: bold; }
+    .additional { color: #1B7A8C; }
+    .footer { margin-top: 24px; font-size: 9pt; color: #999; border-top: 1px solid #E2E7F0; padding-top: 10px; }
+    .print-btn { margin-top: 16px; padding: 10px 24px; background: #0A2463; color: #fff; border: none; border-radius: 6px; font-size: 11pt; cursor: pointer; }
+    @media print {
+      body { padding: 12px 20px; }
+      .print-btn { display: none; }
+    }
+  </style>
+  </head><body>
+  <div class="header">
+    <h2>IDP Competency Assignment Report</h2>
+    <p>Leader: <strong>${leaderName}</strong> &nbsp;·&nbsp; Generated: ${today} &nbsp;·&nbsp; PT. Amerta Indah Otsuka</p>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th class="left" style="width:10%">NIK</th>
+        <th class="left" style="width:22%">Name</th>
+        <th style="width:7%">Grade</th>
+        <th class="left" style="width:16%">Position</th>
+        <th class="left" style="width:28%">Competency</th>
+        <th style="width:8%">Actual</th>
+        <th style="width:9%">Target</th>
+      </tr>
+    </thead>
+    <tbody>`);
+
+  printRows.forEach((r, i) => {
+    // Add subtle divider row before each new person (except first)
+    if (r.isFirst && i > 0) {
+      win.document.write(`<tr class="divider"><td colspan="7"></td></tr>`);
+    }
+    win.document.write(`<tr>
+      <td style="font-family:monospace;font-size:9pt;">${r.nik}</td>
+      <td>${r.name ? `<strong>${r.name}</strong>` : ''}</td>
+      <td class="center">${r.grade ? `<span style="background:#D6EEF2;color:#1B7A8C;padding:2px 8px;border-radius:20px;font-size:9pt;font-weight:bold;">${r.grade}</span>` : ''}</td>
+      <td style="font-size:9.5pt;color:#555;">${r.position}</td>
+      <td>${r.competency}</td>
+      <td class="center" style="font-weight:bold;">${r.actual}</td>
+      <td class="center" style="font-weight:bold;color:#0A2463;">${r.target}</td>
+    </tr>`);
+  });
+
+  win.document.write(`</tbody></table>
+  <div class="footer">IDP Management System &nbsp;·&nbsp; PT. Amerta Indah Otsuka &nbsp;·&nbsp; ${today}</div>
+  <br>
+  <button class="print-btn" onclick="window.print()">🖨 Print / Save as PDF</button>
+  </body></html>`);
+  win.document.close();
 }
 
 function openAssignModal(memberNik) {
