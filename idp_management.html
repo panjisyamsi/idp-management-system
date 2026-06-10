@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,159 +7,60 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --primary: #0A2463;
-  --primary-light: #1B3F8B;
-  --accent: #E84855;
-  --accent-soft: #FEE8EA;
-  --gold: #F4A827;
-  --gold-soft: #FEF3DC;
-  --green: #2D6A4F;
-  --green-soft: #D8F3DC;
-  --teal: #1B7A8C;
-  --teal-soft: #D6EEF2;
-  --purple: #5C4B8A;
-  --purple-soft: #EBE8F5;
-  --bg: #F4F6FB;
-  --surface: #FFFFFF;
-  --surface2: #F8F9FC;
-  --border: #E2E7F0;
-  --border-strong: #C8D0E0;
-  --text: #0D1B2A;
-  --text-secondary: #4A5568;
-  --text-muted: #8896AB;
-  --shadow-sm: 0 1px 3px rgba(10,36,99,0.08);
-  --shadow: 0 4px 16px rgba(10,36,99,0.10);
-  --shadow-lg: 0 8px 32px rgba(10,36,99,0.14);
-  --radius: 12px;
-  --radius-sm: 8px;
-  --radius-lg: 16px;
-  --font: 'Plus Jakarta Sans', sans-serif;
-  --mono: 'DM Mono', monospace;
-  --nav-height: 60px;
-  --sidebar-width: 240px;
-  --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
+  --primary: #0A2463; --primary-light: #1B3F8B; --accent: #E84855; --accent-soft: #FEE8EA;
+  --gold: #F4A827; --gold-soft: #FEF3DC; --green: #2D6A4F; --green-soft: #D8F3DC;
+  --teal: #1B7A8C; --teal-soft: #D6EEF2; --purple: #5C4B8A; --purple-soft: #EBE8F5;
+  --bg: #F4F6FB; --surface: #FFFFFF; --surface2: #F8F9FC;
+  --border: #E2E7F0; --border-strong: #C8D0E0;
+  --text: #0D1B2A; --text-secondary: #4A5568; --text-muted: #8896AB;
+  --shadow-sm: 0 1px 3px rgba(10,36,99,0.08); --shadow: 0 4px 16px rgba(10,36,99,0.10); --shadow-lg: 0 8px 32px rgba(10,36,99,0.14);
+  --radius: 12px; --radius-sm: 8px; --radius-lg: 16px;
+  --font: 'Plus Jakarta Sans', sans-serif; --mono: 'DM Mono', monospace;
+  --nav-height: 60px; --sidebar-width: 240px; --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
 }
-
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 14px; }
-body {
-  font-family: var(--font);
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
+body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 .hidden { display: none !important; }
-.flex { display: flex; }
-.flex-col { flex-direction: column; }
-.items-center { align-items: center; }
-.justify-between { justify-content: space-between; }
-.gap-2 { gap: 8px; }
-.gap-3 { gap: 12px; }
-.gap-4 { gap: 16px; }
-.w-full { width: 100%; }
-.text-sm { font-size: 12px; }
-.text-xs { font-size: 11px; }
-.font-medium { font-weight: 500; }
-.font-semibold { font-weight: 600; }
-.font-bold { font-weight: 700; }
-.text-muted { color: var(--text-muted); }
-.text-secondary { color: var(--text-secondary); }
+.flex { display: flex; } .items-center { align-items: center; } .justify-between { justify-content: space-between; }
+.gap-2 { gap: 8px; } .gap-3 { gap: 12px; } .gap-4 { gap: 16px; }
+.w-full { width: 100%; } .text-sm { font-size: 12px; } .text-xs { font-size: 11px; }
+.font-medium { font-weight: 500; } .font-semibold { font-weight: 600; } .font-bold { font-weight: 700; }
+.text-muted { color: var(--text-muted); } .text-secondary { color: var(--text-secondary); }
 
-#toast-container {
-  position: fixed; top: 20px; right: 20px;
-  z-index: 9999; display: flex; flex-direction: column; gap: 8px;
-}
-.toast {
-  padding: 12px 18px; border-radius: var(--radius-sm);
-  font-size: 13px; font-weight: 500;
-  background: var(--text); color: #fff;
-  box-shadow: var(--shadow-lg);
-  animation: slideIn 0.3s ease;
-  max-width: 320px;
-}
-.toast.success { background: var(--green); }
-.toast.error { background: var(--accent); }
-.toast.warning { background: var(--gold); color: var(--text); }
+/* TOAST */
+#toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+.toast { padding: 12px 18px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; background: var(--text); color: #fff; box-shadow: var(--shadow-lg); animation: slideIn 0.3s ease; max-width: 320px; }
+.toast.success { background: var(--green); } .toast.error { background: var(--accent); } .toast.warning { background: var(--gold); color: var(--text); }
 @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 @keyframes slideOut { to { transform: translateX(120%); opacity: 0; } }
 
-#loading-overlay {
-  position: fixed; inset: 0; background: rgba(255,255,255,0.85);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 8888; backdrop-filter: blur(4px);
-}
-.spinner {
-  width: 36px; height: 36px;
-  border: 3px solid var(--border);
-  border-top-color: var(--primary);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
+/* LOADING */
+#loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.85); display: flex; align-items: center; justify-content: center; z-index: 8888; backdrop-filter: blur(4px); }
+.spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-#page-login {
-  min-height: 100vh;
-  display: flex; align-items: center; justify-content: center;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 50%, #2A5298 100%);
-  position: relative; overflow: hidden;
-}
-#page-login::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-}
-.login-card {
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  padding: 48px 40px;
-  width: 100%; max-width: 400px;
-  box-shadow: 0 24px 64px rgba(0,0,0,0.25);
-  position: relative; z-index: 1;
-}
+/* LOGIN */
+#page-login { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 50%, #2A5298 100%); position: relative; overflow: hidden; }
+#page-login::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
+.login-card { background: var(--surface); border-radius: var(--radius-lg); padding: 48px 40px; width: 100%; max-width: 400px; box-shadow: 0 24px 64px rgba(0,0,0,0.25); position: relative; z-index: 1; }
 .login-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
-.login-logo-icon {
-  width: 44px; height: 44px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-weight: 700; font-size: 16px;
-}
-.login-logo-text { line-height: 1.2; }
+.login-logo-icon { width: 44px; height: 44px; background: linear-gradient(135deg, var(--primary), var(--primary-light)); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 16px; }
 .login-logo-text .title { font-size: 15px; font-weight: 700; color: var(--primary); }
 .login-logo-text .sub { font-size: 11px; color: var(--text-muted); }
 .login-card h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
 .login-card p { color: var(--text-secondary); font-size: 13px; margin-bottom: 28px; }
 
+/* FORMS */
 .form-group { margin-bottom: 16px; }
-.form-label {
-  display: block; font-size: 12px; font-weight: 600;
-  color: var(--text-secondary); margin-bottom: 6px; letter-spacing: 0.3px;
-  text-transform: uppercase;
-}
-.form-input {
-  width: 100%; padding: 11px 14px;
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-family: var(--font); font-size: 14px; color: var(--text);
-  background: var(--surface); outline: none;
-  transition: border-color var(--transition), box-shadow var(--transition);
-}
-.form-input:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(10,36,99,0.08);
-}
+.form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; letter-spacing: 0.3px; text-transform: uppercase; }
+.form-input { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: var(--font); font-size: 14px; color: var(--text); background: var(--surface); outline: none; transition: border-color var(--transition), box-shadow var(--transition); }
+.form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(10,36,99,0.08); }
 .form-input.mono { font-family: var(--mono); letter-spacing: 1px; }
 select.form-input { cursor: pointer; }
 
-.btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  padding: 10px 20px; border-radius: var(--radius-sm);
-  font-family: var(--font); font-size: 13px; font-weight: 600;
-  border: none; cursor: pointer; transition: all var(--transition);
-  white-space: nowrap; text-decoration: none;
-}
+/* BUTTONS */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 20px; border-radius: var(--radius-sm); font-family: var(--font); font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: all var(--transition); white-space: nowrap; text-decoration: none; }
 .btn-primary { background: var(--primary); color: #fff; }
 .btn-primary:hover { background: var(--primary-light); transform: translateY(-1px); box-shadow: var(--shadow); }
 .btn-accent { background: var(--accent); color: #fff; }
@@ -173,16 +74,9 @@ select.form-input { cursor: pointer; }
 .btn-full { width: 100%; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
 
+/* LAYOUT */
 #app-layout { display: none; min-height: 100vh; }
-
-.top-nav {
-  position: fixed; top: 0; left: 0; right: 0;
-  height: var(--nav-height); z-index: 100;
-  background: var(--primary);
-  display: flex; align-items: center;
-  padding: 0 20px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.2);
-}
+.top-nav { position: fixed; top: 0; left: 0; right: 0; height: var(--nav-height); z-index: 100; background: var(--primary); display: flex; align-items: center; padding: 0 20px; box-shadow: 0 2px 16px rgba(0,0,0,0.2); }
 .nav-brand { display: flex; align-items: center; gap: 10px; color: #fff; font-weight: 700; font-size: 15px; margin-right: 20px; }
 .nav-brand-icon { width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; }
 .nav-user { margin-left: auto; display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,0.9); }
@@ -191,39 +85,35 @@ select.form-input { cursor: pointer; }
 .nav-user-role { font-size: 11px; color: rgba(255,255,255,0.6); }
 .nav-avatar { width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #fff; cursor: pointer; transition: background var(--transition); }
 .nav-avatar:hover { background: rgba(255,255,255,0.3); }
-
 .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; z-index: 100; box-shadow: 0 -4px 16px rgba(0,0,0,0.08); }
 .bottom-nav-item { flex: 1; padding: 10px 4px 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: color var(--transition); color: var(--text-muted); font-size: 10px; font-weight: 500; border: none; background: none; font-family: var(--font); }
 .bottom-nav-item.active { color: var(--primary); }
 .bottom-nav-icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 18px; line-height: 1; }
-
 .sidebar { position: fixed; top: var(--nav-height); left: 0; bottom: 0; width: var(--sidebar-width); background: var(--surface); border-right: 1px solid var(--border); padding: 16px 12px; overflow-y: auto; z-index: 50; display: none; }
 .sidebar-label { font-size: 10px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.8px; text-transform: uppercase; padding: 0 8px; margin-bottom: 4px; margin-top: 12px; }
 .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius-sm); cursor: pointer; transition: all var(--transition); color: var(--text-secondary); font-size: 13px; font-weight: 500; border: none; background: none; font-family: var(--font); width: 100%; text-align: left; }
 .sidebar-item:hover { background: var(--surface2); color: var(--text); }
 .sidebar-item.active { background: rgba(10,36,99,0.08); color: var(--primary); font-weight: 600; }
 .sidebar-icon { width: 18px; text-align: center; font-size: 15px; }
-
 .main-content { padding-top: var(--nav-height); min-height: 100vh; }
 .page-view { display: none; padding: 24px 20px 100px; }
 .page-view.active { display: block; }
-
 @media (min-width: 768px) {
-  .sidebar { display: block; }
-  .bottom-nav { display: none; }
+  .sidebar { display: block; } .bottom-nav { display: none; }
   .main-content { margin-left: var(--sidebar-width); }
   .page-view { padding: 28px 32px 40px; }
 }
 
+/* CARDS */
 .card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
 .card-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
 .card-title { font-size: 15px; font-weight: 700; }
 .card-body { padding: 20px 24px; }
-
 .page-header { margin-bottom: 24px; }
 .page-header h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
 .page-header p { color: var(--text-secondary); font-size: 13px; }
 
+/* STATS */
 .stats-grid { display: grid; gap: 16px; grid-template-columns: repeat(2, 1fr); }
 @media (min-width: 768px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
 .stat-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; box-shadow: var(--shadow-sm); }
@@ -231,6 +121,7 @@ select.form-input { cursor: pointer; }
 .stat-value { font-size: 28px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
 .stat-sub { font-size: 11px; color: var(--text-muted); }
 
+/* BADGES */
 .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; }
 .badge-blue { background: rgba(10,36,99,0.08); color: var(--primary); }
 .badge-green { background: var(--green-soft); color: var(--green); }
@@ -240,12 +131,12 @@ select.form-input { cursor: pointer; }
 .badge-teal { background: var(--teal-soft); color: var(--teal); }
 .badge-gray { background: var(--surface2); color: var(--text-muted); }
 
+/* PROGRESS */
 .progress-wrap { background: var(--border); border-radius: 100px; overflow: hidden; }
 .progress-bar { height: 100%; border-radius: 100px; transition: width 0.5s ease; }
-.progress-bar.blue { background: var(--primary); }
-.progress-bar.green { background: var(--green); }
-.progress-bar.gold { background: var(--gold); }
+.progress-bar.blue { background: var(--primary); } .progress-bar.green { background: var(--green); } .progress-bar.gold { background: var(--gold); }
 
+/* PIPELINE */
 .pipeline-item { display: flex; align-items: flex-start; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--border); }
 .pipeline-item:last-child { border-bottom: none; }
 .pipeline-icon { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; }
@@ -254,12 +145,11 @@ select.form-input { cursor: pointer; }
 .pipeline-meta { font-size: 12px; color: var(--text-muted); }
 .pipeline-status { flex-shrink: 0; }
 
+/* ASSESSMENT */
 .assessment-section { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 16px; overflow: hidden; }
 .assessment-section-header { padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: var(--surface2); border-bottom: 1px solid var(--border); }
 .competency-block { padding: 20px; border-bottom: 1px solid var(--border); }
 .competency-block:last-child { border-bottom: none; }
-.competency-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
-.competency-title { font-weight: 700; font-size: 15px; }
 .level-block { margin-bottom: 16px; }
 .level-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
 .indicator-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: var(--radius-sm); margin-bottom: 6px; border: 1.5px solid var(--border); cursor: pointer; transition: all var(--transition); }
@@ -270,6 +160,7 @@ select.form-input { cursor: pointer; }
 .indicator-text { font-size: 13px; line-height: 1.5; flex: 1; }
 .indicator-example { font-size: 11px; color: var(--text-muted); font-style: italic; margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--border); }
 
+/* TABLE */
 .table-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
 thead th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; background: var(--surface2); border-bottom: 1px solid var(--border); white-space: nowrap; }
@@ -277,6 +168,7 @@ tbody td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-
 tbody tr:last-child td { border-bottom: none; }
 tbody tr:hover { background: var(--surface2); }
 
+/* MODAL */
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; display: flex; align-items: flex-end; justify-content: center; backdrop-filter: blur(2px); animation: fadeIn 0.2s ease; }
 @media (min-width: 640px) { .modal-overlay { align-items: center; } }
 .modal { background: var(--surface); border-radius: var(--radius-lg) var(--radius-lg) 0 0; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s cubic-bezier(0.4,0,0.2,1); }
@@ -290,17 +182,49 @@ tbody tr:hover { background: var(--surface2); }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
+/* EMPTY STATE */
 .empty-state { text-align: center; padding: 60px 24px; }
 .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.4; }
 .empty-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
 .empty-desc { font-size: 13px; color: var(--text-muted); }
 
+/* BAR CHART */
 .bar-chart { display: flex; flex-direction: column; gap: 10px; }
 .bar-row { display: flex; align-items: center; gap: 12px; }
 .bar-name { font-size: 12px; color: var(--text-secondary); width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
 .bar-track { flex: 1; height: 8px; background: var(--border); border-radius: 100px; overflow: hidden; }
 .bar-fill { height: 100%; border-radius: 100px; background: var(--primary); transition: width 0.6s ease; }
 .bar-val { font-size: 11px; font-weight: 600; color: var(--text-muted); width: 40px; text-align: right; flex-shrink: 0; }
+
+/* ── MIRAI CHATBOT ─────────────────────────────────────── */
+#mirai-widget { position: fixed; bottom: 24px; right: 24px; z-index: 600; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+#mirai-bubble { background: #fff; border: 1px solid var(--border); border-radius: 14px 14px 2px 14px; padding: 12px 16px; max-width: 230px; font-size: 13px; line-height: 1.5; box-shadow: var(--shadow); animation: fadeIn 0.3s ease; }
+#mirai-panel { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); width: 300px; box-shadow: var(--shadow-lg); display: none; flex-direction: column; overflow: hidden; animation: slideUp 0.25s ease; }
+#mirai-panel.open { display: flex; }
+.mirai-header { background: var(--primary); padding: 12px 14px; display: flex; align-items: center; gap: 10px; }
+.mirai-avatar-sm { width: 34px; height: 34px; border-radius: 50%; overflow: hidden; border: 2px solid rgba(255,255,255,0.3); flex-shrink: 0; }
+.mirai-avatar-sm img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+.mirai-header-info { flex: 1; }
+.mirai-header-name { font-size: 13px; font-weight: 600; color: #fff; }
+.mirai-header-sub { font-size: 10px; color: rgba(255,255,255,0.55); }
+.mirai-close { background: none; border: none; color: rgba(255,255,255,0.6); cursor: pointer; font-size: 20px; line-height: 1; padding: 0 2px; }
+.mirai-close:hover { color: #fff; }
+.mirai-messages { padding: 12px; max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+.mirai-msg { padding: 8px 12px; border-radius: 10px; font-size: 12px; line-height: 1.55; max-width: 88%; }
+.mirai-msg.bot { background: var(--surface2); color: var(--text); align-self: flex-start; border-bottom-left-radius: 3px; }
+.mirai-msg.user { background: var(--primary); color: #fff; align-self: flex-end; border-bottom-right-radius: 3px; }
+.mirai-typing { font-size: 11px; color: var(--text-muted); font-style: italic; align-self: flex-start; padding: 4px 8px; }
+.mirai-input-row { display: flex; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--border); }
+.mirai-input { flex: 1; padding: 7px 12px; border: 1.5px solid var(--border); border-radius: 20px; font-size: 12px; font-family: var(--font); outline: none; background: var(--surface); }
+.mirai-input:focus { border-color: var(--primary); }
+.mirai-send { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); border: none; cursor: pointer; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+.mirai-send:hover { background: var(--primary-light); }
+#mirai-fab { width: 58px; height: 58px; border-radius: 50%; border: 2.5px solid var(--primary); background: #fff; cursor: pointer; overflow: hidden; padding: 0; box-shadow: var(--shadow-lg); transition: transform 0.2s ease; }
+#mirai-fab:hover { transform: scale(1.06); }
+#mirai-fab img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+
+/* CHANGE PASSWORD PAGE */
+#page-change-password { display: none; min-height: 100vh; align-items: center; justify-content: center; background: linear-gradient(135deg,var(--primary),var(--primary-light)); position: fixed; inset: 0; z-index: 500; }
 </style>
 </head>
 <body>
@@ -308,7 +232,7 @@ tbody tr:hover { background: var(--surface2); }
 <div id="toast-container"></div>
 <div id="loading-overlay" class="hidden"><div class="spinner"></div></div>
 
-<!-- LOGIN -->
+<!-- ── LOGIN ─────────────────────────────────────────────── -->
 <div id="page-login">
   <div class="login-card">
     <div class="login-logo">
@@ -329,17 +253,15 @@ tbody tr:hover { background: var(--surface2); }
       <input type="password" id="login-password" class="form-input" placeholder="Enter your password">
     </div>
     <button class="btn btn-primary btn-full btn-lg" onclick="doLogin()">Sign In</button>
-    <p style="margin-top:14px; text-align:center;">
+    <p style="margin-top:14px;text-align:center;">
       <button onclick="showForgotPassword()" style="background:none;border:none;color:var(--primary);font-size:13px;cursor:pointer;font-family:var(--font);text-decoration:underline;">Forgot password?</button>
     </p>
-    <p style="margin-top:8px; font-size:11px; color:var(--text-muted); text-align:center;">
-      Default password: AIO + your NIK. Must be changed on first login.
-    </p>
+    <p style="margin-top:8px;font-size:11px;color:var(--text-muted);text-align:center;">Default password: AIO + your NIK. Must be changed on first login.</p>
   </div>
 </div>
 
-<!-- CHANGE PASSWORD -->
-<div id="page-change-password" style="display:none; min-height:100vh; align-items:center; justify-content:center; background:linear-gradient(135deg,var(--primary),var(--primary-light)); position:fixed; inset:0; z-index:500;">
+<!-- ── CHANGE PASSWORD ────────────────────────────────────── -->
+<div id="page-change-password">
   <div class="login-card">
     <div class="login-logo">
       <div class="login-logo-icon" style="background:var(--gold);">🔐</div>
@@ -362,7 +284,7 @@ tbody tr:hover { background: var(--surface2); }
   </div>
 </div>
 
-<!-- APP LAYOUT -->
+<!-- ── APP LAYOUT ─────────────────────────────────────────── -->
 <div id="app-layout">
   <nav class="top-nav">
     <div class="nav-brand">
@@ -383,7 +305,7 @@ tbody tr:hover { background: var(--surface2); }
 
   <main class="main-content">
     <div id="view-dashboard" class="page-view">
-      <div class="page-header"><h1>Dashboard</h1><p id="dash-greeting">Welcome kembali</p></div>
+      <div class="page-header"><h1>Dashboard</h1><p id="dash-greeting">Welcome back</p></div>
       <div id="dash-content"></div>
     </div>
     <div id="view-assessment" class="page-view">
@@ -427,25 +349,132 @@ tbody tr:hover { background: var(--surface2); }
 
 <div id="modal-container"></div>
 
+<!-- ── MIRAI CHATBOT ──────────────────────────────────────── -->
+<div id="mirai-widget">
+  <div id="mirai-bubble">Ada yang ingin ditanyakan? Saya siap membantu! 😊</div>
+  <div id="mirai-panel">
+    <div class="mirai-header">
+      <div class="mirai-avatar-sm">
+        <img src="https://res.cloudinary.com/dy5q2vnqp/image/upload/f_auto,q_auto/Gemini_Generated_Image_meauyumeauyumeau_f1xgqn" alt="Mirai" onerror="this.parentElement.innerHTML='<div style=\'width:100%;height:100%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:16px;\'>🤖</div>'">
+      </div>
+      <div class="mirai-header-info">
+        <div class="mirai-header-name">Mirai — IDP Assistant</div>
+        <div class="mirai-header-sub">Powered by AI · Bahasa Indonesia</div>
+      </div>
+      <button class="mirai-close" onclick="toggleMirai()">×</button>
+    </div>
+    <div class="mirai-messages" id="mirai-messages"></div>
+    <div class="mirai-input-row">
+      <input class="mirai-input" id="mirai-input" placeholder="Tanya sesuatu..." onkeydown="if(event.key==='Enter')sendMirai()">
+      <button class="mirai-send" onclick="sendMirai()">→</button>
+    </div>
+  </div>
+  <button id="mirai-fab" onclick="toggleMirai()">
+    <img src="https://res.cloudinary.com/dy5q2vnqp/image/upload/f_auto,q_auto/Gemini_Generated_Image_meauyumeauyumeau_f1xgqn" alt="Mirai" onerror="this.outerHTML='<span style=\'font-size:26px;\'>🤖</span>'">
+  </button>
+</div>
+
 <script>
-// ── CONFIG ───────────────────────────────────────────────────
+// ── CONFIG ──────────────────────────────────────────────────
 const API_URL = 'https://script.google.com/macros/s/AKfycbzKKGVMAZqRnW--CoMuXKdXTLnJ6EXwqhReeuWxS3sLY4UhNx6Hmq_mF79lLtu2CMSu/exec';
+const MIRAI_IMG = 'https://res.cloudinary.com/dy5q2vnqp/image/upload/f_auto,q_auto/Gemini_Generated_Image_meauyumeauyumeau_f1xgqn';
 
 // ── STATE ────────────────────────────────────────────────────
 let state = {
-  user: null,
-  currentView: 'dashboard',
-  jadwalTab: 'my',
-  compLibrary: null,
-  assessmentScores: {},
-  assessmentChecks: {},
-  teamData: null,
-  enrollments: [],
-  jadwal: [],
-  mandatoryCompIds: [],
+  user: null, currentView: 'dashboard', jadwalTab: 'my',
+  compLibrary: null, assessmentScores: {}, assessmentChecks: {},
+  teamData: null, enrollments: [], jadwal: [], mandatoryCompIds: [],
 };
 
-// ── API HELPER ───────────────────────────────────────────────
+// ── MIRAI CHATBOT ────────────────────────────────────────────
+const MIRAI_FAQS = [
+  { q: ['enroll','daftar','training','mendaftar'], a: 'Buka menu Schedule, pilih sesi yang sesuai kompetensi kamu, lalu klik Enroll. Email konfirmasi dan Google Calendar invite otomatis dikirim ke kamu dan leader setelah berhasil.' },
+  { q: ['mandatory','wajib'], a: 'Mandatory adalah kompetensi yang wajib diselesaikan dalam program IDP. Leader menetapkan maksimal 2 kompetensi mandatory berdasarkan gap terbesar.' },
+  { q: ['assessment','self','penilaian'], a: 'Self Assessment ada di menu Assessment. Centang indikator perilaku yang kamu tunjukkan secara konsisten. Simpan draft dulu, submit final jika sudah yakin.' },
+  { q: ['password','lupa','reset'], a: 'Di halaman login, klik Forgot password? dan masukkan NIK kamu. Link reset akan dikirim ke email terdaftar.' },
+  { q: ['gap','level'], a: 'Gap adalah selisih antara level aktual dan target level. Kompetensi dengan gap ditandai di dashboard — semakin besar gap, semakin prioritas.' },
+  { q: ['pdf','download'], a: 'PDF assignment tim tersedia di menu Team Assessment setelah semua anggota tim sudah di-assign oleh leader.' },
+  { q: ['leader','tim','team'], a: 'Sebagai leader, kamu bisa review assessment tim di menu Team Assessment dan monitor progress di Team Monitor.' },
+  { q: ['progress','perkembangan'], a: 'Cek menu Progress untuk melihat persentase penyelesaian kompetensi mandatory dan additional kamu.' },
+  { q: ['jadwal','schedule','sesi'], a: 'Jadwal training ada di menu Schedule. Ada dua tab: My Mandatory (sesi sesuai kompetensi kamu) dan All Schedules (semua jadwal yang tersedia).' },
+  { q: ['cancel','batal'], a: 'Untuk membatalkan enrollment, buka menu Schedule, temukan sesi yang sudah kamu daftar, lalu klik Cancel.' },
+  { q: ['admin','hcd'], a: 'Untuk bantuan lebih lanjut, hubungi HCD: Panji Nursamsi di 0857-1567-2731.' },
+  { q: ['halo','hai','hello','hi'], a: 'Halo! Saya Mirai, asisten IDP kamu. Ada yang bisa saya bantu hari ini?' },
+];
+
+let miraiOpen = false;
+let miraiMsgs = [];
+let miraiBubbleTimer = null;
+
+function initMirai() {
+  miraiMsgs = [{ type: 'bot', text: 'Halo! Saya Mirai, asisten IDP kamu. Tanya apapun seputar sistem, jadwal training, atau program pengembanganmu 😊' }];
+  renderMiraiMessages();
+  miraiBubbleTimer = setTimeout(() => {
+    const bubble = document.getElementById('mirai-bubble');
+    if (bubble) bubble.style.display = 'none';
+  }, 6000);
+}
+
+function toggleMirai() {
+  miraiOpen = !miraiOpen;
+  const panel = document.getElementById('mirai-panel');
+  const bubble = document.getElementById('mirai-bubble');
+  if (miraiOpen) {
+    panel.classList.add('open');
+    if (bubble) bubble.style.display = 'none';
+    clearTimeout(miraiBubbleTimer);
+    scrollMiraiToBottom();
+  } else {
+    panel.classList.remove('open');
+  }
+}
+
+function renderMiraiMessages() {
+  const container = document.getElementById('mirai-messages');
+  if (!container) return;
+  container.innerHTML = miraiMsgs.map(m =>
+    `<div class="mirai-msg ${m.type}">${m.text}</div>`
+  ).join('');
+  scrollMiraiToBottom();
+}
+
+function scrollMiraiToBottom() {
+  setTimeout(() => {
+    const c = document.getElementById('mirai-messages');
+    if (c) c.scrollTop = c.scrollHeight;
+  }, 50);
+}
+
+function sendMirai() {
+  const input = document.getElementById('mirai-input');
+  const q = (input.value || '').trim();
+  if (!q) return;
+  input.value = '';
+  miraiMsgs.push({ type: 'user', text: q });
+
+  const typingEl = document.createElement('div');
+  typingEl.className = 'mirai-typing';
+  typingEl.id = 'mirai-typing';
+  typingEl.textContent = 'Mirai sedang mengetik...';
+  document.getElementById('mirai-messages').appendChild(typingEl);
+  scrollMiraiToBottom();
+
+  setTimeout(() => {
+    const typing = document.getElementById('mirai-typing');
+    if (typing) typing.remove();
+    const lc = q.toLowerCase();
+    let reply = 'Maaf, saya belum punya informasi untuk itu. Silakan hubungi HCD: Panji Nursamsi (0857-1567-2731).';
+    for (const faq of MIRAI_FAQS) {
+      if (faq.q.some(k => lc.includes(k))) { reply = faq.a; break; }
+    }
+    miraiMsgs.push({ type: 'bot', text: reply });
+    renderMiraiMessages();
+  }, 700 + Math.random() * 500);
+
+  renderMiraiMessages();
+}
+
+// ── API HELPER ────────────────────────────────────────────────
 async function api(action, payload = {}) {
   showLoading(true);
   try {
@@ -454,8 +483,7 @@ async function api(action, payload = {}) {
       headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({ action, ...payload }),
     });
-    const data = await res.json();
-    return data;
+    return await res.json();
   } catch (err) {
     return { success: false, message: 'Connection failed. Please try again.' };
   } finally {
@@ -463,51 +491,24 @@ async function api(action, payload = {}) {
   }
 }
 
-// ── UI HELPERS ───────────────────────────────────────────────
-function showLoading(v) {
-  document.getElementById('loading-overlay').classList.toggle('hidden', !v);
-}
-
+// ── UI HELPERS ────────────────────────────────────────────────
+function showLoading(v) { document.getElementById('loading-overlay').classList.toggle('hidden', !v); }
 function toast(msg, type = 'default', duration = 3500) {
   const c = document.getElementById('toast-container');
   const t = document.createElement('div');
-  t.className = `toast ${type}`;
-  t.textContent = msg;
-  c.appendChild(t);
-  setTimeout(() => {
-    t.style.animation = 'slideOut 0.3s ease forwards';
-    setTimeout(() => t.remove(), 300);
-  }, duration);
+  t.className = `toast ${type}`; t.textContent = msg; c.appendChild(t);
+  setTimeout(() => { t.style.animation = 'slideOut 0.3s ease forwards'; setTimeout(() => t.remove(), 300); }, duration);
 }
-
 function openModal(htmlContent) {
   closeModal();
-  const c = document.getElementById('modal-container');
-  c.innerHTML = `<div class="modal-overlay" id="active-modal" onclick="handleModalOverlayClick(event)">${htmlContent}</div>`;
+  document.getElementById('modal-container').innerHTML = `<div class="modal-overlay" id="active-modal" onclick="handleModalOverlayClick(event)">${htmlContent}</div>`;
 }
-
-function closeModal() {
-  document.getElementById('modal-container').innerHTML = '';
-}
-
-function handleModalOverlayClick(e) {
-  if (e.target.id === 'active-modal') closeModal();
-}
-
+function closeModal() { document.getElementById('modal-container').innerHTML = ''; }
+function handleModalOverlayClick(e) { if (e.target.id === 'active-modal') closeModal(); }
 function el(id) { return document.getElementById(id); }
 function html(id, content) { const e = el(id); if (e) e.innerHTML = content; }
-
-function initials(name) {
-  if (!name) return '?';
-  return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
-}
-
-function roleLabel(role) {
-  if (role === 'admin') return 'Admin';
-  if (role && role.includes('leader')) return 'Leader & Employee';
-  return 'Employee';
-}
-
+function initials(name) { if (!name) return '?'; return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase(); }
+function roleLabel(role) { if (role === 'admin') return 'Admin'; if (role && role.includes('leader')) return 'Leader & Employee'; return 'Employee'; }
 function gradeColor(grade) {
   if (['G1','D1','D2','D3'].includes(grade)) return 'badge-red';
   if (['M2','M3'].includes(grade)) return 'badge-purple';
@@ -515,47 +516,30 @@ function gradeColor(grade) {
   if (grade === 'S2') return 'badge-gold';
   return 'badge-gray';
 }
-
 function statusBadge(status) {
-  const map = {
-    assigned:  ['badge-gold',   'Assigned'],
-    enrolled:  ['badge-teal',   'Enrolled'],
-    completed: ['badge-green',  'Completed'],
-    submitted: ['badge-green',  'Submitted'],
-    pending:   ['badge-gray',   'Not enrolled'],
-    mandatory: ['badge-red',    'Mandatory'],
-    additional:['badge-blue',   'Additional'],
-  };
+  const map = { assigned:['badge-gold','Assigned'], enrolled:['badge-teal','Enrolled'], completed:['badge-green','Completed'], submitted:['badge-green','Submitted'], pending:['badge-gray','Not enrolled'], mandatory:['badge-red','Mandatory'], additional:['badge-blue','Additional'] };
   const [cls, label] = map[status] || ['badge-gray', status];
   return `<span class="badge ${cls}">${label}</span>`;
 }
-
 function pct(a, b) { return b > 0 ? Math.round((a / b) * 100) : 0; }
-
 function progressBar(val, max, color = 'blue', height = 8) {
   const p = pct(val, max);
-  return `<div class="progress-wrap" style="height:${height}px;">
-    <div class="progress-bar ${color}" style="width:${p}%"></div>
-  </div>`;
+  return `<div class="progress-wrap" style="height:${height}px;"><div class="progress-bar ${color}" style="width:${p}%"></div></div>`;
 }
 
-// ── AUTH ─────────────────────────────────────────────────────
+// ── AUTH ──────────────────────────────────────────────────────
 async function doLogin() {
   const nik = el('login-nik').value.trim();
   const pwd = el('login-password').value.trim();
   if (!nik || !pwd) { toast('NIK and password are required', 'error'); return; }
-
   const res = await api('login', { nik, password: pwd });
   if (!res.success) { toast(res.message, 'error'); return; }
-
   state.user = res.data;
-
   if (res.data.must_change_password) {
     el('page-login').style.display = 'none';
     el('page-change-password').style.display = 'flex';
     return;
   }
-
   initApp();
 }
 
@@ -564,10 +548,8 @@ async function doChangePassword() {
   const cp = el('confirm-password').value.trim();
   if (!np || np.length < 6) { toast('Password must be at least 6 characters', 'error'); return; }
   if (np !== cp) { toast('Password confirmation does not match', 'error'); return; }
-
   const res = await api('changePassword', { nik: state.user.nik, new_password: np });
   if (!res.success) { toast(res.message, 'error'); return; }
-
   toast('Password changed successfully!', 'success');
   state.user.must_change_password = false;
   el('page-change-password').style.display = 'none';
@@ -579,22 +561,15 @@ function doLogout() {
   state = { user: null, currentView: 'dashboard', jadwalTab: 'my', compLibrary: null, assessmentScores: {}, assessmentChecks: {}, teamData: null, enrollments: [], jadwal: [], mandatoryCompIds: [] };
   el('app-layout').style.display = 'none';
   el('page-login').style.display = 'flex';
-  el('login-nik').value = '';
-  el('login-password').value = '';
+  el('login-nik').value = ''; el('login-password').value = '';
 }
 
 function showForgotPassword() {
   openModal(`<div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-header">
-      <div class="modal-title">Forgot Password</div>
-      <button class="modal-close" onclick="closeModal()">×</button>
-    </div>
+    <div class="modal-header"><div class="modal-title">Forgot Password</div><button class="modal-close" onclick="closeModal()">×</button></div>
     <div class="modal-body">
       <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">Enter your NIK. A password reset link will be sent to your registered email.</p>
-      <div class="form-group">
-        <label class="form-label">Employee ID (NIK)</label>
-        <input type="text" id="forgot-nik" class="form-input mono" placeholder="Enter your NIK">
-      </div>
+      <div class="form-group"><label class="form-label">Employee ID (NIK)</label><input type="text" id="forgot-nik" class="form-input mono" placeholder="Enter your NIK"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
@@ -611,103 +586,55 @@ async function doForgotPassword() {
   else toast(res.message, 'error');
 }
 
-// ── APP INIT ─────────────────────────────────────────────────
+// ── APP INIT ──────────────────────────────────────────────────
 function initApp() {
   el('page-login').style.display = 'none';
   el('app-layout').style.display = 'block';
-
   const u = state.user;
   el('nav-user-name').textContent = u.name;
   el('nav-user-role').textContent = roleLabel(u.role);
   el('nav-avatar').textContent = initials(u.name);
-
   buildNav();
   navigateTo('dashboard');
+  initMirai();
 }
 
 function buildNav() {
   const u = state.user;
   const isLeader = u.role && u.role.includes('leader');
   const isAdmin  = u.role === 'admin';
-
   const employeeItems = [
-    { id: 'dashboard',  icon: '🏠', label: 'Dashboard' },
-    { id: 'assessment', icon: '📋', label: 'Assessment' },
-    { id: 'jadwal',     icon: '📅', label: 'Schedule' },
-    { id: 'progress',   icon: '📈', label: 'Progress' },
+    { id:'dashboard', icon:'🏠', label:'Dashboard' }, { id:'assessment', icon:'📋', label:'Assessment' },
+    { id:'jadwal', icon:'📅', label:'Schedule' }, { id:'progress', icon:'📈', label:'Progress' },
   ];
-  const leaderItems = [
-    { id: 'team-assessment', icon: '👥', label: 'Team' },
-    { id: 'team-monitor',    icon: '📊', label: 'Monitor' },
-  ];
-  const adminItems = [
-    { id: 'admin',       icon: '🛡️', label: 'Admin' },
-    { id: 'admin-users', icon: '👤', label: 'Users' },
-  ];
-  const accountItem = { id: 'account', icon: '⚙️', label: 'Account' };
+  const leaderItems = [{ id:'team-assessment', icon:'👥', label:'Team' }, { id:'team-monitor', icon:'📊', label:'Monitor' }];
+  const adminItems  = [{ id:'admin', icon:'🛡️', label:'Admin' }, { id:'admin-users', icon:'👤', label:'Users' }];
+  const accountItem = { id:'account', icon:'⚙️', label:'Account' };
 
-  let sidebarHtml = `<div class="sidebar-label">MAIN MENU</div>`;
-  employeeItems.forEach(item => { sidebarHtml += sidebarItem(item); });
-
-  if (isLeader) {
-    sidebarHtml += `<div class="sidebar-label">LEADER</div>`;
-    leaderItems.forEach(item => { sidebarHtml += sidebarItem(item); });
-  }
-  if (isAdmin) {
-    sidebarHtml += `<div class="sidebar-label">ADMIN</div>`;
-    adminItems.forEach(item => { sidebarHtml += sidebarItem(item); });
-  }
-
-  sidebarHtml += `<div class="sidebar-label">SETTINGS</div>`;
-  sidebarHtml += sidebarItem(accountItem);
-  sidebarHtml += `<div style="margin-top:8px;">
-    <button class="sidebar-item" style="color:var(--accent);" onclick="doLogout()">
-      <span class="sidebar-icon">🚪</span> Sign Out
-    </button>
-  </div>`;
-  el('sidebar').innerHTML = sidebarHtml;
+  let sHTML = `<div class="sidebar-label">MAIN MENU</div>`;
+  employeeItems.forEach(i => { sHTML += sidebarItem(i); });
+  if (isLeader) { sHTML += `<div class="sidebar-label">LEADER</div>`; leaderItems.forEach(i => { sHTML += sidebarItem(i); }); }
+  if (isAdmin)  { sHTML += `<div class="sidebar-label">ADMIN</div>`;  adminItems.forEach(i  => { sHTML += sidebarItem(i); }); }
+  sHTML += `<div class="sidebar-label">SETTINGS</div>` + sidebarItem(accountItem);
+  sHTML += `<div style="margin-top:8px;"><button class="sidebar-item" style="color:var(--accent);" onclick="doLogout()"><span class="sidebar-icon">🚪</span> Sign Out</button></div>`;
+  el('sidebar').innerHTML = sHTML;
 
   const mobileItems = [...employeeItems.slice(0, 4), accountItem];
-  let bottomHtml = '';
-  mobileItems.forEach(item => {
-    bottomHtml += `<button class="bottom-nav-item" id="bnav-${item.id}" onclick="navigateTo('${item.id}')">
-      <div class="bottom-nav-icon">${item.icon}</div>
-      <span>${item.label}</span>
-    </button>`;
-  });
-  el('bottom-nav').innerHTML = bottomHtml;
+  el('bottom-nav').innerHTML = mobileItems.map(i => `<button class="bottom-nav-item" id="bnav-${i.id}" onclick="navigateTo('${i.id}')"><div class="bottom-nav-icon">${i.icon}</div><span>${i.label}</span></button>`).join('');
 }
 
 function sidebarItem(item) {
-  return `<button class="sidebar-item" id="snav-${item.id}" onclick="navigateTo('${item.id}')">
-    <span class="sidebar-icon">${item.icon}</span> ${item.label}
-  </button>`;
+  return `<button class="sidebar-item" id="snav-${item.id}" onclick="navigateTo('${item.id}')"><span class="sidebar-icon">${item.icon}</span> ${item.label}</button>`;
 }
 
 function navigateTo(viewId) {
   document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.sidebar-item, .bottom-nav-item').forEach(i => i.classList.remove('active'));
-
-  const view = el(`view-${viewId}`);
-  if (view) view.classList.add('active');
-  const sNav = el(`snav-${viewId}`);
-  if (sNav) sNav.classList.add('active');
-  const bNav = el(`bnav-${viewId}`);
-  if (bNav) bNav.classList.add('active');
-
+  const view = el(`view-${viewId}`); if (view) view.classList.add('active');
+  const sNav = el(`snav-${viewId}`); if (sNav) sNav.classList.add('active');
+  const bNav = el(`bnav-${viewId}`); if (bNav) bNav.classList.add('active');
   state.currentView = viewId;
-
-  const loaders = {
-    'dashboard':       loadDashboard,
-    'assessment':      loadAssessment,
-    'jadwal':          loadJadwal,
-    'progress':        loadProgress,
-    'team-assessment': loadTeamAssessment,
-    'team-monitor':    loadTeamMonitor,
-    'admin':           loadAdmin,
-    'admin-users':     loadAdminUsers,
-    'account':         loadAccount,
-  };
+  const loaders = { 'dashboard':loadDashboard, 'assessment':loadAssessment, 'jadwal':loadJadwal, 'progress':loadProgress, 'team-assessment':loadTeamAssessment, 'team-monitor':loadTeamMonitor, 'admin':loadAdmin, 'admin-users':loadAdminUsers, 'account':loadAccount };
   if (loaders[viewId]) loaders[viewId]();
   window.scrollTo(0, 0);
 }
@@ -716,1257 +643,522 @@ function navigateTo(viewId) {
 async function loadDashboard() {
   const u = state.user;
   el('dash-greeting').textContent = `${u.name} · ${u.position || u.grade} · ${u.department}`;
-
-  // Fire both requests in parallel
-  const [res, adminRes] = await Promise.all([
-    api('getDashboard', { nik: u.nik }),
-    api('getAdminDashboard', {}),
-  ]);
-
+  const [res, adminRes] = await Promise.all([api('getDashboard', { nik: u.nik }), api('getAdminDashboard', {})]);
   if (!res.success) { html('dash-content', `<p class="text-muted">${res.message}</p>`); return; }
-
-  const d        = res.data;
-  const totalM   = d.mandatory_total;
-  const doneM    = d.mandatory_completed;
-  const pipeline = d.pipeline || [];
-  const isLeader = u.role && u.role.includes('leader');
-
+  const d = res.data; const totalM = d.mandatory_total; const doneM = d.mandatory_completed;
+  const pipeline = d.pipeline || []; const isLeader = u.role && u.role.includes('leader');
   let content = '';
-
   if (d.assessment_status === 'pending') {
-    content += `<div class="card" style="margin-bottom:16px; border-left:4px solid var(--gold);">
+    content += `<div class="card" style="margin-bottom:16px;border-left:4px solid var(--gold);">
       <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
-        <div>
-          <div style="font-weight:700;margin-bottom:4px;">Self Assessment Incomplete</div>
-          <div style="font-size:13px;color:var(--text-secondary);">Complete your self assessment to begin the IDP process.</div>
-        </div>
+        <div><div style="font-weight:700;margin-bottom:4px;">Self Assessment Incomplete</div><div style="font-size:13px;color:var(--text-secondary);">Complete your self assessment to begin the IDP process.</div></div>
         <button class="btn btn-primary" onclick="navigateTo('assessment')">Start Assessment →</button>
-      </div>
-    </div>`;
+      </div></div>`;
   }
-
   content += `<div class="stats-grid" style="margin-bottom:20px;">
-    <div class="stat-card">
-      <div class="stat-label">Assessment Status</div>
-      <div style="margin-top:6px;">${statusBadge(d.assessment_status)}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Mandatory</div>
-      <div class="stat-value" style="color:var(--primary);">${doneM}<span style="font-size:16px;color:var(--text-muted);">/${totalM}</span></div>
-      <div class="stat-sub">Completed</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Enrolled</div>
-      <div class="stat-value" style="color:var(--teal);">${pipeline.filter(p => p.status === 'enrolled').length}</div>
-      <div class="stat-sub">Active sessions</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Grade</div>
-      <div style="margin-top:8px;"><span class="badge ${gradeColor(u.grade)}" style="font-size:14px;padding:5px 14px;">${u.grade}</span></div>
-    </div>
+    <div class="stat-card"><div class="stat-label">Assessment Status</div><div style="margin-top:6px;">${statusBadge(d.assessment_status)}</div></div>
+    <div class="stat-card"><div class="stat-label">Mandatory</div><div class="stat-value" style="color:var(--primary);">${doneM}<span style="font-size:16px;color:var(--text-muted);">/${totalM}</span></div><div class="stat-sub">Completed</div></div>
+    <div class="stat-card"><div class="stat-label">Enrolled</div><div class="stat-value" style="color:var(--teal);">${pipeline.filter(p=>p.status==='enrolled').length}</div><div class="stat-sub">Active sessions</div></div>
+    <div class="stat-card"><div class="stat-label">Grade</div><div style="margin-top:8px;"><span class="badge ${gradeColor(u.grade)}" style="font-size:14px;padding:5px 14px;">${u.grade}</span></div></div>
   </div>`;
-
-  // ── LEADERBOARD ──────────────────────────────────────────
-  if (adminRes.success) {
-    content += renderRaceLeaderboard(adminRes.data, u.division || u.department);
-  }
-
+  if (adminRes.success) content += renderRaceLeaderboard(adminRes.data, u.division || u.department);
   if (totalM > 0) {
-    content += `<div class="card" style="margin-bottom:16px;">
-      <div class="card-header">
-        <div class="card-title">Mandatory Progress</div>
-        <span style="font-size:13px;font-weight:700;color:var(--primary);">${pct(doneM, totalM)}%</span>
-      </div>
-      <div class="card-body">
-        ${progressBar(doneM, totalM, 'green', 10)}
-        <div style="margin-top:8px;font-size:12px;color:var(--text-muted);">${doneM} of ${totalM} mandatory competencies completed</div>
-      </div>
-    </div>`;
+    content += `<div class="card" style="margin-bottom:16px;"><div class="card-header"><div class="card-title">Mandatory Progress</div><span style="font-size:13px;font-weight:700;color:var(--primary);">${pct(doneM,totalM)}%</span></div>
+      <div class="card-body">${progressBar(doneM,totalM,'green',10)}<div style="margin-top:8px;font-size:12px;color:var(--text-muted);">${doneM} of ${totalM} mandatory competencies completed</div></div></div>`;
   }
-
   if (pipeline.length > 0) {
-    content += `<div class="card">
-      <div class="card-header"><div class="card-title">My Competencies</div></div>
-      <div class="card-body" style="padding:0 24px;">`;
+    content += `<div class="card"><div class="card-header"><div class="card-title">My Competencies</div></div><div class="card-body" style="padding:0 24px;">`;
     pipeline.forEach(p => {
-      const icons  = { assigned: '🎯', enrolled: '📚', completed: '✅' };
-      const colors = { assigned: 'var(--gold-soft)', enrolled: 'var(--teal-soft)', completed: 'var(--green-soft)' };
+      const icons = { assigned:'🎯', enrolled:'📚', completed:'✅' };
+      const colors = { assigned:'var(--gold-soft)', enrolled:'var(--teal-soft)', completed:'var(--green-soft)' };
       content += `<div class="pipeline-item">
-        <div class="pipeline-icon" style="background:${colors[p.status] || 'var(--surface2)'};">${icons[p.status] || '📋'}</div>
-        <div class="pipeline-info">
-          <div class="pipeline-name">${p.competency_name || p.competency_id}</div>
-          <div class="pipeline-meta">${p.competency_id} · Gap: ${p.gap} level · Target: Level ${p.target_level} · Current: Level ${p.self_score}</div>
-        </div>
-        <div class="pipeline-status">
-          ${statusBadge(p.decision)}
-          <br><span style="margin-top:4px;display:block;">${statusBadge(p.status)}</span>
-        </div>
+        <div class="pipeline-icon" style="background:${colors[p.status]||'var(--surface2)'};">${icons[p.status]||'📋'}</div>
+        <div class="pipeline-info"><div class="pipeline-name">${p.competency_name||p.competency_id}</div><div class="pipeline-meta">${p.competency_id} · Gap: ${p.gap} level · Target: Level ${p.target_level} · Current: Level ${p.self_score}</div></div>
+        <div class="pipeline-status">${statusBadge(p.decision)}<br><span style="margin-top:4px;display:block;">${statusBadge(p.status)}</span></div>
       </div>`;
     });
     content += `</div></div>`;
   } else if (d.assessment_status === 'submitted') {
-    content += `<div class="card"><div class="card-body">
-      <div class="empty-state">
-        <div class="empty-icon">⏳</div>
-        <div class="empty-title">Waiting for Leader</div>
-        <div class="empty-desc">Your leader has not set development priorities yet. Please wait.</div>
-      </div>
-    </div></div>`;
+    content += `<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">Waiting for Leader</div><div class="empty-desc">Your leader has not set development priorities yet.</div></div></div></div>`;
   }
-
   if (isLeader) {
-    content += `<div class="card" style="margin-top:16px; border-left:4px solid var(--primary);">
+    content += `<div class="card" style="margin-top:16px;border-left:4px solid var(--primary);">
       <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-        <div>
-          <div style="font-weight:700;margin-bottom:4px;">Leader Menu</div>
-          <div style="font-size:13px;color:var(--text-secondary);">Review team assessment and monitor progress</div>
-        </div>
-        <div style="display:flex;gap:8px;">
-          <button class="btn btn-ghost btn-sm" onclick="navigateTo('team-assessment')">Team Assessment</button>
-          <button class="btn btn-primary btn-sm" onclick="navigateTo('team-monitor')">Team Monitor</button>
-        </div>
-      </div>
-    </div>`;
+        <div><div style="font-weight:700;margin-bottom:4px;">Leader Menu</div><div style="font-size:13px;color:var(--text-secondary);">Review team assessment and monitor progress</div></div>
+        <div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="navigateTo('team-assessment')">Team Assessment</button><button class="btn btn-primary btn-sm" onclick="navigateTo('team-monitor')">Team Monitor</button></div>
+      </div></div>`;
   }
-
   html('dash-content', content);
 }
 
 // ── RACE LEADERBOARD ──────────────────────────────────────────
 function renderRaceLeaderboard(adminData, myDivision) {
   const deptStats = adminData.department_stats || {};
-
-  // Group departments → divisions using broad mapping
-  // Division is already stored in Users sheet; deptStats keys are Department names.
-  // We use the keys directly as "division" labels since admin dashboard groups by Department.
-  // Filter out empty keys and sort by completion rate desc.
-  const entries = Object.entries(deptStats)
-    .filter(([name]) => name && name.trim() !== '')
+  const entries = Object.entries(deptStats).filter(([name]) => name && name.trim() !== '')
     .map(([name, stat]) => {
-      const mandatoryDone  = stat.completed  || 0;
-      const mandatoryTotal = stat.assigned   || 0;
-      // Progress = mandatory completion rate; fallback to assessment rate if no mandatory data yet
-      const progressPct = mandatoryTotal > 0
-        ? Math.round((mandatoryDone / mandatoryTotal) * 100)
-        : 0;
-      return { name, progressPct, total: stat.total || 0, assessed: stat.assessed || 0, mandatoryDone, mandatoryTotal };
-    })
-    .sort((a, b) => b.progressPct - a.progressPct);
-
+      const mandatoryDone  = stat.completed || 0; const mandatoryTotal = stat.assigned || 0;
+      const progressPct = mandatoryTotal > 0 ? Math.round((mandatoryDone / mandatoryTotal) * 100) : 0;
+      return { name, progressPct, total: stat.total||0, assessed: stat.assessed||0, mandatoryDone, mandatoryTotal };
+    }).sort((a, b) => b.progressPct - a.progressPct);
   if (entries.length === 0) return '';
-
-  // Check if any racing has started (any division has > 0 progress)
   const anyProgress = entries.some(e => e.progressPct > 0);
-
-  // Avatar colors — one per division slot, cycling
-  const avatarColors = [
-    '#E84855','#0A2463','#F4A827','#2D6A4F','#5C4B8A',
-    '#1B7A8C','#E07B39','#2E86AB','#A23B72','#F18F01',
-    '#C73E1D','#3B1F2B','#44BBA4',
-  ];
-
-  // Short name for label (max 12 chars)
+  const avatarColors = ['#E84855','#0A2463','#F4A827','#2D6A4F','#5C4B8A','#1B7A8C','#E07B39','#2E86AB','#A23B72','#F18F01'];
   const shortName = name => name.length > 12 ? name.slice(0, 11) + '…' : name;
-
-  // Build avatar SVG characters
-  // Each avatar: running pose if progress > 0, ready pose if 0, celebrate if 100
-  const avatarSVG = (color, state, idx) => {
-    if (state === 'celebrate') {
-      // Arms up celebrate
-      return `
-        <g>
-          <!-- body -->
-          <ellipse cx="16" cy="22" rx="5" ry="7" fill="${color}" opacity="0.9"/>
-          <!-- head -->
-          <circle cx="16" cy="11" r="5" fill="${color}"/>
-          <!-- left arm up -->
-          <line x1="11" y1="20" x2="6" y2="12" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
-          <!-- right arm up -->
-          <line x1="21" y1="20" x2="26" y2="12" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
-          <!-- left leg -->
-          <line x1="13" y1="28" x2="10" y2="36" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
-          <!-- right leg -->
-          <line x1="19" y1="28" x2="22" y2="36" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
-          <!-- star -->
-          <text x="16" y="7" text-anchor="middle" font-size="8">⭐</text>
-        </g>`;
-    }
-    if (state === 'ready') {
-      // Crouch ready at start line
-      return `
-        <g>
-          <!-- body leaning forward -->
-          <ellipse cx="16" cy="24" rx="5" ry="6" fill="${color}" opacity="0.9" transform="rotate(-15,16,24)"/>
-          <!-- head -->
-          <circle cx="19" cy="13" r="5" fill="${color}"/>
-          <!-- left arm back -->
-          <line x1="13" y1="22" x2="8" y2="28" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
-          <!-- right arm forward -->
-          <line x1="19" y1="21" x2="25" y2="17" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
-          <!-- left leg back -->
-          <line x1="13" y1="29" x2="8" y2="36" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
-          <!-- right leg crouched -->
-          <line x1="18" y1="29" x2="22" y2="36" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
-          <!-- eyes focused -->
-          <circle cx="21" cy="12" r="1.2" fill="white"/>
-          <circle cx="21.4" cy="12" r="0.6" fill="#111"/>
-        </g>`;
-    }
-    // Running pose — alternate leg based on idx for visual variety
-    const legPhase = idx % 2 === 0;
-    return `
-      <g>
-        <!-- body leaning -->
-        <ellipse cx="16" cy="22" rx="5" ry="7" fill="${color}" opacity="0.9" transform="rotate(-10,16,22)"/>
-        <!-- head -->
-        <circle cx="18" cy="11" r="5" fill="${color}"/>
-        <!-- arm back -->
-        <line x1="12" y1="20" x2="6" y2="${legPhase ? 26 : 24}" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
-        <!-- arm forward -->
-        <line x1="20" y1="19" x2="26" y2="${legPhase ? 14 : 16}" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
-        <!-- leg stride forward -->
-        <line x1="15" y1="28" x2="${legPhase ? 22 : 10}" y2="36" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
-        <!-- leg stride back -->
-        <line x1="18" y1="28" x2="${legPhase ? 10 : 24}" y2="36" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
-        <!-- motion dots -->
-        <circle cx="${legPhase ? 4 : 3}" cy="22" r="1.5" fill="${color}" opacity="0.4"/>
-        <circle cx="${legPhase ? 2 : 1}" cy="19" r="1" fill="${color}" opacity="0.25"/>
-      </g>`;
+  const TRACK_W = 860; const FINISH_X = 820; const START_X = 60; const USABLE_W = FINISH_X - START_X;
+  const n = entries.length; const laneH = Math.max(44, Math.min(60, Math.floor((n * 44 + 40) / n)));
+  const totalH = n * laneH + 60;
+  const avatarSVG = (color, runState, idx) => {
+    if (runState === 'celebrate') return `<g><ellipse cx="16" cy="22" rx="5" ry="7" fill="${color}" opacity="0.9"/><circle cx="16" cy="11" r="5" fill="${color}"/><line x1="11" y1="20" x2="6" y2="12" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/><line x1="21" y1="20" x2="26" y2="12" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/><line x1="13" y1="28" x2="10" y2="36" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/><line x1="19" y1="28" x2="22" y2="36" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/><text x="16" y="7" text-anchor="middle" font-size="8">⭐</text></g>`;
+    if (runState === 'ready') return `<g><ellipse cx="16" cy="24" rx="5" ry="6" fill="${color}" opacity="0.9" transform="rotate(-15,16,24)"/><circle cx="19" cy="13" r="5" fill="${color}"/><line x1="13" y1="22" x2="8" y2="28" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/><line x1="19" y1="21" x2="25" y2="17" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/><line x1="13" y1="29" x2="8" y2="36" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/><line x1="18" y1="29" x2="22" y2="36" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/></g>`;
+    const lp = idx % 2 === 0;
+    return `<g><ellipse cx="16" cy="22" rx="5" ry="7" fill="${color}" opacity="0.9" transform="rotate(-10,16,22)"/><circle cx="18" cy="11" r="5" fill="${color}"/><line x1="12" y1="20" x2="6" y2="${lp?26:24}" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/><line x1="20" y1="19" x2="26" y2="${lp?14:16}" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/><line x1="15" y1="28" x2="${lp?22:10}" y2="36" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/><line x1="18" y1="28" x2="${lp?10:24}" y2="36" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/></g>`;
   };
-
-  // Track dimensions
-  const TRACK_W    = 860;
-  const TRACK_H    = 80;
-  const START_X    = 60;   // start line x
-  const FINISH_X   = 820;  // finish line x
-  const USABLE_W   = FINISH_X - START_X;
-  const AVATAR_W   = 32;
-  const n          = entries.length;
-  const laneH      = Math.max(44, Math.min(60, Math.floor((n * 44 + 40) / n)));
-  const totalH     = n * laneH + 60; // 60 for header area
-
-  // Build SVG rows
   let avatarRows = '';
   entries.forEach((entry, i) => {
-    const y         = 50 + i * laneH;
-    const color     = avatarColors[i % avatarColors.length];
-    const isMe      = myDivision && entry.name.toLowerCase().includes(myDivision.toLowerCase());
-    const avatarX   = START_X + Math.round((entry.progressPct / 100) * USABLE_W) - AVATAR_W / 2;
-    const clampedX  = Math.max(START_X - 4, Math.min(FINISH_X - AVATAR_W, avatarX));
-    const runState  = entry.progressPct >= 100 ? 'celebrate' : entry.progressPct > 0 ? 'running' : 'ready';
-    const animClass = runState === 'running' ? `runner-anim-${i}` : '';
-
-    // Rank medal
-    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
-
-    // Lane background — highlight my division
+    const y = 50 + i * laneH; const color = avatarColors[i % avatarColors.length];
+    const isMe = myDivision && entry.name.toLowerCase().includes(myDivision.toLowerCase());
+    const avatarX = START_X + Math.round((entry.progressPct / 100) * USABLE_W) - 16;
+    const clampedX = Math.max(START_X - 4, Math.min(FINISH_X - 32, avatarX));
+    const runState = entry.progressPct >= 100 ? 'celebrate' : entry.progressPct > 0 ? 'running' : 'ready';
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}`;
     avatarRows += `
-      <!-- Lane ${i} -->
-      <rect x="0" y="${y - 4}" width="${TRACK_W}" height="${laneH - 2}"
-        fill="${isMe ? 'rgba(244,168,39,0.10)' : i % 2 === 0 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.04)'}"
-        rx="4"/>
-
-      <!-- Lane stripe (track feel) -->
-      <line x1="${START_X}" y1="${y + laneH - 6}" x2="${FINISH_X}" y2="${y + laneH - 6}"
-        stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="6,6"/>
-
-      <!-- Progress trail -->
-      ${entry.progressPct > 0 ? `
-        <rect x="${START_X}" y="${y + laneH/2 - 3}" width="${Math.round((entry.progressPct/100) * USABLE_W)}" height="4"
-          fill="${color}" opacity="0.25" rx="2"/>
-      ` : ''}
-
-      <!-- Rank + name label (left) -->
-      <text x="8" y="${y + laneH / 2 - 4}" font-family="Plus Jakarta Sans,sans-serif"
-        font-size="13" font-weight="700" fill="${isMe ? '#F4A827' : 'rgba(255,255,255,0.85)'}">
-        ${typeof medal === 'string' && medal.length > 2 ? '' : medal}
-      </text>
-      ${typeof medal === 'number' || medal.length <= 2 ? `
-        <text x="8" y="${y + laneH / 2 + 10}" font-family="Plus Jakarta Sans,sans-serif"
-          font-size="10" fill="rgba(255,255,255,0.5)">${medal}</text>
-      ` : ''}
-      <text x="32" y="${y + laneH / 2 - 3}" font-family="Plus Jakarta Sans,sans-serif"
-        font-size="11" font-weight="${isMe ? '700' : '500'}" fill="${isMe ? '#F4A827' : 'rgba(255,255,255,0.8)'}">
-        ${shortName(entry.name)}
-      </text>
-      <text x="32" y="${y + laneH / 2 + 10}" font-family="Plus Jakarta Sans,sans-serif"
-        font-size="9.5" fill="rgba(255,255,255,0.45)">
-        ${entry.progressPct}% · ${entry.mandatoryDone}/${entry.mandatoryTotal > 0 ? entry.mandatoryTotal : '?'} done
-      </text>
-
-      <!-- Avatar SVG -->
-      <g transform="translate(${clampedX}, ${y + laneH/2 - 20})" class="${animClass}">
-        <svg width="32" height="40" viewBox="0 0 32 40" overflow="visible">
-          ${avatarSVG(color, runState, i)}
-        </svg>
-      </g>
-
-      ${isMe ? `
-        <!-- "YOU" tag -->
-        <rect x="${clampedX + 34}" y="${y + laneH/2 - 18}" width="30" height="14" rx="7"
-          fill="#F4A827"/>
-        <text x="${clampedX + 49}" y="${y + laneH/2 - 8}" text-anchor="middle"
-          font-family="Plus Jakarta Sans,sans-serif" font-size="8.5" font-weight="700" fill="#0A2463">YOU</text>
-      ` : ''}
-    `;
+      <rect x="0" y="${y-4}" width="${TRACK_W}" height="${laneH-2}" fill="${isMe?'rgba(244,168,39,0.10)':i%2===0?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.04)'}" rx="4"/>
+      ${entry.progressPct>0?`<rect x="${START_X}" y="${y+laneH/2-2}" width="${Math.round((entry.progressPct/100)*USABLE_W)}" height="4" fill="${color}" opacity="0.25" rx="2"/>`:''}
+      <text x="8" y="${y+laneH/2+4}" font-family="Plus Jakarta Sans,sans-serif" font-size="13" font-weight="700" fill="${isMe?'#F4A827':'rgba(255,255,255,0.85)'}">${medal}</text>
+      <text x="32" y="${y+laneH/2-3}" font-family="Plus Jakarta Sans,sans-serif" font-size="11" font-weight="${isMe?'700':'500'}" fill="${isMe?'#F4A827':'rgba(255,255,255,0.8)'}">${shortName(entry.name)}</text>
+      <text x="32" y="${y+laneH/2+10}" font-family="Plus Jakarta Sans,sans-serif" font-size="9.5" fill="rgba(255,255,255,0.45)">${entry.progressPct}% · ${entry.mandatoryDone}/${entry.mandatoryTotal>0?entry.mandatoryTotal:'?'} done</text>
+      <g transform="translate(${clampedX},${y+laneH/2-20})"><svg width="32" height="40" viewBox="0 0 32 40" overflow="visible">${avatarSVG(color,runState,i)}</svg></g>
+      ${isMe?`<rect x="${clampedX+34}" y="${y+laneH/2-18}" width="30" height="14" rx="7" fill="#F4A827"/><text x="${clampedX+49}" y="${y+laneH/2-8}" text-anchor="middle" font-family="Plus Jakarta Sans,sans-serif" font-size="8.5" font-weight="700" fill="#0A2463">YOU</text>`:''}`;
   });
-
-  // Finish line decorations
-  const finishDecor = `
-    <!-- Finish post left -->
-    <rect x="${FINISH_X}" y="30" width="4" height="${totalH - 50}" fill="#E84855" rx="2"/>
-    <!-- Checkered pattern on finish -->
-    ${Array.from({length: 8}, (_, i) => `
-      <rect x="${FINISH_X + (i % 2 === 0 ? 0 : 4)}" y="${30 + Math.floor(i/2)*10}" width="4" height="10"
-        fill="${i % 2 === 0 ? '#fff' : '#111'}" opacity="0.9"/>
-    `).join('')}
-    <!-- Finish label -->
-    <text x="${FINISH_X + 10}" y="45" font-family="Plus Jakarta Sans,sans-serif"
-      font-size="10" font-weight="700" fill="#E84855" transform="rotate(90,${FINISH_X + 10},45)">FINISH</text>
-  `;
-
-  // Start line
-  const startDecor = `
-    <line x1="${START_X}" y1="30" x2="${START_X}" y2="${totalH - 20}"
-      stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="4,4"/>
-    <text x="${START_X}" y="24" text-anchor="middle" font-family="Plus Jakarta Sans,sans-serif"
-      font-size="9" fill="rgba(255,255,255,0.4)">START</text>
-  `;
-
-  // Running animation keyframes (CSS injected once)
-  const runningCSS = entries.map((_, i) => {
-    if (entries[i].progressPct > 0 && entries[i].progressPct < 100) {
-      // Bobbing up-down run cycle
-      return `
-        .runner-anim-${i} {
-          animation: runBob 0.45s ease-in-out infinite alternate;
-          animation-delay: ${i * 0.07}s;
-          transform-origin: center bottom;
-        }`;
-    }
-    return '';
-  }).join('');
-
-  const phaseLabel = anyProgress
-    ? `<span style="color:#2D6A4F;font-weight:700;">Race in progress</span>`
-    : `<span style="color:#8896AB;">All teams at the starting line — race begins when first training completes!</span>`;
-
-  return `
-    <style>
-      @keyframes runBob {
-        from { transform: translateY(0px) rotate(-2deg); }
-        to   { transform: translateY(-3px) rotate(2deg); }
-      }
-      ${runningCSS}
-    </style>
-    <div class="card" style="margin-bottom:20px;overflow:hidden;">
-      <div class="card-header" style="background:linear-gradient(135deg,#0A2463,#1B3F8B);border-bottom:none;padding:16px 20px;">
-        <div>
-          <div class="card-title" style="color:#fff;font-size:16px;">Division Race Track</div>
-          <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:2px;">Mandatory training completion · ${phaseLabel}</div>
-        </div>
-        <div style="font-size:22px;">🏁</div>
-      </div>
-      <div style="background:linear-gradient(180deg,#0e1f4a 0%,#0a1836 100%);padding:0;overflow-x:auto;">
-        <svg width="${TRACK_W}" height="${totalH}" viewBox="0 0 ${TRACK_W} ${totalH}"
-          style="display:block;min-width:${TRACK_W}px;">
-
-          <!-- Background subtle grid -->
-          <defs>
-            <pattern id="trackGrid" width="40" height="${totalH}" patternUnits="userSpaceOnUse">
-              <line x1="0" y1="0" x2="0" y2="${totalH}" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
-            </pattern>
-          </defs>
-          <rect width="${TRACK_W}" height="${totalH}" fill="url(#trackGrid)"/>
-
-          ${startDecor}
-          ${avatarRows}
-          ${finishDecor}
-        </svg>
-      </div>
-    </div>`;
+  const phaseLabel = anyProgress ? `<span style="color:#2D6A4F;font-weight:700;">Race in progress</span>` : `<span style="color:#8896AB;">All teams at the starting line</span>`;
+  return `<div class="card" style="margin-bottom:20px;overflow:hidden;">
+    <div class="card-header" style="background:linear-gradient(135deg,#0A2463,#1B3F8B);border-bottom:none;padding:16px 20px;">
+      <div><div class="card-title" style="color:#fff;font-size:16px;">Division Race Track</div><div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:2px;">Mandatory training completion · ${phaseLabel}</div></div>
+      <div style="font-size:22px;">🏁</div>
+    </div>
+    <div style="background:linear-gradient(180deg,#0e1f4a 0%,#0a1836 100%);overflow-x:auto;">
+      <svg width="${TRACK_W}" height="${totalH}" viewBox="0 0 ${TRACK_W} ${totalH}" style="display:block;min-width:${TRACK_W}px;">
+        <line x1="${START_X}" y1="30" x2="${START_X}" y2="${totalH-20}" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="4,4"/>
+        <text x="${START_X}" y="24" text-anchor="middle" font-family="Plus Jakarta Sans,sans-serif" font-size="9" fill="rgba(255,255,255,0.4)">START</text>
+        <rect x="${FINISH_X}" y="30" width="4" height="${totalH-50}" fill="#E84855" rx="2"/>
+        <text x="${FINISH_X+10}" y="45" font-family="Plus Jakarta Sans,sans-serif" font-size="10" font-weight="700" fill="#E84855" transform="rotate(90,${FINISH_X+10},45)">FINISH</text>
+        ${avatarRows}
+      </svg>
+    </div>
+  </div>`;
 }
 
 // ── ASSESSMENT ────────────────────────────────────────────────
 async function loadAssessment() {
   const u = state.user;
-
   const statusRes = await api('getAssessmentStatus', { nik: u.nik });
   if (statusRes.success && statusRes.data.has_submitted_final) {
-    html('assessment-content', `<div class="card"><div class="card-body">
-      <div class="empty-state">
-        <div class="empty-icon">✅</div>
-        <div class="empty-title">Assessment Completed</div>
-        <div class="empty-desc">You have completed your self assessment. Results are being reviewed by your leader.</div>
-      </div>
-    </div></div>`);
+    html('assessment-content', `<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">✅</div><div class="empty-title">Assessment Completed</div><div class="empty-desc">You have completed your self assessment. Results are being reviewed by your leader.</div></div></div></div>`);
     return;
   }
-
   if (!state.compLibrary) {
-    const libRes = await api('getCompetencyLibrary', {
-      department:       u.department,
-      division:         u.division,
-      grade:            u.grade,
-      has_subordinates: u.has_subordinates,
-    });
+    const libRes = await api('getCompetencyLibrary', { department: u.department, division: u.division, grade: u.grade, has_subordinates: u.has_subordinates });
     if (!libRes.success) { html('assessment-content', `<p class="text-muted">${libRes.message}</p>`); return; }
     state.compLibrary = libRes.data;
-
     state.compLibrary.forEach(comp => {
       if (!state.assessmentChecks[comp.competency_id]) {
         state.assessmentChecks[comp.competency_id] = {};
-        for (let l = 1; l <= 5; l++) {
-          const indicators = comp.levels[l] || [];
-          state.assessmentChecks[comp.competency_id][l] = indicators.map(() => false);
-        }
+        for (let l = 1; l <= 5; l++) { state.assessmentChecks[comp.competency_id][l] = (comp.levels[l]||[]).map(()=>false); }
       }
     });
   }
-
   if (statusRes.success && statusRes.data.scores.length > 0) {
-    statusRes.data.scores.forEach(s => {
-      state.assessmentScores[s.competency_id] = s.self_score;
-    });
+    statusRes.data.scores.forEach(s => { state.assessmentScores[s.competency_id] = s.self_score; });
   }
-
   renderAssessmentForm();
 }
 
 function renderAssessmentForm() {
   const lib = state.compLibrary;
-  if (!lib || lib.length === 0) {
-    html('assessment-content', `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No competencies found</div><div class="empty-desc">Contact admin to configure your competency data.</div></div>`);
-    return;
-  }
-
-  const typeOrder = { core: 0, role: 1, jf: 2 };
-  const typeLabel = { core: 'Core Competency', role: 'Role Competency', jf: 'Job Family Competency' };
-  const typeColor = { core: 'var(--primary)', role: 'var(--purple)', jf: 'var(--teal)' };
-
-  const grouped = {};
-  lib.forEach(comp => {
-    const t = comp.competency_type;
-    if (!grouped[t]) grouped[t] = [];
-    grouped[t].push(comp);
-  });
-
-  let content = `<div style="background:var(--gold-soft);border:1px solid var(--gold);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:20px;font-size:13px;">
-    <strong>Instructions:</strong> Check all behavioral indicators that you <strong>consistently</strong> demonstrate in your work. A level is achieved only if all indicators at that level are checked.
-  </div>`;
-
-  Object.keys(grouped).sort((a, b) => (typeOrder[a] || 0) - (typeOrder[b] || 0)).forEach(type => {
-    content += `<div style="margin-bottom:8px;">
-      <div style="font-size:11px;font-weight:700;color:${typeColor[type]};text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;padding:0 2px;">${typeLabel[type] || type}</div>`;
+  if (!lib || lib.length === 0) { html('assessment-content', `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No competencies found</div><div class="empty-desc">Contact admin to configure your competency data.</div></div>`); return; }
+  const typeOrder = { core:0, role:1, jf:2 };
+  const typeLabel = { core:'Core Competency', role:'Role Competency', jf:'Job Family Competency' };
+  const typeColor = { core:'var(--primary)', role:'var(--purple)', jf:'var(--teal)' };
+  const grouped = {}; lib.forEach(comp => { const t = comp.competency_type; if (!grouped[t]) grouped[t]=[]; grouped[t].push(comp); });
+  let content = `<div style="background:var(--gold-soft);border:1px solid var(--gold);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:20px;font-size:13px;"><strong>Instructions:</strong> Check all behavioral indicators that you <strong>consistently</strong> demonstrate in your work.</div>`;
+  Object.keys(grouped).sort((a,b)=>(typeOrder[a]||0)-(typeOrder[b]||0)).forEach(type => {
+    content += `<div style="margin-bottom:8px;"><div style="font-size:11px;font-weight:700;color:${typeColor[type]};text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;">${typeLabel[type]||type}</div>`;
     grouped[type].forEach(comp => { content += renderCompetencyBlock(comp); });
     content += `</div>`;
   });
-
   content += `<div style="display:flex;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid var(--border);">
     <button class="btn btn-ghost" onclick="saveDraftAssessment()">💾 Save Draft</button>
     <button class="btn btn-primary btn-lg" onclick="confirmFinalSubmit()">✅ Final Submit</button>
   </div>`;
-
   html('assessment-content', content);
 }
 
 function renderCompetencyBlock(comp) {
-  const cid          = comp.competency_id;
-  const currentScore = state.assessmentScores[cid] || 0;
-  const typeColor    = { core: 'badge-blue', role: 'badge-purple', jf: 'badge-teal' };
-
+  const cid = comp.competency_id; const currentScore = state.assessmentScores[cid]||0;
+  const typeColor = { core:'badge-blue', role:'badge-purple', jf:'badge-teal' };
   let out = `<div class="assessment-section" id="comp-block-${cid}">
     <div class="assessment-section-header" onclick="toggleCompetency('${cid}')">
+      <div style="display:flex;align-items:center;gap:10px;"><span class="badge ${typeColor[comp.competency_type]||'badge-gray'}">${cid}</span><span style="font-weight:700;font-size:14px;">${comp.competency_name}</span></div>
       <div style="display:flex;align-items:center;gap:10px;">
-        <span class="badge ${typeColor[comp.competency_type] || 'badge-gray'}">${cid}</span>
-        <span style="font-weight:700;font-size:14px;">${comp.competency_name}</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <span id="score-badge-${cid}" style="font-size:12px;font-weight:700;color:var(--primary);">
-          ${currentScore > 0 ? `Level ${currentScore}` : 'Not rated'}
-        </span>
-        <span class="accordion-arrow" id="arrow-${cid}" style="transition:transform 0.2s;font-size:12px;color:var(--text-muted);">▼</span>
+        <span id="score-badge-${cid}" style="font-size:12px;font-weight:700;color:var(--primary);">${currentScore>0?`Level ${currentScore}`:'Not rated'}</span>
+        <span id="arrow-${cid}" style="transition:transform 0.2s;font-size:12px;color:var(--text-muted);">▼</span>
       </div>
     </div>
     <div id="comp-body-${cid}" style="display:none;">`;
-
-  for (let level = 1; level <= 5; level++) {
-    const indicators = comp.levels[level] || [];
-    if (indicators.length === 0) continue;
-    const checks = state.assessmentChecks[cid]?.[level] || [];
-
-    out += `<div class="competency-block"><div class="level-block">
-      <div class="level-label">Level ${level}</div>`;
-    indicators.forEach((ind, idx) => {
-      const isChecked = checks[idx] || false;
-      out += `<div class="indicator-item${isChecked ? ' checked' : ''}" onclick="toggleIndicator('${cid}',${level},${idx})">
-        <div class="indicator-checkbox">${isChecked ? '✓' : ''}</div>
-        <div class="indicator-text">
-          ${ind.behavioral_indicator}
-          ${ind.example_note ? `<div class="indicator-example">${ind.example_note}</div>` : ''}
-        </div>
+  for (let level=1; level<=5; level++) {
+    const indicators = comp.levels[level]||[]; if (indicators.length===0) continue;
+    const checks = state.assessmentChecks[cid]?.[level]||[];
+    out += `<div class="competency-block"><div class="level-block"><div class="level-label">Level ${level}</div>`;
+    indicators.forEach((ind,idx) => {
+      const isChecked = checks[idx]||false;
+      out += `<div class="indicator-item${isChecked?' checked':''}" onclick="toggleIndicator('${cid}',${level},${idx})">
+        <div class="indicator-checkbox">${isChecked?'✓':''}</div>
+        <div class="indicator-text">${ind.behavioral_indicator}${ind.example_note?`<div class="indicator-example">${ind.example_note}</div>`:''}</div>
       </div>`;
     });
     out += `</div></div>`;
   }
-
-  out += `</div></div>`;
-  return out;
+  out += `</div></div>`; return out;
 }
 
 function toggleCompetency(cid) {
-  const body  = el(`comp-body-${cid}`);
-  const arrow = el(`arrow-${cid}`);
-  const isOpen = body.style.display !== 'none';
-  body.style.display   = isOpen ? 'none' : 'block';
-  arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+  const body=el(`comp-body-${cid}`); const arrow=el(`arrow-${cid}`); const isOpen=body.style.display!=='none';
+  body.style.display=isOpen?'none':'block'; arrow.style.transform=isOpen?'rotate(0deg)':'rotate(180deg)';
 }
 
-function toggleIndicator(cid, level, idx) {
-  if (!state.assessmentChecks[cid]) return;
-  if (!state.assessmentChecks[cid][level]) return;
-  state.assessmentChecks[cid][level][idx] = !state.assessmentChecks[cid][level][idx];
-  recalcScore(cid);
-  refreshCompetencyBlock(cid);
+function toggleIndicator(cid,level,idx) {
+  if (!state.assessmentChecks[cid]?.[level]) return;
+  state.assessmentChecks[cid][level][idx]=!state.assessmentChecks[cid][level][idx];
+  recalcScore(cid); refreshCompetencyBlock(cid);
 }
 
 function recalcScore(cid) {
-  const comp = state.compLibrary.find(c => c.competency_id === cid);
-  if (!comp) return;
-  let achieved = 0;
-  for (let l = 1; l <= 5; l++) {
-    const indicators = comp.levels[l] || [];
-    if (indicators.length === 0) continue;
-    const checks     = state.assessmentChecks[cid][l] || [];
-    const allChecked = indicators.every((_, i) => checks[i] === true);
-    if (allChecked) achieved = l;
-    else break;
-  }
-  state.assessmentScores[cid] = achieved;
+  const comp=state.compLibrary.find(c=>c.competency_id===cid); if(!comp) return;
+  let achieved=0;
+  for(let l=1;l<=5;l++){const indicators=comp.levels[l]||[];if(!indicators.length)continue;const checks=state.assessmentChecks[cid][l]||[];const allChecked=indicators.every((_,i)=>checks[i]===true);if(allChecked)achieved=l;else break;}
+  state.assessmentScores[cid]=achieved;
 }
 
 function refreshCompetencyBlock(cid) {
-  const comp = state.compLibrary.find(c => c.competency_id === cid);
-  if (!comp) return;
-  const scoreBadge = el(`score-badge-${cid}`);
-  if (scoreBadge) {
-    const s = state.assessmentScores[cid] || 0;
-    scoreBadge.textContent = s > 0 ? `Level ${s}` : 'Not rated';
-  }
-  for (let l = 1; l <= 5; l++) {
-    const indicators = comp.levels[l] || [];
-    indicators.forEach((_, idx) => {
-      const item = document.querySelector(`[onclick="toggleIndicator('${cid}',${l},${idx})"]`);
-      if (!item) return;
-      const checked = state.assessmentChecks[cid]?.[l]?.[idx] || false;
-      item.classList.toggle('checked', checked);
-      item.querySelector('.indicator-checkbox').textContent = checked ? '✓' : '';
-    });
-  }
+  const comp=state.compLibrary.find(c=>c.competency_id===cid); if(!comp) return;
+  const sb=el(`score-badge-${cid}`); if(sb){const s=state.assessmentScores[cid]||0;sb.textContent=s>0?`Level ${s}`:'Not rated';}
+  for(let l=1;l<=5;l++){const indicators=comp.levels[l]||[];indicators.forEach((_,idx)=>{const item=document.querySelector(`[onclick="toggleIndicator('${cid}',${l},${idx})"]`);if(!item)return;const checked=state.assessmentChecks[cid]?.[l]?.[idx]||false;item.classList.toggle('checked',checked);item.querySelector('.indicator-checkbox').textContent=checked?'✓':'';}); }
 }
 
 function buildAssessmentScores() {
-  const scores = [];
-  if (!state.compLibrary) return scores;
-  state.compLibrary.forEach(comp => {
-    scores.push({
-      competency_id:   comp.competency_id,
-      competency_type: comp.competency_type,
-      self_score:      state.assessmentScores[comp.competency_id] || 0,
-      notes:           '',
-    });
-  });
-  return scores;
+  return (state.compLibrary||[]).map(comp=>({ competency_id:comp.competency_id, competency_type:comp.competency_type, self_score:state.assessmentScores[comp.competency_id]||0, notes:'' }));
 }
 
 async function saveDraftAssessment() {
-  const scores = buildAssessmentScores();
-  const res = await api('submitAssessment', { nik: state.user.nik, scores, is_final: false });
-  if (res.success) toast('Draft saved', 'success');
-  else toast(res.message, 'error');
+  const res=await api('submitAssessment',{nik:state.user.nik,scores:buildAssessmentScores(),is_final:false});
+  if(res.success)toast('Draft saved','success'); else toast(res.message,'error');
 }
 
 function confirmFinalSubmit() {
   openModal(`<div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-header">
-      <div class="modal-title">Confirm Final Submission</div>
-      <button class="modal-close" onclick="closeModal()">×</button>
-    </div>
-    <div class="modal-body">
-      <p style="font-size:14px;line-height:1.6;">After final submission, the assessment <strong>cannot be changed</strong>. Make sure all indicators are filled in honestly.</p>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="doFinalSubmit()">Yes, Submit Final</button>
-    </div>
+    <div class="modal-header"><div class="modal-title">Confirm Final Submission</div><button class="modal-close" onclick="closeModal()">×</button></div>
+    <div class="modal-body"><p style="font-size:14px;line-height:1.6;">After final submission, the assessment <strong>cannot be changed</strong>. Make sure all indicators are filled in honestly.</p></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doFinalSubmit()">Yes, Submit Final</button></div>
   </div>`);
 }
 
 async function doFinalSubmit() {
-  closeModal();
-  const scores = buildAssessmentScores();
-  const res = await api('submitAssessment', { nik: state.user.nik, scores, is_final: true });
-  if (res.success) { toast('Assessment submitted successfully!', 'success'); loadAssessment(); }
-  else toast(res.message, 'error');
+  closeModal(); const res=await api('submitAssessment',{nik:state.user.nik,scores:buildAssessmentScores(),is_final:true});
+  if(res.success){toast('Assessment submitted successfully!','success');loadAssessment();}else toast(res.message,'error');
 }
 
 // ── JADWAL ────────────────────────────────────────────────────
 async function loadJadwal() {
-  const u = state.user;
-
-  const enrRes = await api('getMyEnrollments', { nik: u.nik });
-  state.enrollments = enrRes.success ? enrRes.data : [];
-
-  const dashRes = await api('getDashboard', { nik: u.nik });
-  const pipeline = dashRes.success ? (dashRes.data.pipeline || []) : [];
-  state.mandatoryCompIds = pipeline.filter(p => p.decision === 'mandatory').map(p => p.competency_id);
-
-  const schedRes = await api('getSchedule', { grade: u.grade });
-  state.jadwal = schedRes.success ? schedRes.data : [];
-
+  const u=state.user;
+  const enrRes=await api('getMyEnrollments',{nik:u.nik}); state.enrollments=enrRes.success?enrRes.data:[];
+  const dashRes=await api('getDashboard',{nik:u.nik}); const pipeline=dashRes.success?(dashRes.data.pipeline||[]):[];
+  state.mandatoryCompIds=pipeline.filter(p=>p.decision==='mandatory').map(p=>p.competency_id);
+  const schedRes=await api('getSchedule',{grade:u.grade}); state.jadwal=schedRes.success?schedRes.data:[];
   renderJadwal();
 }
 
 function setJadwalTab(tab) {
-  state.jadwalTab = tab;
-  el('tab-my').className  = tab === 'my'  ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
-  el('tab-all').className = tab === 'all' ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
+  state.jadwalTab=tab;
+  el('tab-my').className=tab==='my'?'btn btn-primary btn-sm':'btn btn-ghost btn-sm';
+  el('tab-all').className=tab==='all'?'btn btn-primary btn-sm':'btn btn-ghost btn-sm';
   renderJadwal();
 }
 
-// ── FIX: isOnline sekarang dideklarasikan dengan benar di dalam loop ──
 function renderJadwal() {
-  const tab = state.jadwalTab;
-  const enrolledSessionIds = state.enrollments.map(e => e.session_id);
-  const mandatoryIds = state.mandatoryCompIds || [];
-
-  let sessions = state.jadwal;
-  if (tab === 'my') {
-    if (mandatoryIds.length > 0) {
-      sessions = sessions.filter(s => mandatoryIds.includes(s.competency_id));
-    } else {
-      sessions = sessions.filter(s => enrolledSessionIds.includes(s.session_id));
-    }
-  }
-
-  if (sessions.length === 0) {
-    html('jadwal-content', `<div class="card"><div class="card-body">
-      <div class="empty-state">
-        <div class="empty-icon">📅</div>
-        <div class="empty-title">${tab === 'my' ? 'No sessions available' : 'No schedules available'}</div>
-        <div class="empty-desc">${tab === 'my' ? 'No sessions matching your mandatory competencies. Check All Schedules tab.' : 'Training schedules will appear here'}</div>
-      </div>
-    </div></div>`);
-    return;
-  }
-
-  let content = `<div class="card"><div class="table-wrap"><table>
-    <thead><tr>
-      <th>Date</th><th>Time</th><th>Competency</th><th>Trainer</th>
-      <th>Location</th><th>Type</th><th>Status</th><th>Action</th>
-    </tr></thead><tbody>`;
-
-  sessions.forEach(s => {
-    const isEnrolled     = enrolledSessionIds.includes(s.session_id);
-    // FIX: deklarasi variabel di dalam scope forEach, bukan referensi undefined
-    const trainingType   = (s.training_type || '').toLowerCase();
-    const isSelfLearning = trainingType.includes('self');
-    const isOnline       = trainingType.includes('online');
-
-    const dateDisplay = isSelfLearning && s.date_end ? `${s.date} – ${s.date_end}` : s.date;
-
-    let typeBadge;
-    if (isSelfLearning) {
-      typeBadge = '<span class="badge badge-purple">Self Learning</span>';
-    } else if (isOnline) {
-      typeBadge = '<span class="badge badge-teal">Online</span>';
-    } else {
-      typeBadge = '<span class="badge badge-blue">Offline</span>';
-    }
-
-    content += `<tr>
-      <td style="white-space:nowrap;">${dateDisplay}</td>
-      <td style="white-space:nowrap;color:var(--text-secondary);">${s.time || '-'}</td>
-      <td><strong>${s.competency_name || s.competency_id}</strong><br>
-          <span style="font-size:11px;color:var(--text-muted);">${s.competency_id}</span></td>
-      <td>${s.trainer || '-'}</td>
-      <td>${s.location || s.area || '-'}</td>
-      <td>${typeBadge}</td>
-      <td>${isEnrolled
-        ? '<span class="badge badge-green">Enrolled</span>'
-        : '<span class="badge badge-gray">Not enrolled</span>'}</td>
-      <td>
-        ${isEnrolled
-          ? `<button class="btn btn-ghost btn-sm" onclick="doCancelEnrollment('${s.session_id}')">Cancel</button>`
-          : `<button class="btn btn-primary btn-sm" onclick="doEnroll('${s.competency_id}','${s.session_id}')">Enroll</button>`
-        }
-      </td>
+  const tab=state.jadwalTab; const enrolledIds=state.enrollments.map(e=>e.session_id); const mandatoryIds=state.mandatoryCompIds||[];
+  let sessions=state.jadwal;
+  if(tab==='my'){sessions=mandatoryIds.length>0?sessions.filter(s=>mandatoryIds.includes(s.competency_id)):sessions.filter(s=>enrolledIds.includes(s.session_id));}
+  if(!sessions.length){html('jadwal-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">No sessions available</div><div class="empty-desc">Check All Schedules tab.</div></div></div></div>`);return;}
+  let content=`<div class="card"><div class="table-wrap"><table><thead><tr><th>Date</th><th>Time</th><th>Competency</th><th>Trainer</th><th>Location</th><th>Type</th><th>Status</th><th>Action</th></tr></thead><tbody>`;
+  sessions.forEach(s=>{
+    const isEnrolled=enrolledIds.includes(s.session_id);
+    const tt=(s.training_type||'').toLowerCase(); const isSL=tt.includes('self'); const isOnline=tt.includes('online');
+    const dateDisplay=isSL&&s.date_end?`${s.date} – ${s.date_end}`:s.date;
+    const typeBadge=isSL?'<span class="badge badge-purple">Self Learning</span>':isOnline?'<span class="badge badge-teal">Online</span>':'<span class="badge badge-blue">Offline</span>';
+    content+=`<tr>
+      <td style="white-space:nowrap;">${dateDisplay}</td><td style="white-space:nowrap;color:var(--text-secondary);">${s.time||'-'}</td>
+      <td><strong>${s.competency_name||s.competency_id}</strong><br><span style="font-size:11px;color:var(--text-muted);">${s.competency_id}</span></td>
+      <td>${s.trainer||'-'}</td><td>${s.location||s.area||'-'}</td><td>${typeBadge}</td>
+      <td>${isEnrolled?'<span class="badge badge-green">Enrolled</span>':'<span class="badge badge-gray">Not enrolled</span>'}</td>
+      <td>${isEnrolled?`<button class="btn btn-ghost btn-sm" onclick="doCancelEnrollment('${s.session_id}')">Cancel</button>`:`<button class="btn btn-primary btn-sm" onclick="doEnroll('${s.competency_id}','${s.session_id}')">Enroll</button>`}</td>
     </tr>`;
   });
-
-  content += `</tbody></table></div></div>`;
-  html('jadwal-content', content);
+  content+=`</tbody></table></div></div>`; html('jadwal-content',content);
 }
 
-async function doEnroll(competencyId, sessionId) {
-  const res = await api('enrollSession', { nik: state.user.nik, competency_id: competencyId, session_id: sessionId });
-  if (res.success) { toast('Enrollment successful!', 'success'); loadJadwal(); }
-  else toast(res.message, 'error');
+async function doEnroll(competencyId,sessionId) {
+  const res=await api('enrollSession',{nik:state.user.nik,competency_id:competencyId,session_id:sessionId});
+  if(res.success){toast('Enrollment successful!','success');loadJadwal();}else toast(res.message,'error');
 }
 
 async function doCancelEnrollment(sessionId) {
-  const res = await api('cancelEnrollment', { nik: state.user.nik, session_id: sessionId });
-  if (res.success) { toast('Enrollment cancelled', 'success'); loadJadwal(); }
-  else toast(res.message, 'error');
+  const res=await api('cancelEnrollment',{nik:state.user.nik,session_id:sessionId});
+  if(res.success){toast('Enrollment cancelled','success');loadJadwal();}else toast(res.message,'error');
 }
 
 // ── PROGRESS ──────────────────────────────────────────────────
 async function loadProgress() {
-  const res = await api('getDashboard', { nik: state.user.nik });
-  if (!res.success) { html('progress-content', `<p class="text-muted">${res.message}</p>`); return; }
-
-  const d        = res.data;
-  const pipeline = d.pipeline || [];
-
-  if (pipeline.length === 0) {
-    html('progress-content', `<div class="card"><div class="card-body">
-      <div class="empty-state">
-        <div class="empty-icon">📈</div>
-        <div class="empty-title">No Progress Data</div>
-        <div class="empty-desc">Complete self assessment and wait for your leader's assignment.</div>
-      </div>
-    </div></div>`);
-    return;
-  }
-
-  const mandatory  = pipeline.filter(p => p.decision === 'mandatory');
-  const additional = pipeline.filter(p => p.decision === 'additional');
-
-  const renderSection = (title, items, color) => {
-    if (items.length === 0) return '';
-    let s = `<div class="card" style="margin-bottom:16px;">
-      <div class="card-header"><div class="card-title">${title}</div></div>
-      <div class="card-body" style="padding:0 24px;">`;
-    items.forEach(p => {
-      const pctBar = p.status === 'completed' ? 100 : p.status === 'enrolled' ? 50 : 10;
-      s += `<div class="pipeline-item">
-        <div class="pipeline-icon" style="background:${p.status === 'completed' ? 'var(--green-soft)' : p.status === 'enrolled' ? 'var(--teal-soft)' : 'var(--gold-soft)'};">
-          ${p.status === 'completed' ? '✅' : p.status === 'enrolled' ? '📚' : '🎯'}
-        </div>
-        <div class="pipeline-info">
-          <div class="pipeline-name">${p.competency_name || p.competency_id}</div>
-          <div style="margin:6px 0;">${progressBar(pctBar, 100, color, 6)}</div>
-          <div class="pipeline-meta">Current Level ${p.self_score} → Target Level ${p.target_level} (Gap: ${p.gap})</div>
-        </div>
-        <div class="pipeline-status">${statusBadge(p.status)}</div>
-      </div>`;
+  const res=await api('getDashboard',{nik:state.user.nik});
+  if(!res.success){html('progress-content',`<p class="text-muted">${res.message}</p>`);return;}
+  const pipeline=res.data.pipeline||[];
+  if(!pipeline.length){html('progress-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📈</div><div class="empty-title">No Progress Data</div><div class="empty-desc">Complete self assessment and wait for your leader's assignment.</div></div></div></div>`);return;}
+  const mandatory=pipeline.filter(p=>p.decision==='mandatory'); const additional=pipeline.filter(p=>p.decision==='additional');
+  const renderSection=(title,items,color)=>{
+    if(!items.length)return'';
+    let s=`<div class="card" style="margin-bottom:16px;"><div class="card-header"><div class="card-title">${title}</div></div><div class="card-body" style="padding:0 24px;">`;
+    items.forEach(p=>{const pctBar=p.status==='completed'?100:p.status==='enrolled'?50:10;
+      s+=`<div class="pipeline-item"><div class="pipeline-icon" style="background:${p.status==='completed'?'var(--green-soft)':p.status==='enrolled'?'var(--teal-soft)':'var(--gold-soft)'};">${p.status==='completed'?'✅':p.status==='enrolled'?'📚':'🎯'}</div>
+        <div class="pipeline-info"><div class="pipeline-name">${p.competency_name||p.competency_id}</div><div style="margin:6px 0;">${progressBar(pctBar,100,color,6)}</div><div class="pipeline-meta">Current Level ${p.self_score} → Target Level ${p.target_level} (Gap: ${p.gap})</div></div>
+        <div class="pipeline-status">${statusBadge(p.status)}</div></div>`;
     });
-    s += `</div></div>`;
-    return s;
+    s+=`</div></div>`;return s;
   };
-
-  html('progress-content', renderSection('Mandatory Competencies', mandatory, 'green') + renderSection('Additional Competencies', additional, 'blue'));
+  html('progress-content',renderSection('Mandatory Competencies',mandatory,'green')+renderSection('Additional Competencies',additional,'blue'));
 }
 
 // ── TEAM ASSESSMENT ───────────────────────────────────────────
 async function loadTeamAssessment() {
-  const res = await api('getTeamAssessments', { leader_nik: state.user.nik });
-  if (!res.success) { html('team-assessment-content', `<p class="text-muted">${res.message}</p>`); return; }
-  state.teamData = res.data;
-  renderTeamAssessmentList();
+  const res=await api('getTeamAssessments',{leader_nik:state.user.nik});
+  if(!res.success){html('team-assessment-content',`<p class="text-muted">${res.message}</p>`);return;}
+  state.teamData=res.data; renderTeamAssessmentList();
 }
 
 function renderTeamAssessmentList() {
-  const team = state.teamData;
-  if (!team || team.length === 0) {
-    html('team-assessment-content', `<div class="card"><div class="card-body">
-      <div class="empty-state">
-        <div class="empty-icon">👥</div>
-        <div class="empty-title">No Direct Reports</div>
-        <div class="empty-desc">You have no team members registered as subordinates.</div>
-      </div>
-    </div></div>`);
-    return;
-  }
-
-  let content = `<div class="card"><div class="table-wrap"><table>
-    <thead><tr>
-      <th>Name</th><th>Grade</th><th>Department</th>
-      <th>Assessment</th><th>Assignment</th><th>Mandatory</th><th>Action</th>
-    </tr></thead><tbody>`;
-
-  team.forEach(m => {
-    content += `<tr>
+  const team=state.teamData;
+  if(!team||!team.length){html('team-assessment-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">No Direct Reports</div></div></div></div>`);return;}
+  let content=`<div class="card"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Grade</th><th>Department</th><th>Assessment</th><th>Assignment</th><th>Mandatory</th><th>Action</th></tr></thead><tbody>`;
+  team.forEach(m=>{
+    content+=`<tr>
       <td><strong>${m.name}</strong><br><span style="font-size:11px;font-family:var(--mono);color:var(--text-muted);">${m.nik}</span></td>
-      <td><span class="badge ${gradeColor(m.grade)}">${m.grade}</span></td>
-      <td style="font-size:12px;">${m.department}</td>
-      <td>${m.has_submitted ? '<span class="badge badge-green">Completed</span>' : '<span class="badge badge-gray">Pending</span>'}</td>
-      <td>${m.already_assigned ? '<span class="badge badge-teal">Done</span>' : '<span class="badge badge-gold">Pending</span>'}</td>
+      <td><span class="badge ${gradeColor(m.grade)}">${m.grade}</span></td><td style="font-size:12px;">${m.department}</td>
+      <td>${m.has_submitted?'<span class="badge badge-green">Completed</span>':'<span class="badge badge-gray">Pending</span>'}</td>
+      <td>${m.already_assigned?'<span class="badge badge-teal">Done</span>':'<span class="badge badge-gold">Pending</span>'}</td>
       <td><span style="font-weight:700;color:var(--accent);">${m.mandatory_count}</span>/2</td>
-      <td>
-        ${m.has_submitted
-          ? `<button class="btn btn-primary btn-sm" onclick="openAssignModal('${m.nik}')">Review & Assign</button>`
-          : `<span class="text-muted text-sm">Awaiting assessment</span>`
-        }
-      </td>
+      <td>${m.has_submitted?`<button class="btn btn-primary btn-sm" onclick="openAssignModal('${m.nik}')">Review & Assign</button>`:'<span class="text-muted text-sm">Awaiting assessment</span>'}</td>
     </tr>`;
   });
-
-  content += `</tbody></table></div></div>`;
-  html('team-assessment-content', content);
+  content+=`</tbody></table></div></div>`; html('team-assessment-content',content);
 }
 
 function openAssignModal(memberNik) {
-  const member = state.teamData.find(m => m.nik === memberNik);
-  if (!member) return;
-
-  const decisions = {};
-  member.competencies.forEach(c => { decisions[c.competency_id] = c.decision || ''; });
-
-  const typeLabel = { core: 'Core', role: 'Role', jf: 'Job Family' };
-  const typeColor = { core: 'badge-blue', role: 'badge-purple', jf: 'badge-teal' };
-
-  const grouped = {};
-  member.competencies.forEach(c => {
-    const t = c.competency_type;
-    if (!grouped[t]) grouped[t] = [];
-    grouped[t].push(c);
-  });
-
-  let compRows = '';
-  Object.keys(grouped).forEach(type => {
-    compRows += `<div style="font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:0.8px;text-transform:uppercase;margin:16px 0 8px;">${typeLabel[type] || type}</div>`;
-    grouped[type].forEach(c => {
-      compRows += `<div style="padding:12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;">
+  const member=state.teamData.find(m=>m.nik===memberNik); if(!member)return;
+  const decisions={}; member.competencies.forEach(c=>{decisions[c.competency_id]=c.decision||'';});
+  const typeLabel={core:'Core',role:'Role',jf:'Job Family'}; const typeColor={core:'badge-blue',role:'badge-purple',jf:'badge-teal'};
+  const grouped={}; member.competencies.forEach(c=>{const t=c.competency_type;if(!grouped[t])grouped[t]=[];grouped[t].push(c);});
+  let compRows='';
+  Object.keys(grouped).forEach(type=>{
+    compRows+=`<div style="font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:0.8px;text-transform:uppercase;margin:16px 0 8px;">${typeLabel[type]||type}</div>`;
+    grouped[type].forEach(c=>{
+      compRows+=`<div style="padding:12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span class="badge ${typeColor[c.competency_type] || 'badge-gray'}">${c.competency_id}</span>
-            <div>
-              <div style="font-weight:600;font-size:13px;">${c.competency_name || c.competency_id}</div>
-              <div style="font-size:11px;color:var(--text-muted);">Self: L${c.self_score} → Target: L${c.target_level} · Gap: ${c.gap}</div>
-            </div>
+          <div style="display:flex;align-items:center;gap:8px;"><span class="badge ${typeColor[c.competency_type]||'badge-gray'}">${c.competency_id}</span>
+            <div><div style="font-weight:600;font-size:13px;">${c.competency_name||c.competency_id}</div><div style="font-size:11px;color:var(--text-muted);">Self: L${c.self_score} → Target: L${c.target_level} · Gap: ${c.gap}</div></div>
           </div>
           <div style="display:flex;gap:6px;" id="decision-btns-${memberNik}-${c.competency_id}">
-            <button class="btn btn-sm ${c.decision === 'mandatory' ? 'btn-accent' : 'btn-ghost'}"
-              onclick="setDecision('${memberNik}','${c.competency_id}','mandatory')">Mandatory</button>
-            <button class="btn btn-sm ${c.decision === 'additional' ? 'btn-primary' : 'btn-ghost'}"
-              onclick="setDecision('${memberNik}','${c.competency_id}','additional')">Additional</button>
-            <button class="btn btn-sm btn-ghost" style="${!c.decision ? 'opacity:0.5' : ''}"
-              onclick="setDecision('${memberNik}','${c.competency_id}','')">—</button>
+            <button class="btn btn-sm ${c.decision==='mandatory'?'btn-accent':'btn-ghost'}" onclick="setDecision('${memberNik}','${c.competency_id}','mandatory')">Mandatory</button>
+            <button class="btn btn-sm ${c.decision==='additional'?'btn-primary':'btn-ghost'}" onclick="setDecision('${memberNik}','${c.competency_id}','additional')">Additional</button>
+            <button class="btn btn-sm btn-ghost" onclick="setDecision('${memberNik}','${c.competency_id}','')">—</button>
           </div>
         </div>
-        ${c.gap <= 0 ? '<div style="margin-top:6px;font-size:11px;color:var(--green);">✓ Target already achieved</div>' : ''}
+        ${c.gap<=0?'<div style="margin-top:6px;font-size:11px;color:var(--green);">✓ Target already achieved</div>':''}
       </div>`;
     });
   });
-
-  const initCount = Object.values(decisions).filter(d => d === 'mandatory').length;
-
+  const initCount=Object.values(decisions).filter(d=>d==='mandatory').length;
   openModal(`<div class="modal" style="max-width:680px;" onclick="event.stopPropagation()">
-    <div class="modal-header">
-      <div>
-        <div class="modal-title">${member.name}</div>
-        <div style="font-size:12px;color:var(--text-muted);">${member.grade} · ${member.department}</div>
-      </div>
-      <button class="modal-close" onclick="closeModal()">×</button>
-    </div>
+    <div class="modal-header"><div><div class="modal-title">${member.name}</div><div style="font-size:12px;color:var(--text-muted);">${member.grade} · ${member.department}</div></div><button class="modal-close" onclick="closeModal()">×</button></div>
     <div class="modal-body">
-      <div style="background:var(--gold-soft);border:1px solid var(--gold);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px;font-size:13px;">
-        <strong>Rule:</strong> Maximum <strong>2 Mandatory</strong> competencies. Untagged competencies will not be assigned.
-        <div id="mandatory-counter" style="margin-top:4px;font-weight:600;">Mandatory selected: ${initCount}/2</div>
-      </div>
+      <div style="background:var(--gold-soft);border:1px solid var(--gold);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px;font-size:13px;"><strong>Rule:</strong> Maximum <strong>2 Mandatory</strong> competencies.<div id="mandatory-counter" style="margin-top:4px;font-weight:600;">Mandatory selected: ${initCount}/2</div></div>
       ${compRows}
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-green" onclick="doSaveApproval('${memberNik}')">💾 Save Assignment</button>
-    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-green" onclick="doSaveApproval('${memberNik}')">💾 Save Assignment</button></div>
   </div>`);
-
-  window._currentDecisions = decisions;
-  window._currentMemberNik = memberNik;
+  window._currentDecisions=decisions; window._currentMemberNik=memberNik;
 }
 
-function setDecision(memberNik, compId, decision) {
-  if (!window._currentDecisions) return;
-  if (decision === 'mandatory') {
-    const currentMandatory = Object.entries(window._currentDecisions)
-      .filter(([cid, d]) => d === 'mandatory' && cid !== compId).length;
-    if (currentMandatory >= 2) { toast('Maximum 2 Mandatory competencies allowed', 'warning'); return; }
-  }
-  window._currentDecisions[compId] = decision;
-
-  const btnContainer = el(`decision-btns-${memberNik}-${compId}`);
-  if (btnContainer) {
-    const btns = btnContainer.querySelectorAll('button');
-    btns[0].className = `btn btn-sm ${decision === 'mandatory' ? 'btn-accent' : 'btn-ghost'}`;
-    btns[1].className = `btn btn-sm ${decision === 'additional' ? 'btn-primary' : 'btn-ghost'}`;
-    btns[2].className = `btn btn-sm btn-ghost`;
-    btns[2].style.opacity = !decision ? '0.5' : '1';
-  }
-
-  const counter = el('mandatory-counter');
-  if (counter) {
-    const count = Object.values(window._currentDecisions).filter(d => d === 'mandatory').length;
-    counter.textContent = `Mandatory selected: ${count}/2`;
-  }
+function setDecision(memberNik,compId,decision) {
+  if(!window._currentDecisions)return;
+  if(decision==='mandatory'){const cnt=Object.entries(window._currentDecisions).filter(([cid,d])=>d==='mandatory'&&cid!==compId).length;if(cnt>=2){toast('Maximum 2 Mandatory competencies allowed','warning');return;}}
+  window._currentDecisions[compId]=decision;
+  const btnContainer=el(`decision-btns-${memberNik}-${compId}`);
+  if(btnContainer){const btns=btnContainer.querySelectorAll('button');btns[0].className=`btn btn-sm ${decision==='mandatory'?'btn-accent':'btn-ghost'}`;btns[1].className=`btn btn-sm ${decision==='additional'?'btn-primary':'btn-ghost'}`;btns[2].className=`btn btn-sm btn-ghost`;}
+  const counter=el('mandatory-counter');
+  if(counter){const count=Object.values(window._currentDecisions).filter(d=>d==='mandatory').length;counter.textContent=`Mandatory selected: ${count}/2`;}
 }
 
 async function doSaveApproval(memberNik) {
-  const decisions = Object.entries(window._currentDecisions).map(([cid, dec]) => ({
-    competency_id: cid,
-    decision:      dec,
-    suggestion:    '',
-  }));
-  const res = await api('saveApproval', { leader_nik: state.user.nik, member_nik: memberNik, decisions });
-  if (res.success) { toast('Assignment saved successfully!', 'success'); closeModal(); loadTeamAssessment(); }
-  else toast(res.message, 'error');
+  const decisions=Object.entries(window._currentDecisions).map(([cid,dec])=>({competency_id:cid,decision:dec,suggestion:''}));
+  const res=await api('saveApproval',{leader_nik:state.user.nik,member_nik:memberNik,decisions});
+  if(res.success){toast('Assignment saved successfully!','success');closeModal();loadTeamAssessment();}else toast(res.message,'error');
 }
 
 // ── TEAM MONITOR ──────────────────────────────────────────────
 async function loadTeamMonitor() {
-  const res = await api('getTeamProgress', { leader_nik: state.user.nik });
-  if (!res.success) { html('team-monitor-content', `<p class="text-muted">${res.message}</p>`); return; }
-
-  const team = res.data;
-  if (!team || team.length === 0) {
-    html('team-monitor-content', `<div class="card"><div class="card-body">
-      <div class="empty-state"><div class="empty-icon">📊</div><div class="empty-title">No Team Data</div></div>
-    </div></div>`);
-    return;
-  }
-
-  const totalMandatory = team.reduce((s, m) => s + m.mandatory_total, 0);
-  const totalCompleted = team.reduce((s, m) => s + m.mandatory_completed, 0);
-  const teamPct  = pct(totalCompleted, totalMandatory);
-  const maxDepth = Math.max(...team.map(m => m.depth || 1));
-
-  let content = `<div class="stats-grid" style="margin-bottom:20px;">
-    <div class="stat-card">
-      <div class="stat-label">Total Members</div>
-      <div class="stat-value">${team.length}</div>
-      <div class="stat-sub">${maxDepth} level${maxDepth > 1 ? 's' : ''} deep</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Completion Rate</div>
-      <div class="stat-value" style="color:var(--green);">${teamPct}%</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Mandatory Done</div>
-      <div class="stat-value">${totalCompleted}<span style="font-size:14px;color:var(--text-muted);">/${totalMandatory}</span></div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Active Enrollments</div>
-      <div class="stat-value" style="color:var(--teal);">${team.reduce((s, m) => s + m.enrolled_session_ids.length, 0)}</div>
-    </div>
+  const res=await api('getTeamProgress',{leader_nik:state.user.nik});
+  if(!res.success){html('team-monitor-content',`<p class="text-muted">${res.message}</p>`);return;}
+  const team=res.data;
+  if(!team||!team.length){html('team-monitor-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📊</div><div class="empty-title">No Team Data</div></div></div></div>`);return;}
+  const totalMandatory=team.reduce((s,m)=>s+m.mandatory_total,0); const totalCompleted=team.reduce((s,m)=>s+m.mandatory_completed,0);
+  const teamPct=pct(totalCompleted,totalMandatory); const maxDepth=Math.max(...team.map(m=>m.depth||1));
+  let content=`<div class="stats-grid" style="margin-bottom:20px;">
+    <div class="stat-card"><div class="stat-label">Total Members</div><div class="stat-value">${team.length}</div><div class="stat-sub">${maxDepth} level${maxDepth>1?'s':''} deep</div></div>
+    <div class="stat-card"><div class="stat-label">Completion Rate</div><div class="stat-value" style="color:var(--green);">${teamPct}%</div></div>
+    <div class="stat-card"><div class="stat-label">Mandatory Done</div><div class="stat-value">${totalCompleted}<span style="font-size:14px;color:var(--text-muted);">/${totalMandatory}</span></div></div>
+    <div class="stat-card"><div class="stat-label">Active Enrollments</div><div class="stat-value" style="color:var(--teal);">${team.reduce((s,m)=>s+m.enrolled_session_ids.length,0)}</div></div>
   </div>`;
-
-  const depths = [...new Set(team.map(m => m.depth || 1))].sort();
-  if (depths.length > 1) {
-    content += `<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
-      <span style="font-size:12px;color:var(--text-muted);font-weight:600;">Filter by level:</span>
-      <button class="btn btn-primary btn-sm" id="depth-btn-all" onclick="filterTeamDepth('all')">All</button>
-      ${depths.map(d => `<button class="btn btn-ghost btn-sm" id="depth-btn-${d}" onclick="filterTeamDepth(${d})">Level ${d}${d === 1 ? ' (Direct)' : ''}</button>`).join('')}
-    </div>`;
-  }
-
-  content += `<div class="card"><div class="table-wrap"><table id="team-monitor-table">
-    <thead><tr>
-      <th>Name</th><th>Reports To</th><th>Grade</th>
-      <th>Mandatory</th><th>Progress</th><th>Enrolled</th><th>Status</th>
-    </tr></thead><tbody>`;
-
-  const depthColors = ['var(--primary)', 'var(--teal)', 'var(--purple)', 'var(--green)', 'var(--gold)'];
-  team.forEach(m => {
-    const p      = pct(m.mandatory_completed, m.mandatory_total);
-    const color  = p >= 100 ? 'green' : p >= 50 ? 'gold' : 'blue';
-    const depth  = m.depth || 1;
-    const indent = depth - 1;
-    const dc     = depthColors[Math.min(indent, 4)];
-
-    content += `<tr data-depth="${depth}">
-      <td>
-        <div style="display:flex;align-items:center;gap:6px;">
-          ${indent > 0 ? `<div style="width:${indent * 14}px;flex-shrink:0;"></div><div style="width:2px;height:30px;background:${dc};opacity:0.35;flex-shrink:0;border-radius:2px;"></div>` : ''}
-          <div>
-            <div style="font-weight:600;">${m.name}</div>
-            <div style="font-size:11px;color:var(--text-muted);">${m.department}</div>
-          </div>
-        </div>
-      </td>
-      <td style="font-size:12px;color:var(--text-secondary);">${m.spv_name || '—'}</td>
+  const depths=[...new Set(team.map(m=>m.depth||1))].sort();
+  if(depths.length>1){content+=`<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;"><span style="font-size:12px;color:var(--text-muted);font-weight:600;">Filter:</span><button class="btn btn-primary btn-sm" id="depth-btn-all" onclick="filterTeamDepth('all')">All</button>${depths.map(d=>`<button class="btn btn-ghost btn-sm" id="depth-btn-${d}" onclick="filterTeamDepth(${d})">Level ${d}${d===1?' (Direct)':''}</button>`).join('')}</div>`;}
+  content+=`<div class="card"><div class="table-wrap"><table id="team-monitor-table"><thead><tr><th>Name</th><th>Reports To</th><th>Grade</th><th>Mandatory</th><th>Progress</th><th>Enrolled</th><th>Status</th></tr></thead><tbody>`;
+  const depthColors=['var(--primary)','var(--teal)','var(--purple)','var(--green)','var(--gold)'];
+  team.forEach(m=>{
+    const p=pct(m.mandatory_completed,m.mandatory_total); const color=p>=100?'green':p>=50?'gold':'blue';
+    const depth=m.depth||1; const indent=depth-1; const dc=depthColors[Math.min(indent,4)];
+    content+=`<tr data-depth="${depth}">
+      <td><div style="display:flex;align-items:center;gap:6px;">${indent>0?`<div style="width:${indent*14}px;flex-shrink:0;"></div><div style="width:2px;height:30px;background:${dc};opacity:0.35;flex-shrink:0;border-radius:2px;"></div>`:''}<div><div style="font-weight:600;">${m.name}</div><div style="font-size:11px;color:var(--text-muted);">${m.department}</div></div></div></td>
+      <td style="font-size:12px;color:var(--text-secondary);">${m.spv_name||'—'}</td>
       <td><span class="badge ${gradeColor(m.grade)}">${m.grade}</span></td>
       <td style="font-weight:700;">${m.mandatory_completed}/${m.mandatory_total}</td>
-      <td style="min-width:100px;">
-        ${progressBar(m.mandatory_completed, m.mandatory_total || 1, color, 6)}
-        <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">${p}%</div>
-      </td>
+      <td style="min-width:100px;">${progressBar(m.mandatory_completed,m.mandatory_total||1,color,6)}<div style="font-size:10px;color:var(--text-muted);margin-top:2px;">${p}%</div></td>
       <td><span class="badge badge-teal">${m.enrolled_session_ids.length}</span></td>
-      <td>${m.mandatory_total === 0
-        ? '<span class="badge badge-gray">Not assigned</span>'
-        : m.mandatory_completed >= m.mandatory_total
-          ? '<span class="badge badge-green">Completed</span>'
-          : '<span class="badge badge-gold">In Progress</span>'
-      }</td>
+      <td>${m.mandatory_total===0?'<span class="badge badge-gray">Not assigned</span>':m.mandatory_completed>=m.mandatory_total?'<span class="badge badge-green">Completed</span>':'<span class="badge badge-gold">In Progress</span>'}</td>
     </tr>`;
   });
-
-  content += `</tbody></table></div></div>`;
-  html('team-monitor-content', content);
+  content+=`</tbody></table></div></div>`; html('team-monitor-content',content);
 }
 
 function filterTeamDepth(depth) {
-  document.querySelectorAll('[id^="depth-btn-"]').forEach(btn => { btn.className = 'btn btn-ghost btn-sm'; });
-  const active = el('depth-btn-' + depth);
-  if (active) active.className = 'btn btn-primary btn-sm';
-  document.querySelectorAll('#team-monitor-table tbody tr').forEach(row => {
-    row.style.display = (depth === 'all' || row.dataset.depth == depth) ? '' : 'none';
-  });
+  document.querySelectorAll('[id^="depth-btn-"]').forEach(btn=>{btn.className='btn btn-ghost btn-sm';});
+  const active=el('depth-btn-'+depth); if(active)active.className='btn btn-primary btn-sm';
+  document.querySelectorAll('#team-monitor-table tbody tr').forEach(row=>{row.style.display=(depth==='all'||row.dataset.depth==depth)?'':'none';});
 }
 
 // ── ADMIN ─────────────────────────────────────────────────────
 async function loadAdmin() {
-  const res = await api('getAdminDashboard', {});
-  if (!res.success) { html('admin-content', `<p class="text-muted">${res.message}</p>`); return; }
-
-  const d          = res.data;
-  const s          = d.summary;
-  const deptStats  = d.department_stats || {};
-  const compDemand = d.competency_demand || {};
-
-  let content = `<div class="stats-grid" style="margin-bottom:24px;">
-    <div class="stat-card">
-      <div class="stat-label">Total Employees</div>
-      <div class="stat-value">${s.total_employees}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Assessments Completed</div>
-      <div class="stat-value" style="color:var(--primary);">${s.total_assessed}</div>
-      <div class="stat-sub">${pct(s.total_assessed, s.total_employees)}% of total</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Leaders Assigned</div>
-      <div class="stat-value" style="color:var(--teal);">${s.leaders_assigned}<span style="font-size:14px;color:var(--text-muted);">/${s.total_leaders}</span></div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Mandatory Done</div>
-      <div class="stat-value" style="color:var(--green);">${s.mandatory_completed}<span style="font-size:14px;color:var(--text-muted);">/${s.mandatory_total}</span></div>
-    </div>
+  const res=await api('getAdminDashboard',{});
+  if(!res.success){html('admin-content',`<p class="text-muted">${res.message}</p>`);return;}
+  const d=res.data; const s=d.summary; const deptStats=d.department_stats||{}; const compDemand=d.competency_demand||{};
+  let content=`<div class="stats-grid" style="margin-bottom:24px;">
+    <div class="stat-card"><div class="stat-label">Total Employees</div><div class="stat-value">${s.total_employees}</div></div>
+    <div class="stat-card"><div class="stat-label">Assessments Completed</div><div class="stat-value" style="color:var(--primary);">${s.total_assessed}</div><div class="stat-sub">${pct(s.total_assessed,s.total_employees)}% of total</div></div>
+    <div class="stat-card"><div class="stat-label">Leaders Assigned</div><div class="stat-value" style="color:var(--teal);">${s.leaders_assigned}<span style="font-size:14px;color:var(--text-muted);">/${s.total_leaders}</span></div></div>
+    <div class="stat-card"><div class="stat-label">Mandatory Done</div><div class="stat-value" style="color:var(--green);">${s.mandatory_completed}<span style="font-size:14px;color:var(--text-muted);">/${s.mandatory_total}</span></div></div>
   </div>`;
-
-  const depts = Object.entries(deptStats).sort((a, b) => b[1].total - a[1].total);
-  if (depts.length > 0) {
-    content += `<div style="display:grid;gap:16px;">
-      <div class="card">
-        <div class="card-header"><div class="card-title">Progress by Department</div></div>
-        <div class="card-body"><div class="bar-chart">`;
-    depts.slice(0, 15).forEach(([dept, stat]) => {
-      const p = pct(stat.assessed, stat.total);
-      content += `<div class="bar-row">
-        <div class="bar-name" title="${dept}">${dept}</div>
-        <div class="bar-track"><div class="bar-fill" style="width:${p}%;"></div></div>
-        <div class="bar-val">${stat.assessed}/${stat.total}</div>
-      </div>`;
-    });
-    content += `</div></div></div>`;
-
-    const compEntries = Object.entries(compDemand).sort((a, b) => (b[1].mandatory + b[1].additional) - (a[1].mandatory + a[1].additional));
-    if (compEntries.length > 0) {
-      content += `<div class="card">
-        <div class="card-header"><div class="card-title">Competency Demand</div></div>
-        <div class="card-body" style="padding:0 24px;"><div class="table-wrap"><table>
-          <thead><tr><th>Competency</th><th>Mandatory</th><th>Additional</th><th>Total</th></tr></thead>
-          <tbody>`;
-      compEntries.slice(0, 10).forEach(([cid, cd]) => {
-        content += `<tr>
-          <td><span class="badge badge-blue">${cid}</span></td>
-          <td><span style="font-weight:700;color:var(--accent);">${cd.mandatory}</span></td>
-          <td><span style="font-weight:700;color:var(--primary);">${cd.additional}</span></td>
-          <td><strong>${cd.mandatory + cd.additional}</strong></td>
-        </tr>`;
-      });
-      content += `</tbody></table></div></div></div>`;
+  const depts=Object.entries(deptStats).sort((a,b)=>b[1].total-a[1].total);
+  if(depts.length>0){
+    content+=`<div style="display:grid;gap:16px;"><div class="card"><div class="card-header"><div class="card-title">Progress by Department</div></div><div class="card-body"><div class="bar-chart">`;
+    depts.slice(0,15).forEach(([dept,stat])=>{const p=pct(stat.assessed,stat.total);content+=`<div class="bar-row"><div class="bar-name" title="${dept}">${dept}</div><div class="bar-track"><div class="bar-fill" style="width:${p}%;"></div></div><div class="bar-val">${stat.assessed}/${stat.total}</div></div>`;});
+    content+=`</div></div></div>`;
+    const compEntries=Object.entries(compDemand).sort((a,b)=>(b[1].mandatory+b[1].additional)-(a[1].mandatory+a[1].additional));
+    if(compEntries.length>0){
+      content+=`<div class="card"><div class="card-header"><div class="card-title">Competency Demand</div></div><div class="card-body" style="padding:0 24px;"><div class="table-wrap"><table><thead><tr><th>Competency</th><th>Mandatory</th><th>Additional</th><th>Total</th></tr></thead><tbody>`;
+      compEntries.slice(0,10).forEach(([cid,cd])=>{content+=`<tr><td><span class="badge badge-blue">${cid}</span></td><td><span style="font-weight:700;color:var(--accent);">${cd.mandatory}</span></td><td><span style="font-weight:700;color:var(--primary);">${cd.additional}</span></td><td><strong>${cd.mandatory+cd.additional}</strong></td></tr>`;});
+      content+=`</tbody></table></div></div></div>`;
     }
-    content += `</div>`;
+    content+=`</div>`;
   }
-
-  html('admin-content', content);
+  html('admin-content',content);
 }
 
 // ── ADMIN USERS ───────────────────────────────────────────────
 async function loadAdminUsers() {
-  const res = await api('getAdminUsers', {});
-  if (!res.success) { html('admin-users-content', `<p class="text-muted">${res.message}</p>`); return; }
-
-  const users = res.data;
-  let content = `<div style="margin-bottom:16px;display:flex;gap:10px;align-items:center;">
-    <input type="text" id="user-search" class="form-input" placeholder="Search name or NIK..." style="max-width:280px;" oninput="filterAdminUsers(this.value)">
-    <span style="font-size:13px;color:var(--text-muted);">${users.length} employees</span>
-  </div>
-  <div class="card"><div class="table-wrap"><table>
-    <thead><tr><th>NIK</th><th>Name</th><th>Grade</th><th>Division</th><th>Role</th><th>Must Change</th><th>Action</th></tr></thead>
-    <tbody id="admin-users-tbody">`;
-
-  users.forEach(u => {
-    content += `<tr data-search="${u.nik} ${(u.name || '').toLowerCase()}">
-      <td style="font-family:var(--mono);font-size:12px;">${u.nik}</td>
-      <td><strong>${u.name}</strong><br><span style="font-size:11px;color:var(--text-muted);">${u.position || ''}</span></td>
-      <td><span class="badge ${gradeColor(u.grade)}">${u.grade}</span></td>
-      <td style="font-size:12px;">${u.division}</td>
-      <td>${u.role && u.role.includes('leader') ? '<span class="badge badge-purple">Leader</span>' : '<span class="badge badge-gray">Employee</span>'}</td>
-      <td>${u.must_change_password ? '<span class="badge badge-gold">Yes</span>' : '<span class="badge badge-green">No</span>'}</td>
-      <td><button class="btn btn-ghost btn-sm" onclick="openUserEditModal('${u.nik}')">Edit</button></td>
-    </tr>`;
-  });
-
-  content += `</tbody></table></div></div>`;
-  html('admin-users-content', content);
-  window._adminUsers = users;
+  const res=await api('getAdminUsers',{});
+  if(!res.success){html('admin-users-content',`<p class="text-muted">${res.message}</p>`);return;}
+  const users=res.data;
+  let content=`<div style="margin-bottom:16px;display:flex;gap:10px;align-items:center;"><input type="text" id="user-search" class="form-input" placeholder="Search name or NIK..." style="max-width:280px;" oninput="filterAdminUsers(this.value)"><span style="font-size:13px;color:var(--text-muted);">${users.length} employees</span></div>
+  <div class="card"><div class="table-wrap"><table><thead><tr><th>NIK</th><th>Name</th><th>Grade</th><th>Division</th><th>Role</th><th>Must Change</th><th>Action</th></tr></thead><tbody id="admin-users-tbody">`;
+  users.forEach(u=>{content+=`<tr data-search="${u.nik} ${(u.name||'').toLowerCase()}"><td style="font-family:var(--mono);font-size:12px;">${u.nik}</td><td><strong>${u.name}</strong><br><span style="font-size:11px;color:var(--text-muted);">${u.position||''}</span></td><td><span class="badge ${gradeColor(u.grade)}">${u.grade}</span></td><td style="font-size:12px;">${u.division}</td><td>${u.role&&u.role.includes('leader')?'<span class="badge badge-purple">Leader</span>':'<span class="badge badge-gray">Employee</span>'}</td><td>${u.must_change_password?'<span class="badge badge-gold">Yes</span>':'<span class="badge badge-green">No</span>'}</td><td><button class="btn btn-ghost btn-sm" onclick="openUserEditModal('${u.nik}')">Edit</button></td></tr>`;});
+  content+=`</tbody></table></div></div>`; html('admin-users-content',content); window._adminUsers=users;
 }
 
-function filterAdminUsers(q) {
-  document.querySelectorAll('#admin-users-tbody tr').forEach(row => {
-    row.style.display = (row.dataset.search || '').includes(q.toLowerCase()) ? '' : 'none';
-  });
-}
+function filterAdminUsers(q) { document.querySelectorAll('#admin-users-tbody tr').forEach(row=>{row.style.display=(row.dataset.search||'').includes(q.toLowerCase())?'':'none';}); }
 
 function openUserEditModal(nik) {
-  const user = (window._adminUsers || []).find(u => u.nik === nik);
-  if (!user) return;
+  const user=(window._adminUsers||[]).find(u=>u.nik===nik); if(!user)return;
   openModal(`<div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-header">
-      <div class="modal-title">Edit User — ${user.name}</div>
-      <button class="modal-close" onclick="closeModal()">×</button>
-    </div>
+    <div class="modal-header"><div class="modal-title">Edit User — ${user.name}</div><button class="modal-close" onclick="closeModal()">×</button></div>
     <div class="modal-body">
-      <div class="form-group">
-        <label class="form-label">NIK</label>
-        <input class="form-input mono" value="${user.nik}" disabled>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Name</label>
-        <input class="form-input" id="edit-name" value="${user.name || ''}">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Grade</label>
-        <select class="form-input" id="edit-grade">
-          ${['S0','S1','S2','S3','M1','M2','M3','G1','D1','D2','D3'].map(g => `<option value="${g}"${user.grade === g ? ' selected' : ''}>${g}</option>`).join('')}
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Role</label>
-        <select class="form-input" id="edit-role">
-          <option value="employee"${user.role === 'employee' ? ' selected' : ''}>Employee</option>
-          <option value="leader,employee"${user.role && user.role.includes('leader') ? ' selected' : ''}>Leader & Employee</option>
-          <option value="admin"${user.role === 'admin' ? ' selected' : ''}>Admin</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Supervisor NIK</label>
-        <input class="form-input mono" id="edit-spv" value="${user.spv_nik || ''}">
-      </div>
-      <div style="padding:12px;background:var(--accent-soft);border-radius:var(--radius-sm);font-size:13px;">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-          <input type="checkbox" id="edit-reset-pwd"> Reset password to default (AIO + NIK)
-        </label>
-      </div>
+      <div class="form-group"><label class="form-label">NIK</label><input class="form-input mono" value="${user.nik}" disabled></div>
+      <div class="form-group"><label class="form-label">Name</label><input class="form-input" id="edit-name" value="${user.name||''}"></div>
+      <div class="form-group"><label class="form-label">Grade</label><select class="form-input" id="edit-grade">${['S0','S1','S2','S3','M1','M2','M3','G1','D1','D2','D3'].map(g=>`<option value="${g}"${user.grade===g?' selected':''}>${g}</option>`).join('')}</select></div>
+      <div class="form-group"><label class="form-label">Role</label><select class="form-input" id="edit-role"><option value="employee"${user.role==='employee'?' selected':''}>Employee</option><option value="leader,employee"${user.role&&user.role.includes('leader')?' selected':''}>Leader & Employee</option><option value="admin"${user.role==='admin'?' selected':''}>Admin</option></select></div>
+      <div class="form-group"><label class="form-label">Supervisor NIK</label><input class="form-input mono" id="edit-spv" value="${user.spv_nik||''}"></div>
+      <div style="padding:12px;background:var(--accent-soft);border-radius:var(--radius-sm);font-size:13px;"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input type="checkbox" id="edit-reset-pwd"> Reset password to default (AIO + NIK)</label></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="doUpdateUser('${nik}')">Save</button>
-    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doUpdateUser('${nik}')">Save</button></div>
   </div>`);
 }
 
 async function doUpdateUser(nik) {
-  const updates = {
-    name:           el('edit-name').value.trim(),
-    grade:          el('edit-grade').value,
-    role:           el('edit-role').value,
-    spv_nik:        el('edit-spv').value.trim(),
-    reset_password: el('edit-reset-pwd').checked,
-  };
-  const res = await api('updateUser', { nik, updates });
-  if (res.success) { toast('User updated successfully', 'success'); closeModal(); loadAdminUsers(); }
-  else toast(res.message, 'error');
+  const updates={name:el('edit-name').value.trim(),grade:el('edit-grade').value,role:el('edit-role').value,spv_nik:el('edit-spv').value.trim(),reset_password:el('edit-reset-pwd').checked};
+  const res=await api('updateUser',{nik,updates});
+  if(res.success){toast('User updated successfully','success');closeModal();loadAdminUsers();}else toast(res.message,'error');
 }
 
 // ── ACCOUNT ───────────────────────────────────────────────────
 function loadAccount() {
-  const u = state.user;
-  const content = `<div style="display:grid;gap:16px;max-width:600px;">
-    <div class="card">
-      <div class="card-body" style="display:flex;align-items:center;gap:20px;">
-        <div style="width:72px;height:72px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;flex-shrink:0;">${initials(u.name)}</div>
-        <div>
-          <div style="font-size:18px;font-weight:700;margin-bottom:4px;">${u.name}</div>
-          <div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;">${u.position || '—'}</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <span class="badge ${gradeColor(u.grade)}">${u.grade}</span>
-            <span class="badge badge-blue">${u.division || u.department}</span>
-            ${u.role && u.role.includes('leader') ? '<span class="badge badge-purple">Leader</span>' : ''}
-          </div>
-        </div>
-      </div>
+  const u=state.user;
+  const content=`<div style="display:grid;gap:16px;max-width:600px;">
+    <div class="card"><div class="card-body" style="display:flex;align-items:center;gap:20px;">
+      <div style="width:72px;height:72px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;flex-shrink:0;">${initials(u.name)}</div>
+      <div><div style="font-size:18px;font-weight:700;margin-bottom:4px;">${u.name}</div><div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;">${u.position||'—'}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="badge ${gradeColor(u.grade)}">${u.grade}</span><span class="badge badge-blue">${u.division||u.department}</span>${u.role&&u.role.includes('leader')?'<span class="badge badge-purple">Leader</span>':''}</div>
+      </div></div></div>
+    <div class="card"><div class="card-header"><div class="card-title">Account Information</div></div>
+      <div class="card-body">${[['NIK',u.nik,true],['Email',u.email||'—',false],['Department',u.department,false],['Division',u.division||'—',false],['Supervisor NIK',u.spv_nik||'—',true]].map(([label,val,mono])=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);"><span style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;">${label}</span><span style="font-size:13px;font-weight:500;${mono?'font-family:var(--mono);':''}">${val}</span></div>`).join('')}</div>
     </div>
-    <div class="card">
-      <div class="card-header"><div class="card-title">Account Information</div></div>
-      <div class="card-body" style="display:grid;gap:0;">
-        ${[['NIK', u.nik, true], ['Email', u.email || '—', false], ['Department', u.department, false], ['Division', u.division || '—', false], ['Supervisor NIK', u.spv_nik || '—', true]].map(([label, val, mono]) => `
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
-            <span style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;">${label}</span>
-            <span style="font-size:13px;font-weight:500;${mono ? 'font-family:var(--mono);' : ''}">${val}</span>
-          </div>`).join('')}
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header"><div class="card-title">Security</div></div>
+    <div class="card"><div class="card-header"><div class="card-title">Security</div></div>
       <div class="card-body">
-        <div class="form-group">
-          <label class="form-label">Current Password</label>
-          <input type="password" id="acc-old-pwd" class="form-input" placeholder="Enter current password">
-        </div>
-        <div class="form-group">
-          <label class="form-label">New Password</label>
-          <input type="password" id="acc-new-pwd" class="form-input" placeholder="Minimum 6 characters">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Confirm New Password</label>
-          <input type="password" id="acc-confirm-pwd" class="form-input" placeholder="Repeat new password">
-        </div>
+        <div class="form-group"><label class="form-label">Current Password</label><input type="password" id="acc-old-pwd" class="form-input" placeholder="Enter current password"></div>
+        <div class="form-group"><label class="form-label">New Password</label><input type="password" id="acc-new-pwd" class="form-input" placeholder="Minimum 6 characters"></div>
+        <div class="form-group"><label class="form-label">Confirm New Password</label><input type="password" id="acc-confirm-pwd" class="form-input" placeholder="Repeat new password"></div>
         <button class="btn btn-primary" onclick="doAccountChangePassword()">Save New Password</button>
       </div>
     </div>
     <button class="btn btn-ghost" style="color:var(--accent);border-color:var(--accent);" onclick="doLogout()">🚪 Sign Out</button>
   </div>`;
-  html('account-content', content);
+  html('account-content',content);
 }
 
 async function doAccountChangePassword() {
-  const old = el('acc-old-pwd').value.trim();
-  const np  = el('acc-new-pwd').value.trim();
-  const cp  = el('acc-confirm-pwd').value.trim();
-  if (!old || !np) { toast('All fields are required', 'error'); return; }
-  if (np.length < 6) { toast('Password must be at least 6 characters', 'error'); return; }
-  if (np !== cp) { toast('Password confirmation does not match', 'error'); return; }
-  const res = await api('changePassword', { nik: state.user.nik, old_password: old, new_password: np });
-  if (res.success) {
-    toast('Password changed successfully!', 'success');
-    el('acc-old-pwd').value = ''; el('acc-new-pwd').value = ''; el('acc-confirm-pwd').value = '';
-  } else toast(res.message, 'error');
+  const old=el('acc-old-pwd').value.trim(); const np=el('acc-new-pwd').value.trim(); const cp=el('acc-confirm-pwd').value.trim();
+  if(!old||!np){toast('All fields are required','error');return;}
+  if(np.length<6){toast('Password must be at least 6 characters','error');return;}
+  if(np!==cp){toast('Password confirmation does not match','error');return;}
+  const res=await api('changePassword',{nik:state.user.nik,old_password:old,new_password:np});
+  if(res.success){toast('Password changed successfully!','success');el('acc-old-pwd').value='';el('acc-new-pwd').value='';el('acc-confirm-pwd').value='';}else toast(res.message,'error');
 }
 
-function showAccountModal() { navigateTo('account'); }
+function showAccountModal(){navigateTo('account');}
 
 // ── KEYBOARD SHORTCUTS ────────────────────────────────────────
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeModal();
-  if (e.key === 'Enter' && el('page-login') && el('page-login').style.display !== 'none') doLogin();
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeModal();
+  if(e.key==='Enter'&&el('page-login')&&el('page-login').style.display!=='none')doLogin();
 });
 
 // ── INIT ──────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  el('page-login').style.display = 'flex';
+document.addEventListener('DOMContentLoaded',()=>{
+  el('page-login').style.display='flex';
 });
 </script>
 </body>
