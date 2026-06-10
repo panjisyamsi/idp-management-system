@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MIRAI — Milestone Individual Roadmap for Accelerated Impact</title>
+<title>MIRAI — PT. Amerta Indah Otsuka</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 /* ─── DESIGN TOKENS ──────────────────────────────────────────────── */
@@ -989,6 +989,120 @@ tbody tr:hover { background: var(--indigo-soft); }
 
 /* ─── RACE LEADERBOARD — kept compatible, re-styled wrapper ────────── */
 /* Wrapper colors updated via inline styles in JS */
+/* ─── MOBILE RESPONSIVE OVERRIDES ────────────────────────────────── */
+@media (max-width: 767px) {
+  .page-view { padding: 20px 16px 90px; }
+  .page-header { margin-bottom: 20px; }
+  .page-header h1 { font-size: 20px; }
+  .card-body { padding: 16px; }
+  .card-header { padding: 16px 16px 12px; }
+  .cta-card { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .cta-card > div:last-child { width: 100%; }
+  .cta-card .btn { width: 100%; justify-content: center; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stat-card { padding: 14px; }
+  .stat-value { font-size: 24px; }
+  .pipeline-item { gap: 10px; }
+  .pipeline-status { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+
+  /* TABLE -> CARD LIST */
+  .table-wrap { overflow-x: unset; }
+  table.mobile-cards thead { display: none; }
+  table.mobile-cards tbody { display: flex; flex-direction: column; gap: 10px; }
+  table.mobile-cards tbody tr {
+    display: flex; flex-direction: column;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 14px; box-shadow: var(--shadow-xs);
+  }
+  table.mobile-cards tbody tr:hover { background: var(--surface); }
+  table.mobile-cards tbody td {
+    padding: 3px 0; border-bottom: none; font-size: 13px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  table.mobile-cards tbody td:empty { display: none; }
+  table.mobile-cards tbody td[data-label]::before {
+    content: attr(data-label);
+    font-size: 10px; font-weight: 800; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.4px;
+    min-width: 72px; flex-shrink: 0;
+  }
+  table.mobile-cards tbody td:last-child { margin-top: 8px; }
+
+  /* Admin users table */
+  table.mobile-compact thead { display: none; }
+  table.mobile-compact tbody { display: flex; flex-direction: column; gap: 8px; }
+  table.mobile-compact tbody tr {
+    display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto auto auto;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 12px 14px; gap: 2px 8px;
+  }
+  table.mobile-compact tbody tr:hover { background: var(--surface); }
+  table.mobile-compact tbody td { padding: 0; border: none; font-size: 13px; }
+  table.mobile-compact tbody td:nth-child(1) { grid-column:1; grid-row:1; font-family:var(--mono); font-size:11px; color:var(--text-muted); }
+  table.mobile-compact tbody td:nth-child(2) { grid-column:1; grid-row:2; font-weight:700; }
+  table.mobile-compact tbody td:nth-child(3) { grid-column:2; grid-row:1/3; display:flex; align-items:center; justify-content:flex-end; }
+  table.mobile-compact tbody td:nth-child(4) { grid-column:1; grid-row:3; font-size:12px; color:var(--text-secondary); }
+  table.mobile-compact tbody td:nth-child(5) { grid-column:2; grid-row:3; display:flex; align-items:center; justify-content:flex-end; }
+  table.mobile-compact tbody td:nth-child(6) { display:none; }
+  table.mobile-compact tbody td:nth-child(7) { grid-column:1/3; grid-row:4; padding-top:8px; margin-top:6px; border-top:1px solid var(--border); }
+  table.mobile-compact tbody td:nth-child(7) .btn { width:100%; justify-content:center; }
+
+  /* Team assessment table */
+  table.mobile-team thead { display: none; }
+  table.mobile-team tbody { display: flex; flex-direction: column; gap: 10px; }
+  table.mobile-team tbody tr {
+    display: grid; grid-template-columns: 1fr auto;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 14px; gap: 4px 8px;
+  }
+  table.mobile-team tbody tr:hover { background: var(--surface); }
+  table.mobile-team tbody td { padding: 0; border: none; }
+  table.mobile-team tbody td:nth-child(1) { grid-column:1; grid-row:1; font-size:14px; }
+  table.mobile-team tbody td:nth-child(2) { grid-column:2; grid-row:1; text-align:right; }
+  table.mobile-team tbody td:nth-child(3) { grid-column:1; grid-row:2; font-size:12px; color:var(--text-secondary); }
+  table.mobile-team tbody td:nth-child(4) { grid-column:1; grid-row:3; }
+  table.mobile-team tbody td:nth-child(5) { grid-column:2; grid-row:3; text-align:right; }
+  table.mobile-team tbody td:nth-child(6) { grid-column:1; grid-row:4; font-size:13px; }
+  table.mobile-team tbody td:nth-child(7) { grid-column:1/3; grid-row:5; padding-top:10px; margin-top:6px; border-top:1px solid var(--border); }
+  table.mobile-team tbody td:nth-child(7) .btn { width:100%; justify-content:center; }
+
+  /* Team monitor table */
+  table.mobile-monitor thead { display: none; }
+  table.mobile-monitor tbody { display: flex; flex-direction: column; gap: 10px; }
+  table.mobile-monitor tbody tr {
+    display: grid; grid-template-columns: 1fr auto;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 14px; gap: 4px 8px;
+  }
+  table.mobile-monitor tbody tr:hover { background: var(--surface); }
+  table.mobile-monitor tbody td { padding: 0; border: none; }
+  table.mobile-monitor tbody td:nth-child(1) { grid-column:1/3; grid-row:1; }
+  table.mobile-monitor tbody td:nth-child(2) { display:none; }
+  table.mobile-monitor tbody td:nth-child(3) { grid-column:2; grid-row:2; text-align:right; }
+  table.mobile-monitor tbody td:nth-child(4) { grid-column:1; grid-row:2; font-weight:700; }
+  table.mobile-monitor tbody td:nth-child(5) { grid-column:1/3; grid-row:3; }
+  table.mobile-monitor tbody td:nth-child(6) { grid-column:2; grid-row:4; text-align:right; }
+  table.mobile-monitor tbody td:nth-child(7) { grid-column:1; grid-row:4; }
+
+  /* MIRAI chatbot */
+  #mirai-widget { right: 12px; bottom: 80px; }
+  #mirai-panel { width: calc(100vw - 24px); max-width: 360px; }
+  #mirai-bubble { max-width: 180px; font-size: 12px; }
+
+  /* Modal */
+  .modal { max-height: 95vh; }
+  .modal-body { padding: 16px 18px; }
+  .modal-footer { padding: 12px 18px; flex-wrap: wrap; }
+  .modal-footer .btn { flex: 1; justify-content: center; min-width: 100px; }
+
+  /* Bar chart */
+  .bar-name { width: 80px; font-size: 11px; }
+
+  /* Jadwal tabs */
+  #jadwal-tabs { width: 100%; }
+  #jadwal-tabs .btn { flex: 1; justify-content: center; }
+}
+
 </style>
 </head>
 <body>
@@ -1341,6 +1455,20 @@ function showLoading(v) {
   document.getElementById('loading-overlay').classList.toggle('hidden', !v);
 }
 
+// apiFast: no loading overlay — for quick actions (enroll, cancel, save draft)
+async function apiFast(action, payload = {}) {
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action, ...payload }),
+    });
+    return await res.json();
+  } catch (err) {
+    return { success: false, message: 'Connection failed. Please try again.' };
+  }
+}
+
 function toast(msg, type = 'default', duration = 3500) {
   const c = document.getElementById('toast-container');
   const t = document.createElement('div');
@@ -1595,8 +1723,6 @@ async function loadDashboard() {
     </div>
   </div>`;
 
-  if (adminRes.success) content += renderRaceLeaderboard(adminRes.data, u.division || u.department);
-
   if (totalM > 0) {
     const pctVal = pct(doneM, totalM);
     content += `<div class="card" style="margin-bottom:16px;">
@@ -1646,6 +1772,8 @@ async function loadDashboard() {
       </div>
     </div>`;
   }
+
+  if (adminRes.success) content += renderRaceLeaderboard(adminRes.data, u.division || u.department);
 
   html('dash-content', content);
 }
@@ -1951,7 +2079,7 @@ function renderJadwal() {
     </div></div></div>`);
     return;
   }
-  let content = `<div class="card"><div class="table-wrap"><table><thead><tr>
+  let content = `<div class="card"><div class="table-wrap"><table class="mobile-cards"><thead><tr>
     <th>Date</th><th>Time</th><th>Competency</th><th>Trainer</th><th>Location</th><th>Type</th><th>Status</th><th>Action</th>
   </tr></thead><tbody>`;
   sessions.forEach(s => {
@@ -1966,13 +2094,13 @@ function renderJadwal() {
         ? '<span class="badge badge-sky">Online</span>'
         : '<span class="badge badge-indigo">Offline</span>';
     content += `<tr>
-      <td style="white-space:nowrap;font-weight:600;">${dateDisplay}</td>
-      <td style="white-space:nowrap;color:var(--text-secondary);">${s.time||'—'}</td>
-      <td><div style="font-weight:700;">${s.competency_name||s.competency_id}</div><div style="font-size:11px;color:var(--text-muted);font-family:var(--mono);">${s.competency_id}</div></td>
-      <td style="font-size:13px;">${s.trainer||'—'}</td>
-      <td style="font-size:13px;">${s.location||s.area||'—'}</td>
-      <td>${typeBadge}</td>
-      <td>${isEnrolled ? '<span class="badge badge-green">Enrolled</span>' : '<span class="badge badge-gray">Not enrolled</span>'}</td>
+      <td data-label="Date" style="white-space:nowrap;font-weight:600;">${dateDisplay}</td>
+      <td data-label="Time" style="white-space:nowrap;color:var(--text-secondary);">${s.time||'—'}</td>
+      <td data-label="Competency"><div style="font-weight:700;">${s.competency_name||s.competency_id}</div><div style="font-size:11px;color:var(--text-muted);font-family:var(--mono);">${s.competency_id}</div></td>
+      <td data-label="Trainer" style="font-size:13px;">${s.trainer||'—'}</td>
+      <td data-label="Location" style="font-size:13px;">${s.location||s.area||'—'}</td>
+      <td data-label="Type">${typeBadge}</td>
+      <td data-label="Status">${isEnrolled ? '<span class="badge badge-green">Enrolled</span>' : '<span class="badge badge-gray">Not enrolled</span>'}</td>
       <td>${isEnrolled
         ? `<button class="btn btn-ghost btn-sm" onclick="doCancelEnrollment('${s.session_id}')">Cancel</button>`
         : `<button class="btn btn-primary btn-sm" onclick="doEnroll('${s.competency_id}','${s.session_id}')">Enroll</button>`
@@ -1983,16 +2111,149 @@ function renderJadwal() {
   html('jadwal-content', content);
 }
 
+function buildCalendarUrl(session) {
+  // Build Google Calendar "Add Event" URL from session data
+  const title = encodeURIComponent(`[MIRAI] ${session.competency_name || session.competency_id}`);
+  const location = encodeURIComponent(session.location || session.area || '');
+  const details = encodeURIComponent(`Training: ${session.competency_name || session.competency_id}\nTrainer: ${session.trainer || '-'}\nLocation: ${session.location || session.area || '-'}\n\nDikelola melalui MIRAI Development Platform - PT. Amerta Indah Otsuka`);
+
+  // Parse date: expects YYYY-MM-DD or DD/MM/YYYY
+  let dateStr = session.date || '';
+  let dateFormatted = '';
+  let dateEndFormatted = '';
+
+  try {
+    // Normalize date format
+    let d;
+    if (dateStr.includes('-') && dateStr.length === 10) {
+      d = new Date(dateStr);
+    } else if (dateStr.includes('/')) {
+      const parts = dateStr.split('/');
+      d = new Date(`${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`);
+    } else {
+      d = new Date(dateStr);
+    }
+
+    const isSL = (session.training_type || '').toLowerCase().includes('self');
+
+    if (isSL && session.date_end) {
+      // Self Learning: all-day range
+      let de;
+      const des = session.date_end;
+      if (des.includes('-') && des.length === 10) {
+        de = new Date(des);
+      } else if (des.includes('/')) {
+        const p = des.split('/');
+        de = new Date(`${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`);
+      } else {
+        de = new Date(des);
+      }
+      de.setDate(de.getDate() + 1); // Google Calendar end is exclusive
+      dateFormatted = d.toISOString().replace(/-/g,'').split('T')[0];
+      dateEndFormatted = de.toISOString().replace(/-/g,'').split('T')[0];
+    } else {
+      // Parse time: "13.30 - 16.30" or "13:30 - 16:30"
+      const timeStr = (session.time || '08:00 - 09:00').replace(/\./g, ':');
+      const timeParts = timeStr.split('-').map(t => t.trim());
+      const startTime = timeParts[0] || '08:00';
+      const endTime   = timeParts[1] || '09:00';
+
+      const [sh, sm] = startTime.split(':').map(Number);
+      const [eh, em] = endTime.split(':').map(Number);
+
+      const startDt = new Date(d);
+      startDt.setHours(sh, sm || 0, 0, 0);
+      const endDt = new Date(d);
+      endDt.setHours(eh, em || 0, 0, 0);
+
+      // Format: YYYYMMDDTHHmmss (local, no Z — Calendar will use user's timezone)
+      const fmt = dt => dt.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z');
+      dateFormatted    = fmt(startDt);
+      dateEndFormatted = fmt(endDt);
+    }
+  } catch(e) {
+    // Fallback: just use today
+    const now = new Date();
+    dateFormatted = now.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z');
+    dateEndFormatted = dateFormatted;
+  }
+
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dateFormatted}/${dateEndFormatted}&details=${details}&location=${location}&sf=true&output=xml`;
+}
+
+function showCalendarModal(session) {
+  const calUrl = buildCalendarUrl(session);
+  const isSL = (session.training_type || '').toLowerCase().includes('self');
+  const dateDisplay = isSL && session.date_end
+    ? `${session.date} – ${session.date_end}`
+    : `${session.date}${session.time ? ' · ' + session.time : ''}`;
+
+  openModal(`<div class="modal" onclick="event.stopPropagation()" style="max-width:440px;">
+    <div class="modal-header">
+      <div class="modal-title">Enrollment Successful!</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="notice notice-mint" style="margin-bottom:20px;">
+        <div class="notice-icon">✅</div>
+        <div>Kamu berhasil terdaftar di sesi ini.</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:var(--r);padding:16px;margin-bottom:20px;">
+        <div style="font-weight:800;font-size:14px;margin-bottom:8px;">${session.competency_name || session.competency_id}</div>
+        <div style="font-size:12px;color:var(--text-secondary);display:flex;flex-direction:column;gap:5px;">
+          <span>📅 ${dateDisplay}</span>
+          <span>📍 ${session.location || session.area || '—'}</span>
+          <span>👤 ${session.trainer || '—'}</span>
+        </div>
+      </div>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">Tambahkan ke Google Calendar agar kamu tidak lupa.</p>
+      <a href="${calUrl}" target="_blank" rel="noopener" class="btn btn-primary btn-full" style="text-decoration:none;justify-content:center;">
+        📅 Tambah ke Google Calendar
+      </a>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Tutup</button>
+    </div>
+  </div>`);
+}
+
 async function doEnroll(competencyId, sessionId) {
-  const res = await api('enrollSession', { nik: state.user.nik, competency_id: competencyId, session_id: sessionId });
-  if (res.success) { toast('Enrollment successful!', 'success'); loadJadwal(); }
-  else toast(res.message, 'error');
+  // Optimistic UI: update button immediately
+  const btn = document.querySelector(`button[onclick="doEnroll('${competencyId}','${sessionId}')"]`);
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '...';
+  }
+
+  // Find session data from memory for Calendar
+  const session = state.jadwal.find(s => s.session_id === sessionId) || {};
+  session.competency_id = session.competency_id || competencyId;
+
+  const res = await apiFast('enrollSession', { nik: state.user.nik, competency_id: competencyId, session_id: sessionId });
+  if (res.success) {
+    // Update local state immediately — no full reload
+    state.enrollments.push({ session_id: sessionId, competency_id: competencyId });
+    renderJadwal();
+    showCalendarModal(session);
+  } else {
+    toast(res.message, 'error');
+    if (btn) { btn.disabled = false; btn.textContent = 'Enroll'; }
+  }
 }
 
 async function doCancelEnrollment(sessionId) {
-  const res = await api('cancelEnrollment', { nik: state.user.nik, session_id: sessionId });
-  if (res.success) { toast('Enrollment cancelled', 'success'); loadJadwal(); }
-  else toast(res.message, 'error');
+  const btn = document.querySelector(`button[onclick="doCancelEnrollment('${sessionId}')"]`);
+  if (btn) { btn.disabled = true; btn.textContent = '...'; }
+
+  const res = await apiFast('cancelEnrollment', { nik: state.user.nik, session_id: sessionId });
+  if (res.success) {
+    state.enrollments = state.enrollments.filter(e => e.session_id !== sessionId);
+    renderJadwal();
+    toast('Enrollment dibatalkan', 'success');
+  } else {
+    toast(res.message, 'error');
+    if (btn) { btn.disabled = false; btn.textContent = 'Cancel'; }
+  }
 }
 
 // ── PROGRESS ────────────────────────────────────────────────────
@@ -2059,7 +2320,7 @@ function renderTeamAssessmentList() {
     ${!allAssigned ? `<span style="font-size:12px;color:var(--text-muted);">${pendingCount} member(s) not yet assigned</span>` : ''}
   </div>`;
 
-  content += `<div class="card"><div class="table-wrap"><table><thead><tr>
+  content += `<div class="card"><div class="table-wrap"><table class="mobile-team"><thead><tr>
     <th>Name</th><th>Grade</th><th>Department</th><th>Assessment</th><th>Assignment</th><th>Mandatory</th><th>Action</th>
   </tr></thead><tbody>`;
   team.forEach(m => {
@@ -2296,7 +2557,7 @@ async function loadTeamMonitor() {
     </div>`;
   }
 
-  content += `<div class="card"><div class="table-wrap"><table id="team-monitor-table"><thead><tr>
+  content += `<div class="card"><div class="table-wrap"><table id="team-monitor-table" class="mobile-monitor"><thead><tr>
     <th>Name</th><th>Reports To</th><th>Grade</th><th>Mandatory</th><th>Progress</th><th>Enrolled</th><th>Status</th>
   </tr></thead><tbody>`;
 
@@ -2401,7 +2662,7 @@ async function loadAdmin() {
     if (compEntries.length > 0) {
       content += `<div class="card">
         <div class="card-header"><div class="card-title">Competency Demand</div></div>
-        <div class="card-body" style="padding:0 24px;"><div class="table-wrap"><table>
+        <div class="card-body" style="padding:0 24px;"><div class="table-wrap"><table class="mobile-cards">
           <thead><tr><th>Competency</th><th>Mandatory</th><th>Additional</th><th>Total</th></tr></thead>
           <tbody>`;
       compEntries.slice(0, 10).forEach(([cid, cd]) => {
@@ -2428,7 +2689,7 @@ async function loadAdminUsers() {
     <input type="text" id="user-search" class="form-input" placeholder="Search name or NIK..." style="max-width:280px;" oninput="filterAdminUsers(this.value)">
     <span style="font-size:13px;color:var(--text-muted);font-weight:600;">${users.length} employees</span>
   </div>
-  <div class="card"><div class="table-wrap"><table><thead><tr>
+  <div class="card"><div class="table-wrap"><table class="mobile-compact"><thead><tr>
     <th>NIK</th><th>Name</th><th>Grade</th><th>Division</th><th>Role</th><th>Must Change Pwd</th><th>Action</th>
   </tr></thead><tbody id="admin-users-tbody">`;
   users.forEach(u => {
