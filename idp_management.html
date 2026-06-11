@@ -1327,7 +1327,7 @@ tbody tr:hover { background: var(--indigo-soft); }
 
 <!-- ── MIRAI CHATBOT ─────────────────────────────────────────────── -->
 <div id="mirai-widget">
-  <div id="mirai-bubble">Ada yang ingin ditanyakan? Saya siap membantu! 😊</div>
+  <div id="mirai-bubble">Have a question? I'm here to help! 😊</div>
   <div id="mirai-panel">
     <div class="mirai-header">
       <div class="mirai-avatar-sm">
@@ -1336,14 +1336,14 @@ tbody tr:hover { background: var(--indigo-soft); }
       </div>
       <div class="mirai-header-info">
         <div class="mirai-header-name">Mirai Assistant</div>
-        <div class="mirai-header-sub">Powered by AI · Bahasa Indonesia</div>
+        <div class="mirai-header-sub">Powered by AI · English</div>
       </div>
       <div class="mirai-online-dot"></div>
       <button class="mirai-close" onclick="toggleMirai()">×</button>
     </div>
     <div class="mirai-messages" id="mirai-messages"></div>
     <div class="mirai-input-row">
-      <input class="mirai-input" id="mirai-input" placeholder="Tanya sesuatu..." onkeydown="if(event.key==='Enter')sendMirai()">
+      <input class="mirai-input" id="mirai-input" placeholder="Ask something..." onkeydown="if(event.key==='Enter')sendMirai()">
       <button class="mirai-send" onclick="sendMirai()">→</button>
     </div>
   </div>
@@ -1355,7 +1355,7 @@ tbody tr:hover { background: var(--indigo-soft); }
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────────────
-const API_URL = 'https://script.google.com/macros/s/AKfycbzKKGVMAZqRnW--CoMuXKdXTLnJ6EXwqhReeuWxS3sLY4UhNx6Hmq_mF79lLtu2CMSu/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzovA5oI8ukVEz4c7xnkRDzq5aXLAn-h6Ef0GzxgnDPrASdVo5vBoF7HEgnrf9v1xtF/exec';
 
 // ── STATE ───────────────────────────────────────────────────────
 let state = {
@@ -1366,18 +1366,18 @@ let state = {
 
 // ── MIRAI CHATBOT ───────────────────────────────────────────────
 const MIRAI_FAQS = [
-  { q: ['enroll','daftar','training','mendaftar'], a: 'Buka menu Schedule, pilih sesi yang sesuai kompetensi kamu, lalu klik Enroll. Email konfirmasi dan Google Calendar invite otomatis dikirim ke kamu dan leader setelah berhasil.' },
-  { q: ['mandatory','wajib'], a: 'Mandatory adalah kompetensi yang wajib diselesaikan dalam program IDP. Leader menetapkan maksimal 2 kompetensi mandatory berdasarkan gap terbesar.' },
-  { q: ['assessment','self','penilaian'], a: 'Self Assessment ada di menu Assessment. Centang indikator perilaku yang kamu tunjukkan secara konsisten. Simpan draft dulu, submit final jika sudah yakin.' },
-  { q: ['password','lupa','reset'], a: 'Di halaman login, klik Forgot password? dan masukkan NIK kamu. Link reset akan dikirim ke email terdaftar.' },
-  { q: ['gap','level'], a: 'Gap adalah selisih antara level aktual dan target level. Kompetensi dengan gap ditandai di dashboard — semakin besar gap, semakin prioritas.' },
-  { q: ['pdf','download'], a: 'PDF assignment tim tersedia di menu Team Assessment setelah semua anggota tim sudah di-assign oleh leader.' },
-  { q: ['leader','tim','team'], a: 'Sebagai leader, kamu bisa review assessment tim di menu Team Assessment dan monitor progress di Team Monitor.' },
-  { q: ['progress','perkembangan'], a: 'Cek menu Progress untuk melihat persentase penyelesaian kompetensi mandatory dan additional kamu.' },
-  { q: ['jadwal','schedule','sesi'], a: 'Jadwal training ada di menu Schedule. Ada dua tab: My Mandatory (sesi sesuai kompetensi kamu) dan All Schedules (semua jadwal yang tersedia).' },
-  { q: ['cancel','batal'], a: 'Untuk membatalkan enrollment, buka menu Schedule, temukan sesi yang sudah kamu daftar, lalu klik Cancel.' },
-  { q: ['admin','hcd'], a: 'Untuk bantuan lebih lanjut, hubungi HCD: Panji Nursamsi di 0857-1567-2731.' },
-  { q: ['halo','hai','hello','hi','hey'], a: 'Halo! Saya Mirai, asisten pengembangan kamu di AIO. Ada yang bisa saya bantu hari ini?' },
+  { q: ['enroll','daftar','training','mendaftar'], a: 'Go to Schedule, select a session that matches your competency, then click Enroll. A confirmation email and Google Calendar invite will be sent to you and your leader automatically.' },
+  { q: ['mandatory','wajib'], a: 'Mandatory competencies are those required to complete in your IDP. Your leader assigns a maximum of 2 mandatory competencies based on your largest gaps.' },
+  { q: ['assessment','self','penilaian'], a: 'Go to the Assessment menu. Check all behavioral indicators you consistently demonstrate. Save as draft first, then submit final when ready.' },
+  { q: ['password','lupa','reset'], a: 'On the login page, click Forgot password? and enter your NIK. A reset link will be sent to your registered email.' },
+  { q: ['gap','level'], a: 'Gap is the difference between your actual level and the target level. Competencies with a gap are highlighted on your dashboard — larger gaps are higher priority.' },
+  { q: ['pdf','download'], a: 'The team assignment PDF is available in the Team Assessment menu after all team members have been assigned by the leader.' },
+  { q: ['leader','tim','team'], a: 'As a leader, you can review your team\'s assessments in Team Assessment and monitor progress in Team Monitor.' },
+  { q: ['progress','perkembangan'], a: 'Check the Progress menu to see your completion percentage for mandatory and additional competencies.' },
+  { q: ['jadwal','schedule','sesi'], a: 'Training schedules are in the Schedule menu. There are two tabs: My Mandatory (sessions matching your competencies) and All Schedules (all available sessions).' },
+  { q: ['cancel','batal'], a: 'To cancel your enrollment, go to Schedule, find the session you enrolled in, and click Cancel.' },
+  { q: ['admin','hcd'], a: 'For further assistance, contact HCD: Panji Nursamsi at 0857-1567-2731.' },
+  { q: ['halo','hai','hello','hi','hey'], a: 'Hello! I\'m Mirai, your development assistant at AIO. How can I help you today?' },
 ];
 
 let miraiOpen = false;
@@ -1385,7 +1385,7 @@ let miraiMsgs = [];
 let miraiBubbleTimer = null;
 
 function initMirai() {
-  miraiMsgs = [{ type: 'bot', text: 'Halo! Saya Mirai 👋 Tanya apapun seputar assessment, jadwal training, atau progres pengembanganmu.' }];
+  miraiMsgs = [{ type: 'bot', text: 'Hi! I\'m Mirai 👋 Ask me anything about your assessment, training schedule, or development progress.' }];
   renderMiraiMessages();
   miraiBubbleTimer = setTimeout(() => {
     const bubble = document.getElementById('mirai-bubble');
@@ -1432,14 +1432,14 @@ function sendMirai() {
   const typingEl = document.createElement('div');
   typingEl.className = 'mirai-typing';
   typingEl.id = 'mirai-typing';
-  typingEl.textContent = 'Mirai sedang mengetik...';
+  typingEl.textContent = 'Mirai is typing...';
   document.getElementById('mirai-messages').appendChild(typingEl);
   scrollMiraiToBottom();
   setTimeout(() => {
     const typing = document.getElementById('mirai-typing');
     if (typing) typing.remove();
     const lc = q.toLowerCase();
-    let reply = 'Maaf, saya belum punya informasi untuk itu. Silakan hubungi HCD: Panji Nursamsi (0857-1567-2731).';
+    let reply = "I don't have information on that yet. Please contact HCD: Panji Nursamsi (0857-1567-2731).";
     for (const faq of MIRAI_FAQS) {
       if (faq.q.some(k => lc.includes(k))) { reply = faq.a; break; }
     }
@@ -2268,7 +2268,7 @@ function showCalendarModal(session) {
     <div class="modal-body">
       <div class="notice notice-mint" style="margin-bottom:20px;">
         <div class="notice-icon">✅</div>
-        <div>Kamu berhasil terdaftar di sesi ini.</div>
+        <div>You have successfully enrolled in this session.</div>
       </div>
       <div style="background:var(--surface2);border-radius:var(--r);padding:16px;margin-bottom:20px;">
         <div style="font-weight:800;font-size:14px;margin-bottom:8px;">${session.competency_name || session.competency_id}</div>
@@ -2278,13 +2278,13 @@ function showCalendarModal(session) {
           <span>👤 ${session.trainer || '—'}</span>
         </div>
       </div>
-      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">Tambahkan ke Google Calendar agar kamu tidak lupa.</p>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">Add this to your Google Calendar so you don't miss it.</p>
       <a href="${calUrl}" target="_blank" rel="noopener" class="btn btn-primary btn-full" style="text-decoration:none;justify-content:center;">
-        📅 Tambah ke Google Calendar
+        📅 Add to Google Calendar
       </a>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal()">Tutup</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Close</button>
     </div>
   </div>`);
 }
@@ -2321,7 +2321,7 @@ async function doCancelEnrollment(sessionId) {
   if (res.success) {
     state.enrollments = state.enrollments.filter(e => e.session_id !== sessionId);
     renderJadwal();
-    toast('Enrollment dibatalkan', 'success');
+    toast('Enrollment cancelled', 'success');
   } else {
     toast(res.message, 'error');
     if (btn) { btn.disabled = false; btn.textContent = 'Cancel'; }
@@ -2496,44 +2496,83 @@ function openAssignModal(memberNik) {
   const member = state.teamData.find(m => m.nik === memberNik);
   if (!member) return;
   const decisions = {};
-  member.competencies.forEach(c => { decisions[c.competency_id] = c.decision || ''; });
+  const leaderLevels = {};
+  member.competencies.forEach(c => {
+    decisions[c.competency_id] = c.decision || '';
+    leaderLevels[c.competency_id] = c.leader_level || '';
+  });
   const typeLabel = { core:'Core', role:'Role', jf:'Job Family' };
   const typeColor = { core:'badge-indigo', role:'badge-violet', jf:'badge-sky' };
   const grouped = {};
   member.competencies.forEach(c => { const t = c.competency_type; if (!grouped[t]) grouped[t]=[]; grouped[t].push(c); });
+
   let compRows = '';
   Object.keys(grouped).forEach(type => {
     compRows += `<div style="font-size:11px;font-weight:800;color:var(--text-muted);letter-spacing:0.6px;text-transform:uppercase;margin:16px 0 8px;">${typeLabel[type]||type}</div>`;
     grouped[type].forEach(c => {
-      compRows += `<div style="padding:13px 15px;border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:8px;transition:border-color 0.15s;">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+      // Build behavioral indicators from self assessment
+      const checkedIndicators = buildCheckedIndicators(c);
+
+      compRows += `<div id="comp-assign-${memberNik}-${c.competency_id}" style="border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden;transition:border-color 0.15s;">
+
+        <!-- Header row: competency info + decision buttons -->
+        <div style="padding:13px 15px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;background:var(--surface);">
           <div style="display:flex;align-items:center;gap:8px;">
             <span class="badge ${typeColor[c.competency_type]||'badge-gray'}">${c.competency_id}</span>
             <div>
               <div style="font-weight:700;font-size:13px;">${c.competency_name||c.competency_id}</div>
-              <div style="font-size:11px;color:var(--text-muted);">Self: L${c.self_score} → Target: L${c.target_level} · Gap: ${c.gap}</div>
+              <div style="font-size:11px;color:var(--text-muted);">Employee self-score: L${c.self_score} · System target: L${c.target_level} · Gap: ${c.gap}</div>
             </div>
           </div>
-          <div style="display:flex;gap:6px;" id="decision-btns-${memberNik}-${c.competency_id}">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;" id="decision-btns-${memberNik}-${c.competency_id}">
             <button class="btn btn-sm ${c.decision==='mandatory'?'btn-accent':'btn-ghost'}" onclick="setDecision('${memberNik}','${c.competency_id}','mandatory')">Mandatory</button>
             <button class="btn btn-sm ${c.decision==='additional'?'btn-primary':'btn-ghost'}" onclick="setDecision('${memberNik}','${c.competency_id}','additional')">Additional</button>
             <button class="btn btn-sm btn-ghost" onclick="setDecision('${memberNik}','${c.competency_id}','')">—</button>
           </div>
         </div>
-        ${c.gap <= 0 ? '<div style="margin-top:6px;font-size:11px;color:var(--mint);font-weight:600;">✓ Target already achieved</div>' : ''}
+
+        <!-- Leader level input -->
+        <div style="padding:10px 15px;background:var(--indigo-soft);border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <label style="font-size:11px;font-weight:700;color:var(--indigo-dark);white-space:nowrap;">Your observed level:</label>
+          <select id="leader-level-${memberNik}-${c.competency_id}" onchange="setLeaderLevel('${memberNik}','${c.competency_id}',this.value)"
+            style="padding:5px 10px;border:1.5px solid var(--indigo);border-radius:var(--r-sm);font-size:12px;font-family:var(--font);font-weight:600;background:white;color:var(--text);cursor:pointer;outline:none;">
+            <option value="">— Enter your observed level —</option>
+            ${[1,2,3,4,5].map(l => `<option value="${l}" ${c.leader_level==l?'selected':''}>Level ${l}</option>`).join('')}
+          </select>
+          ${c.gap <= 0 ? '<span style="font-size:11px;color:var(--mint);font-weight:600;">✓ Target already achieved</span>' : ''}
+        </div>
+
+        <!-- Behavioral indicators (collapsible) -->
+        ${checkedIndicators ? `
+        <div style="border-top:1px solid var(--border);">
+          <div onclick="toggleAssignIndicators('${memberNik}','${c.competency_id}')"
+            style="padding:9px 15px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;background:var(--surface2);">
+            <span style="font-size:11px;font-weight:700;color:var(--text-secondary);">📋 View Self-Assessment Indicators (L${c.self_score})</span>
+            <span id="assign-arrow-${memberNik}-${c.competency_id}" style="font-size:11px;color:var(--text-muted);transition:transform 0.2s;">▼</span>
+          </div>
+          <div id="assign-indicators-${memberNik}-${c.competency_id}" style="display:none;padding:12px 15px;background:var(--surface2);">
+            ${checkedIndicators}
+          </div>
+        </div>` : ''}
+
       </div>`;
     });
   });
+
   const initCount = Object.values(decisions).filter(d => d === 'mandatory').length;
-  openModal(`<div class="modal" style="max-width:680px;" onclick="event.stopPropagation()">
+  openModal(`<div class="modal" style="max-width:720px;" onclick="event.stopPropagation()">
     <div class="modal-header">
-      <div><div class="modal-title">${member.name}</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${member.grade} · ${member.department}</div></div>
+      <div>
+        <div class="modal-title">${member.name}</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${member.grade} · ${member.department}</div>
+      </div>
       <button class="modal-close" onclick="closeModal()">×</button>
     </div>
     <div class="modal-body">
       <div class="notice notice-amber">
         <div class="notice-icon">⚠️</div>
-        <div><strong>Maximum 2 Mandatory</strong> competencies per member.
+        <div>
+          <strong>Maximum 2 Mandatory</strong> competencies per member.
           <div id="mandatory-counter" style="margin-top:4px;font-weight:700;">Mandatory selected: ${initCount}/2</div>
         </div>
       </div>
@@ -2545,7 +2584,38 @@ function openAssignModal(memberNik) {
     </div>
   </div>`);
   window._currentDecisions = decisions;
+  window._currentLeaderLevels = leaderLevels;
   window._currentMemberNik = memberNik;
+}
+
+function buildCheckedIndicators(comp) {
+  // Try to get checked indicators from compLibrary if loaded
+  // comp.checked_indicators should come from backend in getTeamAssessments
+  if (!comp.checked_indicators || !comp.checked_indicators.length) return '';
+  let html = '';
+  comp.checked_indicators.forEach(ind => {
+    html += `<div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);">
+      <div style="width:16px;height:16px;background:var(--indigo);border-radius:3px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;flex-shrink:0;margin-top:1px;">✓</div>
+      <div style="font-size:12px;line-height:1.5;color:var(--text);">
+        <span style="font-size:10px;font-weight:700;color:var(--indigo);margin-right:6px;">L${ind.level}</span>${ind.indicator}
+      </div>
+    </div>`;
+  });
+  return html;
+}
+
+function toggleAssignIndicators(memberNik, compId) {
+  const panel = el(`assign-indicators-${memberNik}-${compId}`);
+  const arrow = el(`assign-arrow-${memberNik}-${compId}`);
+  if (!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+  if (arrow) arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+}
+
+function setLeaderLevel(memberNik, compId, level) {
+  if (!window._currentLeaderLevels) return;
+  window._currentLeaderLevels[compId] = level;
 }
 
 function setDecision(memberNik, compId, decision) {
@@ -2570,7 +2640,12 @@ function setDecision(memberNik, compId, decision) {
 }
 
 async function doSaveApproval(memberNik) {
-  const decisions = Object.entries(window._currentDecisions).map(([cid, dec]) => ({ competency_id: cid, decision: dec, suggestion: '' }));
+  const decisions = Object.entries(window._currentDecisions).map(([cid, dec]) => ({
+    competency_id: cid,
+    decision: dec,
+    suggestion: '',
+    leader_level: window._currentLeaderLevels?.[cid] || '',
+  }));
   const res = await api('saveApproval', { leader_nik: state.user.nik, member_nik: memberNik, decisions });
   if (res.success) { toast('Assignment saved!', 'success'); closeModal(); loadTeamAssessment(); }
   else toast(res.message, 'error');
