@@ -156,14 +156,15 @@ body {
   background: var(--bg);
 }
 .login-left {
-  flex: 1;
+  flex: 1.1;
   background: linear-gradient(145deg, #3451D1 0%, #4F6EF7 50%, #7B93FF 100%);
   display: none;
   align-items: center;
   justify-content: center;
-  padding: 60px;
+  padding: 60px 56px;
   position: relative;
   overflow: hidden;
+  min-width: 0;
 }
 @media (min-width: 900px) { .login-left { display: flex; } }
 .login-left-orb {
@@ -172,9 +173,9 @@ body {
   background: rgba(255,255,255,0.07);
   animation: orbFloat 6s ease-in-out infinite;
 }
-.login-left-orb:nth-child(1) { width: 320px; height: 320px; top: -80px; right: -60px; animation-delay: 0s; }
-.login-left-orb:nth-child(2) { width: 200px; height: 200px; bottom: 60px; left: 40px; animation-delay: -3s; }
-.login-left-orb:nth-child(3) { width: 120px; height: 120px; top: 50%; left: 60%; animation-delay: -1.5s; }
+.login-left-orb:nth-child(1) { width: 380px; height: 380px; top: -100px; right: -80px; animation-delay: 0s; }
+.login-left-orb:nth-child(2) { width: 240px; height: 240px; bottom: 60px; left: 40px; animation-delay: -3s; }
+.login-left-orb:nth-child(3) { width: 140px; height: 140px; top: 50%; left: 60%; animation-delay: -1.5s; }
 @keyframes orbFloat {
   0%, 100% { transform: translateY(0) scale(1); }
   50%       { transform: translateY(-20px) scale(1.04); }
@@ -182,55 +183,65 @@ body {
 .login-brand {
   position: relative; z-index: 1;
   text-align: center;
+  width: 100%;
 }
 .login-wordmark {
-  font-size: 72px;
+  font-size: 96px;
   font-weight: 800;
-  letter-spacing: -3px;
+  letter-spacing: -4px;
   background: linear-gradient(135deg, #fff 30%, rgba(255,255,255,0.6));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   line-height: 1;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   animation: wordmarkReveal 0.8s var(--ease) both;
 }
 @keyframes wordmarkReveal {
-  from { opacity: 0; transform: translateY(20px); letter-spacing: 6px; }
-  to   { opacity: 1; transform: translateY(0);    letter-spacing: -3px; }
+  from { opacity: 0; transform: translateY(20px); letter-spacing: 8px; }
+  to   { opacity: 1; transform: translateY(0);    letter-spacing: -4px; }
+}
+.login-subtitle {
+  font-size: 13px;
+  color: rgba(255,255,255,0.55);
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
 }
 .login-tagline {
-  font-size: 15px;
-  color: rgba(255,255,255,0.75);
-  font-weight: 400;
-  line-height: 1.7;
-  max-width: 260px;
+  font-size: 17px;
+  color: rgba(255,255,255,0.85);
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
   margin: 0 auto;
 }
 .login-features {
-  margin-top: 48px;
+  margin-top: 52px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
+  text-align: left;
 }
 .login-feature-item {
-  display: flex; align-items: center; gap: 14px;
+  display: flex; align-items: center; gap: 16px;
   color: rgba(255,255,255,0.9);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
 }
 .login-feature-icon {
-  width: 36px; height: 36px;
+  width: 40px; height: 40px;
   background: rgba(255,255,255,0.15);
   border-radius: var(--r-sm);
   display: flex; align-items: center; justify-content: center;
-  font-size: 16px;
+  font-size: 18px;
   flex-shrink: 0;
 }
 
 .login-right {
   width: 100%;
-  max-width: 480px;
+  max-width: 460px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1122,7 +1133,8 @@ tbody tr:hover { background: var(--indigo-soft); }
     <div class="login-left-orb"></div>
     <div class="login-brand">
       <div class="login-wordmark">MIRAI</div>
-      <div class="login-tagline">Your personal development companion at PT. Amerta Indah Otsuka</div>
+      <div class="login-subtitle">Development Platform</div>
+      <div class="login-tagline">Your development companion at PT. Amerta Indah Otsuka</div>
       <div class="login-features">
         <div class="login-feature-item">
           <div class="login-feature-icon">📋</div>
@@ -1274,6 +1286,10 @@ tbody tr:hover { background: var(--indigo-soft); }
         <div class="page-eyebrow">Leader</div>
         <h1>Team Monitor</h1>
         <p>Monitor training progress of all team members</p>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:20px;" id="monitor-tabs">
+        <button class="btn btn-primary btn-sm" onclick="setMonitorTab('progress')" id="tab-monitor-progress">Team Progress</button>
+        <button class="btn btn-ghost btn-sm" onclick="setMonitorTab('schedule')" id="tab-monitor-schedule">Team Schedule</button>
       </div>
       <div id="team-monitor-content"></div>
     </div>
@@ -2049,6 +2065,7 @@ async function loadJadwal() {
   const dashRes = await api('getDashboard', { nik: u.nik });
   const pipeline = dashRes.success ? (dashRes.data.pipeline || []) : [];
   state.mandatoryCompIds = pipeline.filter(p => p.decision === 'mandatory').map(p => p.competency_id);
+  state._pipeline = pipeline; // cache for renderJadwal unscheduled display
   const schedRes = await api('getSchedule', { grade: u.grade });
   state.jadwal = schedRes.success ? schedRes.data : [];
   renderJadwal();
@@ -2066,19 +2083,74 @@ function renderJadwal() {
   const enrolledIds  = state.enrollments.map(e => e.session_id);
   const mandatoryIds = state.mandatoryCompIds || [];
   let sessions = state.jadwal;
+
   if (tab === 'my') {
-    sessions = mandatoryIds.length > 0
-      ? sessions.filter(s => mandatoryIds.includes(s.competency_id))
-      : sessions.filter(s => enrolledIds.includes(s.session_id));
-  }
-  if (!sessions.length) {
-    html('jadwal-content', `<div class="card"><div class="card-body"><div class="empty-state">
-      <div class="empty-icon">📅</div>
-      <div class="empty-title">No sessions available</div>
+    if (mandatoryIds.length > 0) {
+      sessions = sessions.filter(s => mandatoryIds.includes(s.competency_id));
+    } else {
+      sessions = sessions.filter(s => enrolledIds.includes(s.session_id));
+    }
+
+    // Find mandatory competencies that have NO session yet — show "To Be Scheduled"
+    const scheduledCompIds = sessions.map(s => s.competency_id);
+    const unscheduled = mandatoryIds.filter(cid => !scheduledCompIds.includes(cid));
+
+    // Build unscheduled placeholder cards
+    let unscheduledHTML = '';
+    if (unscheduled.length > 0) {
+      // Get competency names from pipeline in state
+      const pipeline = state._pipeline || [];
+      unscheduled.forEach(cid => {
+        const comp = pipeline.find(p => p.competency_id === cid);
+        const compName = comp ? (comp.competency_name || cid) : cid;
+        unscheduledHTML += `
+        <div class="card" style="margin-bottom:10px;border-left:4px solid var(--amber);opacity:0.85;">
+          <div class="card-body" style="display:flex;align-items:center;gap:14px;padding:16px 18px;">
+            <div style="width:40px;height:40px;background:var(--amber-soft);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">📋</div>
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:14px;margin-bottom:2px;">${compName}</div>
+              <div style="font-size:11px;font-family:var(--mono);color:var(--text-muted);margin-bottom:6px;">${cid}</div>
+              <span class="badge badge-amber">To be scheduled soon</span>
+            </div>
+          </div>
+        </div>`;
+      });
+    }
+
+    if (!sessions.length && !unscheduledHTML) {
+      html('jadwal-content', `<div class="card"><div class="card-body"><div class="empty-state">
+        <div class="empty-icon">📅</div>
+        <div class="empty-title">No sessions available</div>
+        <div class="empty-desc">Check the All Schedules tab for upcoming training sessions.</div>
+      </div></div></div>`);
+      return;
+    }
+
+    // Render unscheduled first if no real sessions, or after real sessions
+    let content = '';
+    if (sessions.length > 0) {
+      content += renderJadwalTable(sessions, enrolledIds);
+    }
+    content += unscheduledHTML;
+    html('jadwal-content', content || `<div class="card"><div class="card-body"><div class="empty-state">
+      <div class="empty-icon">📅</div><div class="empty-title">No sessions available</div>
       <div class="empty-desc">Check the All Schedules tab for upcoming training sessions.</div>
     </div></div></div>`);
     return;
   }
+
+  if (!sessions.length) {
+    html('jadwal-content', `<div class="card"><div class="card-body"><div class="empty-state">
+      <div class="empty-icon">📅</div>
+      <div class="empty-title">No sessions available</div>
+      <div class="empty-desc">No training sessions available for your grade yet.</div>
+    </div></div></div>`);
+    return;
+  }
+  html('jadwal-content', renderJadwalTable(sessions, enrolledIds));
+}
+
+function renderJadwalTable(sessions, enrolledIds) {
   let content = `<div class="card"><div class="table-wrap"><table class="mobile-cards"><thead><tr>
     <th>Date</th><th>Time</th><th>Competency</th><th>Trainer</th><th>Location</th><th>Type</th><th>Status</th><th>Action</th>
   </tr></thead><tbody>`;
@@ -2108,12 +2180,12 @@ function renderJadwal() {
     </tr>`;
   });
   content += `</tbody></table></div></div>`;
-  html('jadwal-content', content);
+  return content;
 }
 
 function buildCalendarUrl(session) {
   // Build Google Calendar "Add Event" URL from session data
-  const title = encodeURIComponent(`[MIRAI] ${session.competency_name || session.competency_id}`);
+  const title = encodeURIComponent(`[IDP] ${session.competency_name || session.competency_id}`);
   const location = encodeURIComponent(session.location || session.area || '');
   const details = encodeURIComponent(`Training: ${session.competency_name || session.competency_id}\nTrainer: ${session.trainer || '-'}\nLocation: ${session.location || session.area || '-'}\n\nDikelola melalui MIRAI Development Platform - PT. Amerta Indah Otsuka`);
 
@@ -2506,6 +2578,8 @@ async function doSaveApproval(memberNik) {
 
 // ── TEAM MONITOR ────────────────────────────────────────────────
 async function loadTeamMonitor() {
+  state._monitorTab = state._monitorTab || 'progress';
+  if (state._monitorTab === 'schedule') { loadTeamSchedule(); return; }
   const res = await api('getTeamProgress', { leader_nik: state.user.nik });
   if (!res.success) { html('team-monitor-content', `<p class="text-muted">${res.message}</p>`); return; }
   const team = res.data;
@@ -2604,6 +2678,96 @@ function filterTeamDepth(depth) {
   document.querySelectorAll('#team-monitor-table tbody tr').forEach(row => {
     row.style.display = (depth === 'all' || row.dataset.depth == depth) ? '' : 'none';
   });
+}
+
+function setMonitorTab(tab) {
+  state._monitorTab = tab;
+  el('tab-monitor-progress').className = tab === 'progress' ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
+  el('tab-monitor-schedule').className = tab === 'schedule' ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
+  if (tab === 'progress') loadTeamMonitor();
+  else loadTeamSchedule();
+}
+
+async function loadTeamSchedule() {
+  // Get all enrollments for team members
+  const res = await api('getTeamProgress', { leader_nik: state.user.nik });
+  if (!res.success) { html('team-monitor-content', `<p class="text-muted">${res.message}</p>`); return; }
+  const team = res.data || [];
+
+  if (!team.length) {
+    html('team-monitor-content', `<div class="card"><div class="card-body"><div class="empty-state">
+      <div class="empty-icon">📅</div><div class="empty-title">No Team Data</div>
+    </div></div></div>`);
+    return;
+  }
+
+  // Fetch all enrollments for each team member
+  showLoading(true);
+  try {
+    const enrollPromises = team.map(m => apiFast('getMyEnrollments', { nik: m.nik }));
+    const schedRes = await api('getSchedule', { grade: '' }); // get all schedules
+    const allEnrollResults = await Promise.all(enrollPromises);
+    showLoading(false);
+
+    const allSessions = schedRes.success ? schedRes.data : [];
+
+    // Build map: session_id -> session data
+    const sessionMap = {};
+    allSessions.forEach(s => { sessionMap[s.session_id] = s; });
+
+    // Build team enrollment list
+    const teamEnrollments = [];
+    team.forEach((m, i) => {
+      const enrData = allEnrollResults[i];
+      const enrollments = enrData.success ? enrData.data : [];
+      enrollments.forEach(e => {
+        const sess = sessionMap[e.session_id];
+        if (sess) {
+          teamEnrollments.push({ member: m, session: sess, enrollment: e });
+        }
+      });
+    });
+
+    if (!teamEnrollments.length) {
+      html('team-monitor-content', `<div class="card"><div class="card-body"><div class="empty-state">
+        <div class="empty-icon">📅</div>
+        <div class="empty-title">No enrollments yet</div>
+        <div class="empty-desc">None of your team members have enrolled in a training session yet.</div>
+      </div></div></div>`);
+      return;
+    }
+
+    // Sort by date
+    teamEnrollments.sort((a, b) => (a.session.date || '').localeCompare(b.session.date || ''));
+
+    let content = `<div class="card"><div class="table-wrap"><table class="mobile-cards"><thead><tr>
+      <th>Member</th><th>Date</th><th>Competency</th><th>Trainer</th><th>Location</th><th>Type</th>
+    </tr></thead><tbody>`;
+
+    teamEnrollments.forEach(({ member, session: s }) => {
+      const tt = (s.training_type || '').toLowerCase();
+      const isSL = tt.includes('self');
+      const isOnline = tt.includes('online');
+      const dateDisplay = isSL && s.date_end ? `${s.date} – ${s.date_end}` : `${s.date}${s.time ? ' · ' + s.time : ''}`;
+      const typeBadge = isSL
+        ? '<span class="badge badge-violet">Self Learning</span>'
+        : isOnline ? '<span class="badge badge-sky">Online</span>' : '<span class="badge badge-indigo">Offline</span>';
+      content += `<tr>
+        <td data-label="Member"><div style="font-weight:700;">${member.name}</div><div style="font-size:11px;color:var(--text-muted);">${member.grade} · ${member.department}</div></td>
+        <td data-label="Date" style="white-space:nowrap;font-weight:600;">${dateDisplay}</td>
+        <td data-label="Competency"><div style="font-weight:700;">${s.competency_name||s.competency_id}</div><div style="font-size:11px;color:var(--text-muted);font-family:var(--mono);">${s.competency_id}</div></td>
+        <td data-label="Trainer" style="font-size:13px;">${s.trainer||'—'}</td>
+        <td data-label="Location" style="font-size:13px;">${s.location||s.area||'—'}</td>
+        <td data-label="Type">${typeBadge}</td>
+      </tr>`;
+    });
+
+    content += `</tbody></table></div></div>`;
+    html('team-monitor-content', content);
+  } catch(err) {
+    showLoading(false);
+    html('team-monitor-content', `<p class="text-muted">Failed to load team schedule.</p>`);
+  }
 }
 
 // ── ADMIN ───────────────────────────────────────────────────────
@@ -2765,8 +2929,17 @@ async function doUpdateUser(nik) {
 }
 
 // ── ACCOUNT ─────────────────────────────────────────────────────
-function loadAccount() {
+async function loadAccount() {
   const u = state.user;
+  // Fetch supervisor name if not already in user data
+  if (u.spv_nik && !u.spv_name) {
+    try {
+      const spvRes = await apiFast('getSpvName', { spv_nik: u.spv_nik });
+      if (spvRes.success && spvRes.data) {
+        u.spv_name = spvRes.data.name || '';
+      }
+    } catch(e) { /* silent fail */ }
+  }
   const content = `<div style="display:grid;gap:16px;max-width:600px;">
     <div class="card">
       <div class="card-body" style="display:flex;align-items:center;gap:20px;">
@@ -2786,7 +2959,7 @@ function loadAccount() {
     <div class="card">
       <div class="card-header"><div class="card-title">Account Information</div></div>
       <div class="card-body">
-        ${[['NIK',u.nik,true],['Email',u.email||'—',false],['Department',u.department,false],['Division',u.division||'—',false],['Supervisor NIK',u.spv_nik||'—',true]].map(([label,val,mono]) =>
+        ${[['NIK',u.nik,true],['Email',u.email||'—',false],['Department',u.department,false],['Division',u.division||'—',false],['Supervisor',u.spv_name ? `${u.spv_nik} · ${u.spv_name}` : (u.spv_nik||'—'),!!u.spv_nik]].map(([label,val,mono]) =>
           `<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--border);">
             <span style="font-size:12px;font-weight:700;color:var(--text-muted);">${label}</span>
             <span style="font-size:13px;font-weight:600;${mono?'font-family:var(--mono);':''}">${val}</span>
