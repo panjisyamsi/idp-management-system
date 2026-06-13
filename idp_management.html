@@ -442,8 +442,8 @@ tbody tr:hover{background:var(--indigo-soft);}
     <div class="login-left-orb"></div>
     <div class="login-brand">
       <div class="login-wordmark">MIRAI</div>
-      <div class="login-subtitle">Mapping Individual Readiness, Aspirations & Impact</div>
-      <div class="login-tagline">Your development platform at PT. Amerta Indah Otsuka</div>
+      <div class="login-subtitle">Development Platform</div>
+      <div class="login-tagline">Your development companion at PT. Amerta Indah Otsuka</div>
       <div class="login-features">
         <div class="login-feature-item"><div class="login-feature-icon">📋</div>Self Assessment &amp; Competency Tracking</div>
         <div class="login-feature-item"><div class="login-feature-icon">📅</div>Training Schedule &amp; Enrollment</div>
@@ -599,7 +599,7 @@ tbody tr:hover{background:var(--indigo-soft);}
 <script>
 // ── CONFIG ─────────────────────────────────────────────────────
 // UPDATE THIS after New Deployment
-const API_URL = 'https://script.google.com/macros/s/AKfycbwN5RvRc6Qoe74FuMQbGEHYsZT_0E2JqiqqARPIYFLR5pxK5BzCdelpwkFm_mec9kr8/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxHIZ-vWPRezAvfzpPzubxixV3pAA5Q_P056cLkiE9dfLGP0UG6UHD_B_fY2Xs4N7H0/exec';
 
 // ── STATE ───────────────────────────────────────────────────────
 let state = {
@@ -1830,7 +1830,7 @@ async function loadL3Eval() {
   if (!evaluatees.length) {
     html('l3-eval-content', `<div class="card"><div class="card-body"><div class="empty-state">
       <div class="empty-icon">🎯</div><div class="empty-title">No Evaluatees Found</div>
-      <div class="empty-desc">No employees found in our database under your supervision.</div>
+      <div class="empty-desc">No employees found in IDP_Semester_1_2026 sheet under your supervision.</div>
     </div></div></div>`);
     return;
   }
@@ -1850,11 +1850,19 @@ async function loadL3Eval() {
 
   content += `<div style="display:flex;flex-direction:column;gap:10px;">`;
   evaluatees.forEach(e => {
+    const displayName = e.name || e.nik;
+    const gradeLabel  = e.grade || e.level || '—';
+    const posLabel    = e.position ? ` · ${e.position}` : '';
+    const compCount   = e.competencies?.length || 0;
     content += `<div class="l3-evaluatee-card" onclick="openL3Form('${e.nik}')">
       <div class="l3-status-dot ${dotCls[e.l3_status]||'not-started'}"></div>
       <div style="flex:1;min-width:0;">
-        <div style="font-weight:700;font-size:14px;margin-bottom:2px;">${e.name}</div>
-        <div style="font-size:12px;color:var(--text-muted);">${e.grade||e.level||'—'} · ${e.department} · ${e.competencies?.length||0} competencies</div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:1px;">${displayName}</div>
+        <div style="font-size:11px;font-family:var(--mono);color:var(--text-muted);margin-bottom:3px;">${e.nik}</div>
+        <div style="font-size:12px;color:var(--text-secondary);">
+          <span class="badge ${gradeColor(gradeLabel)}" style="font-size:10px;padding:2px 7px;margin-right:6px;">${gradeLabel}</span>
+          ${e.department}${posLabel} · ${compCount} competenc${compCount===1?'y':'ies'}
+        </div>
       </div>
       <div style="flex-shrink:0;display:flex;align-items:center;gap:8px;">
         <span class="badge ${statusBadgeCls[e.l3_status]||'badge-gray'}">${statusLabel[e.l3_status]||'Not Started'}</span>
