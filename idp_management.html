@@ -474,7 +474,7 @@ tbody tr:hover{background:var(--indigo-soft);}
     <div class="login-brand">
       <div class="login-wordmark">MIRAI</div>
       <div class="login-subtitle">Mapping Individual Readiness, Aspirations & Impact</div>
-      <div class="login-tagline">Your development partner at PT. Amerta Indah Otsuka</div>
+      <div class="login-tagline">Your development platform from HCD</div>
       <div class="login-features">
         <div class="login-feature-item"><div class="login-feature-icon">📋</div>Self Assessment &amp; Competency Tracking</div>
         <div class="login-feature-item"><div class="login-feature-icon">📅</div>Training Schedule &amp; Enrollment</div>
@@ -630,7 +630,7 @@ tbody tr:hover{background:var(--indigo-soft);}
 <script>
 // ── CONFIG ─────────────────────────────────────────────────────
 // UPDATE THIS after New Deployment
-const API_URL = 'https://script.google.com/macros/s/AKfycbx1F4V4S-4clh6_eQ8ePEnPcuWVERfQzehrZr-oy_6Hi-TSIpktiK2BYBmho-8ji_M/exec';
+const API_URL = 'https://script.google.com/macros/s/PASTE_YOUR_NEW_DEPLOYMENT_URL_HERE/exec';
 
 // ── STATE ───────────────────────────────────────────────────────
 let state = {
@@ -1865,19 +1865,20 @@ async function loadL3Eval() {
     </div></div></div>`);
     return;
   }
-  const total     = evaluatees.length;
-  const submitted = evaluatees.filter(e => e.l3_status === 'submitted').length;
+  const total      = evaluatees.length;
+  const submitted  = evaluatees.filter(e => e.l3_status === 'submitted').length;
   const inProgress = evaluatees.filter(e => e.l3_status === 'in_progress').length;
+
   let content = `<div class="stats-grid" style="margin-bottom:20px;">
-    <div class="stat-card"><div class="stat-card-accent" style="background:linear-gradient(90deg,var(--indigo),var(--indigo-light));"></div><div class="stat-icon" style="background:var(--indigo-soft);">👥</div><div class="stat-label">Total Evaluatees</div><div class="stat-value">${total}</div></div>
+    <div class="stat-card"><div class="stat-card-accent" style="background:linear-gradient(90deg,var(--indigo),var(--cyan));"></div><div class="stat-icon" style="background:var(--indigo-soft);">👥</div><div class="stat-label">Total Evaluatees</div><div class="stat-value">${total}</div></div>
     <div class="stat-card"><div class="stat-card-accent" style="background:linear-gradient(90deg,var(--mint),#4DD9C0);"></div><div class="stat-icon" style="background:var(--mint-soft);">✅</div><div class="stat-label">Submitted</div><div class="stat-value" style="color:var(--mint);">${submitted}</div></div>
     <div class="stat-card"><div class="stat-card-accent" style="background:linear-gradient(90deg,var(--amber),#FFD080);"></div><div class="stat-icon" style="background:var(--amber-soft);">📝</div><div class="stat-label">In Progress</div><div class="stat-value" style="color:var(--amber);">${inProgress}</div></div>
     <div class="stat-card"><div class="stat-card-accent" style="background:linear-gradient(90deg,var(--sky),#7ED9FA);"></div><div class="stat-icon" style="background:var(--sky-soft);">📊</div><div class="stat-label">Completion</div><div class="stat-value" style="color:var(--sky);">${pct(submitted,total)}%</div></div>
   </div>`;
 
-  const statusLabel = { not_started:'Not Started', in_progress:'In Progress', submitted:'Submitted' };
+  const statusLabel    = { not_started:'Not Started', in_progress:'In Progress', submitted:'Submitted' };
   const statusBadgeCls = { not_started:'badge-gray', in_progress:'badge-amber', submitted:'badge-green' };
-  const dotCls = { not_started:'not-started', in_progress:'in-progress', submitted:'submitted' };
+  const dotCls         = { not_started:'not-started', in_progress:'in-progress', submitted:'submitted' };
 
   content += `<div style="display:flex;flex-direction:column;gap:10px;">`;
   evaluatees.forEach(e => {
@@ -1885,6 +1886,8 @@ async function loadL3Eval() {
     const gradeLabel  = e.grade || e.level || '—';
     const posLabel    = e.position ? ` · ${e.position}` : '';
     const compCount   = e.competencies?.length || 0;
+    // Show competency IDs and their target levels in the card
+    const compSummary = e.competencies?.map(c => `${c.competency_id}`).join(', ') || '—';
     content += `<div class="l3-evaluatee-card" onclick="openL3Form('${e.nik}')">
       <div class="l3-status-dot ${dotCls[e.l3_status]||'not-started'}"></div>
       <div style="flex:1;min-width:0;">
@@ -1892,8 +1895,9 @@ async function loadL3Eval() {
         <div style="font-size:11px;font-family:var(--mono);color:var(--text-muted);margin-bottom:3px;">${e.nik}</div>
         <div style="font-size:12px;color:var(--text-secondary);">
           <span class="badge ${gradeColor(gradeLabel)}" style="font-size:10px;padding:2px 7px;margin-right:6px;">${gradeLabel}</span>
-          ${e.department}${posLabel} · ${compCount} competenc${compCount===1?'y':'ies'}
+          ${e.department}${posLabel}
         </div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">${compCount} competenc${compCount===1?'y':'ies'}: <span style="font-family:var(--mono);color:var(--indigo);">${compSummary}</span></div>
       </div>
       <div style="flex-shrink:0;display:flex;align-items:center;gap:8px;">
         <span class="badge ${statusBadgeCls[e.l3_status]||'badge-gray'}">${statusLabel[e.l3_status]||'Not Started'}</span>
@@ -1902,6 +1906,17 @@ async function loadL3Eval() {
     </div>`;
   });
   content += `</div>`;
+
+  // Download All Team PDF button — at the bottom after all cards
+  content += `<div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+    <div style="font-size:13px;color:var(--text-muted);">
+      Download evaluasi seluruh tim dalam satu file PDF
+    </div>
+    <button class="btn btn-primary" onclick="downloadAllTeamL3PDF()" style="background:linear-gradient(135deg,var(--indigo),var(--indigo-light));">
+      ⬇ Download All Team PDF
+    </button>
+  </div>`;
+
   html('l3-eval-content', content);
 }
 
@@ -1923,11 +1938,13 @@ async function openL3Form(evaluateeNik) {
   const typeColor = { core:'badge-indigo', role:'badge-violet', jf:'badge-sky' };
   let compForms = '';
   comps.forEach((comp, ci) => {
+    const targetLvl = comp.target_level || Object.keys(comp.levels)[0] || '—';
     compForms += `<div class="assessment-section" style="margin-bottom:14px;">
       <div class="assessment-section-header" onclick="toggleL3Comp(${ci})">
-        <div style="display:flex;align-items:center;gap:10px;">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
           <span class="badge ${typeColor[comp.competency_type]||'badge-gray'}">${comp.competency_id}</span>
           <span style="font-weight:700;font-size:14px;">${comp.competency_name}</span>
+          <span style="font-size:11px;font-weight:600;color:var(--cyan);background:var(--indigo-soft);padding:2px 8px;border-radius:var(--r-full);">Target Level ${targetLvl}</span>
         </div>
         <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
           <span id="l3-score-${ci}" style="font-size:12px;font-weight:800;color:${comp.level_achieved>0?'var(--indigo)':'var(--text-muted)'};">${comp.level_achieved>0?`Level ${comp.level_achieved}`:'Not rated'}</span>
@@ -1936,7 +1953,8 @@ async function openL3Form(evaluateeNik) {
       </div>
       <div id="l3-comp-body-${ci}" style="display:none;">`;
     Object.entries(comp.levels).sort((a,b)=>Number(a[0])-Number(b[0])).forEach(([level, indicators]) => {
-      compForms += `<div class="competency-block"><div class="level-block"><div class="level-label">Level ${level}</div>`;
+      compForms += `<div class="competency-block"><div class="level-block">
+        <div class="level-label">Level ${level} — Behavioral Indicators</div>`;
       indicators.forEach((ind, ii) => {
         compForms += `<div class="indicator-item${ind.is_checked?' checked':''}" onclick="toggleL3Indicator(${ci},${level},${ii})">
           <div class="indicator-checkbox">${ind.is_checked?'✓':''}</div>
@@ -1967,7 +1985,7 @@ async function openL3Form(evaluateeNik) {
       <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
       <button class="btn btn-ghost" onclick="saveL3Draft()">💾 Save Draft</button>
       <button class="btn btn-amber" onclick="downloadL3PDF()">⬇ Download PDF</button>
-      <button class="btn btn-primary" onclick="sendL3Email()">📧 Send to Academy</button>
+      <button class="btn btn-primary" onclick="sendL3Email()">📧 Send to Otsuka Academy email</button>
       <button class="btn btn-green" onclick="confirmL3Submit()">✅ Submit Final</button>
     </div>
   </div>`);
@@ -2099,10 +2117,162 @@ async function downloadL3PDF() {
     });
     doc.save(`L3_Eval_${leaderName.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);
     toast('PDF downloaded!', 'success');
-    // Store blob for email sending
-    window._l3PdfDoc = doc;
   } catch(err) { toast('Failed to generate PDF: '+err.message, 'error'); }
   finally { showLoading(false); }
+}
+
+// Download all-team L3 PDF — one file, one page per evaluatee
+async function downloadAllTeamL3PDF() {
+  showLoading(true);
+  try {
+    // Load jsPDF if not already loaded
+    if (!window.jspdf) {
+      await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
+      await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
+    }
+    showLoading(false);
+
+    // Fetch all team L3 data from backend
+    const res = await api('getTeamL3Data', { leader_nik: state.user.nik });
+    if (!res.success) { toast(res.message, 'error'); return; }
+
+    const teamData = res.data;
+    const evaluatees = teamData.evaluatees || [];
+    if (!evaluatees.length) { toast('Tidak ada data tim untuk di-download', 'warning'); return; }
+
+    showLoading(true);
+    const { jsPDF } = window.jspdf;
+    const doc        = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+    const today      = new Date().toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' });
+    const leaderName = teamData.leader_name || state.user?.name || '';
+    const leaderDept = teamData.leader_dept || state.user?.department || '';
+    const dateFile   = new Date().toISOString().split('T')[0];
+
+    // Helper: draw page header
+    const drawPageHeader = () => {
+      doc.setFillColor(26,54,93);
+      doc.rect(0,0,210,22,'F');
+      doc.setTextColor(0,229,255);
+      doc.setFontSize(13); doc.setFont('helvetica','bold');
+      doc.text('MIRAI — L3 Kirkpatrick Evaluation Form', 14, 10);
+      doc.setTextColor(255,255,255);
+      doc.setFontSize(8); doc.setFont('helvetica','normal');
+      doc.text(`Leader: ${leaderName}  ·  Dept: ${leaderDept}  ·  ${today}`, 14, 17);
+    };
+
+    // Helper: safe text — trim long strings
+    const safeText = (str, maxLen = 180) => {
+      const s = String(str || '').trim();
+      return s.length > maxLen ? s.slice(0, maxLen) + '…' : s;
+    };
+
+    evaluatees.forEach((evaluatee, idx) => {
+      // New page for each evaluatee (except first)
+      if (idx > 0) doc.addPage();
+      drawPageHeader();
+
+      let y = 28;
+
+      // Evaluatee info block
+      doc.setFillColor(247,250,252);
+      doc.rect(10, y, 190, 22, 'F');
+      doc.setDrawColor(226,232,240);
+      doc.rect(10, y, 190, 22, 'S');
+
+      doc.setTextColor(26,54,93);
+      doc.setFontSize(12); doc.setFont('helvetica','bold');
+      doc.text(safeText(evaluatee.name, 60), 14, y+8);
+
+      doc.setFontSize(8); doc.setFont('helvetica','normal');
+      doc.setTextColor(74,85,104);
+      doc.text(`NIK: ${evaluatee.nik}`, 14, y+14);
+      doc.text(`${evaluatee.level||'—'} · ${evaluatee.position||'—'} · ${evaluatee.department||'—'}`, 14, y+19);
+
+      // Competency count + page indicator
+      doc.setTextColor(0,229,255);
+      doc.setFontSize(8); doc.setFont('helvetica','bold');
+      doc.text(`${evaluatee.competencies.length} Competenc${evaluatee.competencies.length===1?'y':'ies'} evaluated`, 160, y+8, {align:'right'});
+      doc.text(`${idx+1} / ${evaluatees.length}`, 200, y+8, {align:'right'});
+
+      y += 28;
+
+      // Each competency
+      evaluatee.competencies.forEach((comp, ci) => {
+        // Check if we need a new page
+        const estHeight = 20 + (comp.indicators.length * 8) + 10;
+        if (y + estHeight > 270) { doc.addPage(); drawPageHeader(); y = 28; }
+
+        // Competency header bar
+        doc.setFillColor(26,54,93);
+        doc.rect(10, y, 190, 10, 'F');
+        doc.setTextColor(0,229,255);
+        doc.setFontSize(9); doc.setFont('helvetica','bold');
+        doc.text(`${comp.competency_id} — ${safeText(comp.competency_name, 50)}`, 14, y+7);
+        doc.setTextColor(255,255,255);
+        doc.setFontSize(8);
+        doc.text(`Target Level ${comp.target_level}`, 155, y+7);
+        doc.text(comp.level_achieved > 0 ? `Achieved: L${comp.level_achieved}` : 'Not rated', 185, y+7, {align:'right'});
+        y += 12;
+
+        // Indicators
+        comp.indicators.forEach((ind, ii) => {
+          if (y + 8 > 275) { doc.addPage(); drawPageHeader(); y = 28; }
+
+          const isChecked = ind.is_checked;
+          const rowBg     = isChecked ? [240,253,250] : ii%2===0 ? [255,255,255] : [249,250,252];
+          doc.setFillColor(...rowBg);
+          doc.rect(10, y, 190, 8, 'F');
+          doc.setDrawColor(226,232,240);
+          doc.rect(10, y, 190, 8, 'S');
+
+          // Checkbox
+          if (isChecked) {
+            doc.setFillColor(0,201,167);
+            doc.roundedRect(13, y+1.5, 5, 5, 1, 1, 'F');
+            doc.setTextColor(255,255,255);
+            doc.setFontSize(7); doc.setFont('helvetica','bold');
+            doc.text('✓', 14.8, y+5.5);
+          } else {
+            doc.setDrawColor(160,174,192);
+            doc.roundedRect(13, y+1.5, 5, 5, 1, 1, 'S');
+            doc.setFillColor(243,244,246);
+            doc.rect(13.2, y+1.7, 4.6, 4.6, 'F');
+          }
+
+          // Indicator text
+          doc.setTextColor(isChecked ? 26 : 74, isChecked ? 54 : 85, isChecked ? 93 : 104);
+          doc.setFontSize(7.5); doc.setFont('helvetica', isChecked ? 'bold' : 'normal');
+          const indText = safeText(ind.behavioral_indicator, 130);
+          doc.text(indText, 21, y+5.5);
+
+          // Indicator number (right aligned)
+          doc.setTextColor(160,174,192);
+          doc.setFontSize(7);
+          doc.text(`#${ind.indicator_no}`, 198, y+5.5, {align:'right'});
+
+          y += 8;
+        });
+        y += 5;
+      });
+    });
+
+    // Footer on all pages
+    const totalPages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setFontSize(7); doc.setTextColor(160,174,192);
+      doc.text(`MIRAI Development Platform · PT. Amerta Indah Otsuka · ${today}`, 14, 290);
+      doc.text(`Page ${i} of ${totalPages}`, 200, 290, {align:'right'});
+    }
+
+    doc.save(`L3_Team_Evaluation_${leaderName.replace(/\s+/g,'_')}_${dateFile}.pdf`);
+    toast(`PDF berhasil didownload — ${evaluatees.length} evaluatee`, 'success');
+
+  } catch(err) {
+    toast('Gagal generate PDF: '+err.message, 'error');
+  } finally {
+    showLoading(false);
+  }
 }
 
 async function sendL3Email() {
