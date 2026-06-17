@@ -8,7 +8,7 @@
 <style>
 /* ─── DESIGN TOKENS — Cyber-Corporate Trust Palette ─────────────── */
 :root {
-  /* ── PRIMARY: Deep Trust Blue ─── */https://docs.google.com/document/d/1PA85Sy9gV0665qGkWTAGKK6pFfEgT5cKNH9oNBIThAU/edit?usp=sharing
+  /* ── PRIMARY: Deep Trust Blue ─── */
   --indigo:        #1A365D;
   --indigo-light:  #2C5282;
   --indigo-dark:   #0F2440;
@@ -24,19 +24,14 @@
   --violet-soft:   #EEF2FF;
 
   /* ── SEMANTIC COLORS ─── */
-  /* Success: teal-cyan */
   --mint:          #00C9A7;
   --mint-soft:     #E0FAF5;
-  /* Warning: warm gold */
   --amber:         #F6AD55;
   --amber-soft:    #FFFAF0;
-  /* Danger: muted red */
   --coral:         #FC8181;
   --coral-soft:    #FFF5F5;
-  /* Info: periwinkle */
   --sky:           #7F9CF5;
   --sky-soft:      #EEF2FF;
-  /* Rose */
   --rose:          #FC8181;
 
   /* ── SURFACES ─── */
@@ -148,8 +143,8 @@ select.form-input{cursor:pointer;}
 .btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background var(--t-fast) var(--ease);}
 .btn:hover::after{background:rgba(255,255,255,0.12);}
 .btn:active::after{background:rgba(0,0,0,0.06);}
-.btn-primary{background:#1A365D !important;color:#ffffff !important;box-shadow:0 2px 8px rgba(26,54,93,0.30);} .btn-primary:hover{background:#0F2440 !important;transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,229,255,0.25);}
-.btn-primary:hover{background:var(--indigo-dark);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,229,255,0.25);}
+.btn-primary{background:#1A365D !important;color:#ffffff !important;box-shadow:0 2px 8px rgba(26,54,93,0.30);transform:translateZ(0);-webkit-backface-visibility:hidden;}
+.btn-primary:hover{background:var(--indigo-dark);transform:translateY(-1px) translateZ(0);box-shadow:0 4px 16px rgba(0,229,255,0.25);}
 .btn-accent{background:var(--coral);color:#fff;box-shadow:0 2px 8px rgba(252,129,129,0.28);}
 .btn-accent:hover{filter:brightness(0.95);transform:translateY(-1px);}
 .btn-ghost{background:transparent;color:var(--text-secondary);border-color:var(--border);}
@@ -385,6 +380,13 @@ tbody tr:hover{background:var(--indigo-soft);}
 #mirai-fab img{width:100%;height:100%;object-fit:cover;object-position:top center;}
 @keyframes fabPulse{0%,100%{box-shadow:var(--shadow-lg),0 0 0 0 rgba(0,229,255,0.35);}50%{box-shadow:var(--shadow-lg),0 0 0 10px rgba(0,229,255,0);}}
 
+/* ─── JADWAL: LEVEL BADGE & MISMATCH WARNING ───────────────────────── */
+.level-assigned-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:var(--r-full);font-size:11px;font-weight:800;background:var(--indigo-soft);color:var(--indigo);border:1px solid rgba(26,54,93,0.15);}
+.level-assigned-badge.is-fallback{background:var(--surface3);color:var(--text-secondary);border-color:var(--border);}
+.level-mismatch-row{background:var(--coral-soft) !important;}
+.level-mismatch-warning{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#c0392b;background:var(--coral-soft);padding:3px 9px;border-radius:var(--r-full);border:1px solid var(--coral);}
+.level-match-ok{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#006a58;}
+
 /* ─── MOBILE RESPONSIVE ───────────────────────────────────────────── */
 @media(max-width:767px){
   .page-view{padding:20px 16px 90px;}
@@ -446,6 +448,15 @@ tbody tr:hover{background:var(--indigo-soft);}
   table.mobile-monitor tbody td:nth-child(5){grid-column:1/3;grid-row:3;}
   table.mobile-monitor tbody td:nth-child(6){grid-column:2;grid-row:4;text-align:right;}
   table.mobile-monitor tbody td:nth-child(7){grid-column:1;grid-row:4;}
+  /* Jadwal table now has an extra "Assigned" column (8 cols incl. action) */
+  table.mobile-jadwal thead{display:none;}
+  table.mobile-jadwal tbody{display:flex;flex-direction:column;gap:10px;}
+  table.mobile-jadwal tbody tr{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;box-shadow:var(--shadow-xs);}
+  table.mobile-jadwal tbody tr.level-mismatch-row{background:var(--coral-soft)!important;}
+  table.mobile-jadwal tbody td{padding:3px 0;border-bottom:none;font-size:13px;display:flex;align-items:center;gap:8px;}
+  table.mobile-jadwal tbody td:empty{display:none;}
+  table.mobile-jadwal tbody td[data-label]::before{content:attr(data-label);font-size:10px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.4px;min-width:72px;flex-shrink:0;}
+  table.mobile-jadwal tbody td:last-child{margin-top:8px;}
   #mirai-widget{right:12px;bottom:80px;}
   #mirai-panel{width:calc(100vw - 24px);max-width:360px;}
   #mirai-bubble{max-width:180px;font-size:12px;}
@@ -630,7 +641,7 @@ tbody tr:hover{background:var(--indigo-soft);}
 <script>
 // ── CONFIG ─────────────────────────────────────────────────────
 // UPDATE THIS after New Deployment
-const API_URL = 'https://script.google.com/macros/s/AKfycbx3ZD49xEhMIAnfxpiMVk7ZTH6RuVwLsDsvrSRk5ukdpHqURU7tHlJugfj0fquKBYar/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwD2iWF8BdEvrR0x99UO1a5ynI8JjpdvF4nfeSfbDHHktCYEvsBdNSyEPxhiynuuFPe/exec';
 
 // ── STATE ───────────────────────────────────────────────────────
 let state = {
@@ -645,6 +656,8 @@ let state = {
   enrollments: [],
   jadwal: [],
   mandatoryCompIds: [],
+  mandatoryLevelMap: {},   // NEW: competency_id -> assigned level (leader_level or fallback target_level)
+  mandatoryLevelIsFallback: {}, // NEW: competency_id -> true if leader hasn't set observed level yet
   _pipeline: [],
   miraiHistory: [],
 };
@@ -760,7 +773,7 @@ async function doChangePassword() {
 
 function doLogout() {
   closeModal();
-  state = { user:null, currentView:'dashboard', jadwalTab:'my', monitorTab:'progress', compLibrary:null, assessmentScores:{}, assessmentChecks:{}, teamData:null, enrollments:[], jadwal:[], mandatoryCompIds:[], _pipeline:[], miraiHistory:[] };
+  state = { user:null, currentView:'dashboard', jadwalTab:'my', monitorTab:'progress', compLibrary:null, assessmentScores:{}, assessmentChecks:{}, teamData:null, enrollments:[], jadwal:[], mandatoryCompIds:[], mandatoryLevelMap:{}, mandatoryLevelIsFallback:{}, _pipeline:[], miraiHistory:[] };
   el('app-layout').style.display = 'none';
   el('page-login').style.display = 'flex';
   el('login-nik').value = '';
@@ -1232,6 +1245,9 @@ async function doFinalSubmit() {
 }
 
 // ── JADWAL ──────────────────────────────────────────────────────
+// CHANGED: now builds mandatoryLevelMap (competency_id -> assigned level)
+// from the dashboard pipeline's leader_level field, falling back to
+// target_level when the leader hasn't set an observed level yet.
 async function loadJadwal() {
   const u = state.user;
   const enrRes  = await api('getMyEnrollments', { nik: u.nik });
@@ -1240,6 +1256,18 @@ async function loadJadwal() {
   const pipeline = dashRes.success ? (dashRes.data.pipeline || []) : [];
   state.mandatoryCompIds = pipeline.filter(p => p.decision === 'mandatory').map(p => p.competency_id);
   state._pipeline = pipeline;
+
+  // Build the level-assignment lookup used by both the "to be scheduled"
+  // cards and the session table's mismatch warning.
+  state.mandatoryLevelMap = {};
+  state.mandatoryLevelIsFallback = {};
+  pipeline.forEach(p => {
+    if (p.decision !== 'mandatory') return;
+    const hasLeaderLevel = Number(p.leader_level) > 0;
+    state.mandatoryLevelMap[p.competency_id] = hasLeaderLevel ? Number(p.leader_level) : Number(p.target_level);
+    state.mandatoryLevelIsFallback[p.competency_id] = !hasLeaderLevel;
+  });
+
   const schedRes = await api('getSchedule', { grade: u.grade });
   state.jadwal   = schedRes.success ? schedRes.data : [];
   renderJadwal();
@@ -1250,6 +1278,16 @@ function setJadwalTab(tab) {
   el('tab-my').className  = tab === 'my'  ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
   el('tab-all').className = tab === 'all' ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
   renderJadwal();
+}
+
+// NEW: small helper to render the "Assigned Level: X" badge consistently
+// wherever it's needed. isFallback=true means the leader hasn't set an
+// observed level yet, so we're showing the grade's Target Level instead.
+function renderAssignedLevelBadge(level, isFallback) {
+  if (!level || level <= 0) return '';
+  const label = isFallback ? `Target Level ${level}` : `Assigned Level ${level}`;
+  const cls   = isFallback ? 'level-assigned-badge is-fallback' : 'level-assigned-badge';
+  return `<span class="${cls}">🎯 ${label}</span>`;
 }
 
 function renderJadwal() {
@@ -1267,13 +1305,18 @@ function renderJadwal() {
       unscheduled.forEach(cid => {
         const comp = state._pipeline.find(p => p.competency_id === cid);
         const compName = comp ? (comp.competency_name || cid) : cid;
+        const assignedLevel  = state.mandatoryLevelMap[cid];
+        const isFallback     = state.mandatoryLevelIsFallback[cid];
         unscheduledHTML += `<div class="card" style="margin-bottom:10px;border-left:4px solid var(--amber);opacity:0.85;">
           <div class="card-body" style="display:flex;align-items:center;gap:14px;padding:16px 18px;">
             <div style="width:40px;height:40px;background:var(--amber-soft);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">📋</div>
             <div style="flex:1;">
               <div style="font-weight:700;font-size:14px;margin-bottom:2px;">${compName}</div>
               <div style="font-size:11px;font-family:var(--mono);color:var(--text-muted);margin-bottom:6px;">${cid}</div>
-              <span class="badge badge-amber">To be scheduled soon</span>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <span class="badge badge-amber">To be scheduled soon</span>
+                ${renderAssignedLevelBadge(assignedLevel, isFallback)}
+              </div>
             </div>
           </div>
         </div>`;
@@ -1301,9 +1344,15 @@ function renderJadwal() {
   html('jadwal-content', renderJadwalTable(sessions, enrolledIds));
 }
 
+// CHANGED: added an "Assigned" column showing the level the leader assigned
+// for this competency, plus a row highlight + warning badge whenever the
+// session's own Level (from Jadwal sheet) does not match that assignment.
+// This applies only to mandatory competencies (the ones with a lookup entry
+// in mandatoryLevelMap); "All Schedules" sessions for non-mandatory
+// competencies simply show a dash, since there's nothing assigned to compare against.
 function renderJadwalTable(sessions, enrolledIds) {
-  let content = `<div class="card"><div class="table-wrap"><table class="mobile-cards"><thead><tr>
-    <th>Date</th><th>Time</th><th>Competency</th><th>Trainer</th><th>Location</th><th>Type</th><th>Status</th><th>Action</th>
+  let content = `<div class="card"><div class="table-wrap"><table class="mobile-jadwal"><thead><tr>
+    <th>Date</th><th>Time</th><th>Competency</th><th>Trainer</th><th>Location</th><th>Type</th><th>Assigned</th><th>Status</th><th>Action</th>
   </tr></thead><tbody>`;
   sessions.forEach(s => {
     const isEnrolled = enrolledIds.includes(s.session_id);
@@ -1311,13 +1360,32 @@ function renderJadwalTable(sessions, enrolledIds) {
     const isSL = tt.includes('self'); const isOnline = tt.includes('online');
     const dateDisplay = isSL && s.date_end ? `${s.date} – ${s.date_end}` : s.date;
     const typeBadge = isSL ? '<span class="badge badge-violet">Self Learning</span>' : isOnline ? '<span class="badge badge-sky">Online</span>' : '<span class="badge badge-indigo">Offline</span>';
-    content += `<tr>
+
+    // Level mismatch check — only meaningful for mandatory competencies
+    // that have an assigned level on record.
+    const assignedLevel = state.mandatoryLevelMap[s.competency_id];
+    const isFallback    = state.mandatoryLevelIsFallback[s.competency_id];
+    const sessionLevel  = Number(s.level) || 0;
+    let assignedCellHTML = '<span class="text-muted">—</span>';
+    let rowClass = '';
+    if (assignedLevel) {
+      assignedCellHTML = renderAssignedLevelBadge(assignedLevel, isFallback);
+      if (sessionLevel > 0 && sessionLevel !== assignedLevel) {
+        rowClass = 'level-mismatch-row';
+        assignedCellHTML += `<div class="level-mismatch-warning" style="margin-top:4px;">⚠ This session is Level ${sessionLevel}, not Level ${assignedLevel}</div>`;
+      } else if (sessionLevel > 0 && sessionLevel === assignedLevel) {
+        assignedCellHTML += `<div class="level-match-ok" style="margin-top:4px;">✓ Level matches</div>`;
+      }
+    }
+
+    content += `<tr class="${rowClass}">
       <td data-label="Date" style="white-space:nowrap;font-weight:600;">${dateDisplay}</td>
       <td data-label="Time" style="white-space:nowrap;color:var(--text-secondary);">${s.time||'—'}</td>
-      <td data-label="Competency"><div style="font-weight:700;">${s.competency_name||s.competency_id}</div><div style="font-size:11px;color:var(--text-muted);font-family:var(--mono);">${s.competency_id}</div></td>
+      <td data-label="Competency"><div style="font-weight:700;">${s.competency_name||s.competency_id}</div><div style="font-size:11px;color:var(--text-muted);font-family:var(--mono);">${s.competency_id}${sessionLevel>0?' · Session Level '+sessionLevel:''}</div></td>
       <td data-label="Trainer" style="font-size:13px;">${s.trainer||'—'}</td>
       <td data-label="Location" style="font-size:13px;">${s.location||s.area||'—'}</td>
       <td data-label="Type">${typeBadge}</td>
+      <td data-label="Assigned">${assignedCellHTML}</td>
       <td data-label="Status">${isEnrolled?'<span class="badge badge-green">Enrolled</span>':'<span class="badge badge-gray">Not enrolled</span>'}</td>
       <td>${isEnrolled
         ?`<button class="btn btn-ghost btn-sm" onclick="doCancelEnrollment('${s.session_id}')">Cancel</button>`
@@ -1390,10 +1458,23 @@ function showCalendarModal(session) {
   </div>`);
 }
 
+// CHANGED: warns the employee with a confirm dialog before enrolling into a
+// session whose Level doesn't match the level assigned by their leader.
+// They can still proceed (some orgs allow flexibility), but they now see
+// the warning before committing instead of finding out after the fact.
 async function doEnroll(competencyId, sessionId) {
+  const session = state.jadwal.find(s => s.session_id === sessionId) || {};
+  const assignedLevel = state.mandatoryLevelMap[competencyId];
+  const sessionLevel  = Number(session.level) || 0;
+  if (assignedLevel && sessionLevel > 0 && sessionLevel !== assignedLevel) {
+    const proceed = confirm(
+      `Perhatian: sesi ini adalah Level ${sessionLevel}, sedangkan level yang ditugaskan untuk Anda adalah Level ${assignedLevel}.\n\nLanjutkan enroll ke sesi ini?`
+    );
+    if (!proceed) return;
+  }
+
   const btn = document.querySelector(`button[onclick="doEnroll('${competencyId}','${sessionId}')"]`);
   if (btn) { btn.disabled = true; btn.textContent = '...'; }
-  const session = state.jadwal.find(s => s.session_id === sessionId) || {};
   session.competency_id = session.competency_id || competencyId;
   const res = await apiFast('enrollSession', { nik: state.user.nik, competency_id: competencyId, session_id: sessionId });
   if (res.success) {
@@ -1886,7 +1967,6 @@ async function loadL3Eval() {
     const gradeLabel  = e.grade || e.level || '—';
     const posLabel    = e.position ? ` · ${e.position}` : '';
     const compCount   = e.competencies?.length || 0;
-    // Show competency IDs and their target levels in the card
     const compSummary = e.competencies?.map(c => `${c.competency_id}`).join(', ') || '—';
     content += `<div class="l3-evaluatee-card" onclick="openL3Form('${e.nik}')">
       <div class="l3-status-dot ${dotCls[e.l3_status]||'not-started'}"></div>
@@ -1907,7 +1987,6 @@ async function loadL3Eval() {
   });
   content += `</div>`;
 
-  // Download All Team PDF button — at the bottom after all cards
   content += `<div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
     <div style="font-size:13px;color:var(--text-muted);">
       Download evaluasi seluruh tim dalam satu file PDF
@@ -1927,11 +2006,10 @@ async function openL3Form(evaluateeNik) {
   const eval_ = d.evaluatee;
   const comps = d.competencies || [];
 
-  // Store form state globally
   window._l3FormData = {
     evaluatee_nik: evaluateeNik,
     evaluator_nik: state.user.nik,
-    competencies:  JSON.parse(JSON.stringify(comps)), // deep copy
+    competencies:  JSON.parse(JSON.stringify(comps)),
     is_final: d.is_final,
   };
 
@@ -2006,13 +2084,11 @@ function toggleL3Indicator(ci, level, ii) {
   const comp = fd.competencies[ci];
   if (!comp || !comp.levels[level] || !comp.levels[level][ii]) return;
   comp.levels[level][ii].is_checked = !comp.levels[level][ii].is_checked;
-  // Recalc level achieved
   let achieved = 0;
   Object.entries(comp.levels).sort((a,b)=>Number(a[0])-Number(b[0])).forEach(([lvl, inds]) => {
     if (inds.every(ind => ind.is_checked)) achieved = Number(lvl);
   });
   comp.level_achieved = achieved;
-  // Refresh UI
   const scoreEl = el(`l3-score-${ci}`);
   if (scoreEl) { scoreEl.textContent = achieved>0?`Level ${achieved}`:'Not rated'; scoreEl.style.color = achieved>0?'var(--indigo)':'var(--text-muted)'; }
   const item = document.querySelector(`[onclick="toggleL3Indicator(${ci},${level},${ii})"]`);
@@ -2121,18 +2197,15 @@ async function downloadL3PDF() {
   finally { showLoading(false); }
 }
 
-// Download all-team L3 PDF — one file, one page per evaluatee
 async function downloadAllTeamL3PDF() {
   showLoading(true);
   try {
-    // Load jsPDF if not already loaded
     if (!window.jspdf) {
       await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
       await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
     }
     showLoading(false);
 
-    // Fetch all team L3 data from backend
     const res = await api('getTeamL3Data', { leader_nik: state.user.nik });
     if (!res.success) { toast(res.message, 'error'); return; }
 
@@ -2148,7 +2221,6 @@ async function downloadAllTeamL3PDF() {
     const leaderDept = teamData.leader_dept || state.user?.department || '';
     const dateFile   = new Date().toISOString().split('T')[0];
 
-    // Helper: draw page header
     const drawPageHeader = () => {
       doc.setFillColor(26,54,93);
       doc.rect(0,0,210,22,'F');
@@ -2160,20 +2232,17 @@ async function downloadAllTeamL3PDF() {
       doc.text(`Leader: ${leaderName}  ·  Dept: ${leaderDept}  ·  ${today}`, 14, 17);
     };
 
-    // Helper: safe text — trim long strings
     const safeText = (str, maxLen = 180) => {
       const s = String(str || '').trim();
       return s.length > maxLen ? s.slice(0, maxLen) + '…' : s;
     };
 
     evaluatees.forEach((evaluatee, idx) => {
-      // New page for each evaluatee (except first)
       if (idx > 0) doc.addPage();
       drawPageHeader();
 
       let y = 28;
 
-      // Evaluatee info block
       doc.setFillColor(247,250,252);
       doc.rect(10, y, 190, 22, 'F');
       doc.setDrawColor(226,232,240);
@@ -2188,7 +2257,6 @@ async function downloadAllTeamL3PDF() {
       doc.text(`NIK: ${evaluatee.nik}`, 14, y+14);
       doc.text(`${evaluatee.level||'—'} · ${evaluatee.position||'—'} · ${evaluatee.department||'—'}`, 14, y+19);
 
-      // Competency count + page indicator
       doc.setTextColor(0,229,255);
       doc.setFontSize(8); doc.setFont('helvetica','bold');
       doc.text(`${evaluatee.competencies.length} Competenc${evaluatee.competencies.length===1?'y':'ies'} evaluated`, 160, y+8, {align:'right'});
@@ -2196,13 +2264,10 @@ async function downloadAllTeamL3PDF() {
 
       y += 28;
 
-      // Each competency
       evaluatee.competencies.forEach((comp, ci) => {
-        // Check if we need a new page
         const estHeight = 20 + (comp.indicators.length * 8) + 10;
         if (y + estHeight > 270) { doc.addPage(); drawPageHeader(); y = 28; }
 
-        // Competency header bar
         doc.setFillColor(26,54,93);
         doc.rect(10, y, 190, 10, 'F');
         doc.setTextColor(0,229,255);
@@ -2214,7 +2279,6 @@ async function downloadAllTeamL3PDF() {
         doc.text(comp.level_achieved > 0 ? `Achieved: L${comp.level_achieved}` : 'Not rated', 185, y+7, {align:'right'});
         y += 12;
 
-        // Indicators
         comp.indicators.forEach((ind, ii) => {
           if (y + 8 > 275) { doc.addPage(); drawPageHeader(); y = 28; }
 
@@ -2225,7 +2289,6 @@ async function downloadAllTeamL3PDF() {
           doc.setDrawColor(226,232,240);
           doc.rect(10, y, 190, 8, 'S');
 
-          // Checkbox
           if (isChecked) {
             doc.setFillColor(0,201,167);
             doc.roundedRect(13, y+1.5, 5, 5, 1, 1, 'F');
@@ -2239,13 +2302,11 @@ async function downloadAllTeamL3PDF() {
             doc.rect(13.2, y+1.7, 4.6, 4.6, 'F');
           }
 
-          // Indicator text
           doc.setTextColor(isChecked ? 26 : 74, isChecked ? 54 : 85, isChecked ? 93 : 104);
           doc.setFontSize(7.5); doc.setFont('helvetica', isChecked ? 'bold' : 'normal');
           const indText = safeText(ind.behavioral_indicator, 130);
           doc.text(indText, 21, y+5.5);
 
-          // Indicator number (right aligned)
           doc.setTextColor(160,174,192);
           doc.setFontSize(7);
           doc.text(`#${ind.indicator_no}`, 198, y+5.5, {align:'right'});
@@ -2256,7 +2317,6 @@ async function downloadAllTeamL3PDF() {
       });
     });
 
-    // Footer on all pages
     const totalPages = doc.internal.getNumberOfPages();
     for (let i = 1; i <= totalPages; i++) {
       doc.setPage(i);
@@ -2278,9 +2338,7 @@ async function downloadAllTeamL3PDF() {
 async function sendL3Email() {
   const fd = window._l3FormData;
   if (!fd) return;
-  // Save draft first to ensure data is in sheet
   await saveL3Draft();
-  // Backend generates HTML email from saved L3 data — no PDF needed from frontend
   const res = await api('sendL3Email', {
     evaluator_nik:  fd.evaluator_nik,
     evaluatee_nik:  fd.evaluatee_nik,
@@ -2513,7 +2571,6 @@ async function sendMirai() {
 
   appendMiraiMessage('user', q);
 
-  // Add typing indicator
   const typingEl = document.createElement('div');
   typingEl.className = 'mirai-typing';
   typingEl.id = 'mirai-typing';
@@ -2521,12 +2578,10 @@ async function sendMirai() {
   el('mirai-messages').appendChild(typingEl);
   scrollMiraiToBottom();
 
-  // Build history for context (last 10 turns)
   const history = state.miraiHistory.slice(-10);
 
   const res = await apiFast('miraiChat', { message: q, history });
 
-  // Remove typing indicator
   const typing = el('mirai-typing');
   if (typing) typing.remove();
 
@@ -2536,7 +2591,6 @@ async function sendMirai() {
 
   appendMiraiMessage('bot', replyText);
 
-  // Update history
   state.miraiHistory.push({ role:'user', text: q });
   state.miraiHistory.push({ role:'assistant', text: replyText });
 
