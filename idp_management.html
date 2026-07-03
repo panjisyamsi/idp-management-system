@@ -230,6 +230,26 @@ select.form-input{cursor:pointer;}
 .stat-value{font-size:30px;font-weight:800;line-height:1;letter-spacing:-1px;margin-bottom:4px;}
 .stat-sub{font-size:11px;color:var(--text-muted);font-weight:500;}
 
+/* ─── STAT CARD — GRADIENT COLOR VARIANT ───────────────────────────── */
+/* Usage: class="stat-card stat-card-color stat-card-{blue|cyan|mint|amber|coral|violet|gray}" */
+.stat-card-color{border:none;color:#fff;}
+.stat-card-color:hover{box-shadow:var(--shadow-lg);}
+.stat-card-color .stat-label{color:rgba(255,255,255,0.82);}
+.stat-card-color .stat-value{color:#fff;}
+.stat-card-color .stat-value span{color:rgba(255,255,255,0.65)!important;}
+.stat-card-color .stat-sub{color:rgba(255,255,255,0.78);}
+.stat-card-color .stat-icon{background:rgba(255,255,255,0.20);}
+.stat-card-color .badge{background:rgba(255,255,255,0.22)!important;color:#fff!important;}
+.stat-card-color .progress-wrap{background:rgba(255,255,255,0.25);}
+.stat-card-color .progress-bar{background:#fff!important;}
+.stat-card-blue{background:linear-gradient(135deg,#1A365D 0%,#2C5282 100%);}
+.stat-card-cyan{background:linear-gradient(135deg,#00647D 0%,#00B8D9 100%);}
+.stat-card-mint{background:linear-gradient(135deg,#00695C 0%,#00C9A7 100%);}
+.stat-card-amber{background:linear-gradient(135deg,#A9670F 0%,#F6AD55 100%);}
+.stat-card-coral{background:linear-gradient(135deg,#A52F22 0%,#FC8181 100%);}
+.stat-card-violet{background:linear-gradient(135deg,#433796 0%,#7F9CF5 100%);}
+.stat-card-gray{background:linear-gradient(135deg,#374151 0%,#718096 100%);}
+
 /* ─── BADGES ──────────────────────────────────────────────────────── */
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:var(--r-full);font-size:11px;font-weight:700;letter-spacing:0.1px;}
 .badge-indigo{background:#E8F4FF;color:#1A365D;}
@@ -641,7 +661,7 @@ tbody tr:hover{background:var(--indigo-soft);}
 <script>
 // ── CONFIG ─────────────────────────────────────────────────────
 // UPDATE THIS after New Deployment
-const API_URL = 'https://script.google.com/macros/s/AKfycbwD2iWF8BdEvrR0x99UO1a5ynI8JjpdvF4nfeSfbDHHktCYEvsBdNSyEPxhiynuuFPe/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyo2Z_IgmzzrTk-EIsE19if00uz2xbnOxq2SdNowg_mTLEOi_h3PkTDquxXdmlHP8s/exec';
 
 // ── STATE ───────────────────────────────────────────────────────
 let state = {
@@ -650,6 +670,7 @@ let state = {
   jadwalTab: 'my',
   monitorTab: 'progress',
   compLibrary: null,
+  achievedCompetencies: [],
   assessmentScores: {},
   assessmentChecks: {},
   teamData: null,
@@ -663,33 +684,48 @@ let state = {
 };
 
 // ── API ─────────────────────────────────────────────────────────
+// CHANGED (v2.2, pre-launch scaling fix): added retry with backoff for
+// transient Apps Script errors ("System is busy processing another
+// request...") that are expected to occur more often once 3,000 users
+// are active concurrently. A silent retry is much better UX than
+// immediately showing "Connection failed" for something that would
+// have succeeded 1-2 seconds later.
+async function apiWithRetry(action, payload = {}, maxRetries = 2) {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action, ...payload }),
+      });
+      const json = await res.json();
+      const isTransient = !json.success && /busy|simultaneous|timeout/i.test(json.message || '');
+      if (isTransient && attempt < maxRetries) {
+        await new Promise(r => setTimeout(r, 800 * (attempt + 1))); // 800ms, then 1600ms
+        continue;
+      }
+      return json;
+    } catch (err) {
+      if (attempt < maxRetries) {
+        await new Promise(r => setTimeout(r, 800 * (attempt + 1)));
+        continue;
+      }
+      return { success: false, message: 'Connection failed. Please try again.' };
+    }
+  }
+}
+
 async function api(action, payload = {}) {
   showLoading(true);
   try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action, ...payload }),
-    });
-    return await res.json();
-  } catch (err) {
-    return { success: false, message: 'Connection failed. Please try again.' };
+    return await apiWithRetry(action, payload);
   } finally {
     showLoading(false);
   }
 }
 
 async function apiFast(action, payload = {}) {
-  try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action, ...payload }),
-    });
-    return await res.json();
-  } catch (err) {
-    return { success: false, message: 'Connection failed.' };
-  }
+  return await apiWithRetry(action, payload);
 }
 
 // ── UI HELPERS ──────────────────────────────────────────────────
@@ -773,7 +809,7 @@ async function doChangePassword() {
 
 function doLogout() {
   closeModal();
-  state = { user:null, currentView:'dashboard', jadwalTab:'my', monitorTab:'progress', compLibrary:null, assessmentScores:{}, assessmentChecks:{}, teamData:null, enrollments:[], jadwal:[], mandatoryCompIds:[], mandatoryLevelMap:{}, mandatoryLevelIsFallback:{}, _pipeline:[], miraiHistory:[] };
+  state = { user:null, currentView:'dashboard', jadwalTab:'my', monitorTab:'progress', compLibrary:null, achievedCompetencies:[], assessmentScores:{}, assessmentChecks:{}, teamData:null, enrollments:[], jadwal:[], mandatoryCompIds:[], mandatoryLevelMap:{}, mandatoryLevelIsFallback:{}, _pipeline:[], miraiHistory:[] };
   el('app-layout').style.display = 'none';
   el('page-login').style.display = 'flex';
   el('login-nik').value = '';
@@ -917,31 +953,27 @@ async function loadDashboard() {
 
   const assessedIcon = d.assessment_status === 'submitted' ? '✅' : '📋';
   content += `<div class="stats-grid" style="margin-bottom:20px;">
-    <div class="stat-card">
-      <div class="stat-card-accent" style="background:linear-gradient(90deg,var(--indigo),var(--indigo-light));"></div>
-      <div class="stat-icon" style="background:var(--indigo-soft);">${assessedIcon}</div>
+    <div class="stat-card stat-card-color stat-card-blue">
+      <div class="stat-icon">${assessedIcon}</div>
       <div class="stat-label">Assessment</div>
       <div style="margin-top:4px;">${statusBadge(d.assessment_status)}</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-card-accent" style="background:linear-gradient(90deg,var(--mint),#4DD9C0);"></div>
-      <div class="stat-icon" style="background:var(--mint-soft);">🎯</div>
+    <div class="stat-card stat-card-color stat-card-mint">
+      <div class="stat-icon">🎯</div>
       <div class="stat-label">Mandatory</div>
-      <div class="stat-value" style="color:var(--mint);">${doneM}<span style="font-size:16px;color:var(--text-muted);">/${totalM}</span></div>
+      <div class="stat-value">${doneM}<span style="font-size:16px;">/${totalM}</span></div>
       <div class="stat-sub">Completed</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-card-accent" style="background:linear-gradient(90deg,var(--sky),#7ED9FA);"></div>
-      <div class="stat-icon" style="background:var(--sky-soft);">📚</div>
+    <div class="stat-card stat-card-color stat-card-cyan">
+      <div class="stat-icon">📚</div>
       <div class="stat-label">Enrolled</div>
-      <div class="stat-value" style="color:var(--sky);">${enrolledCount}</div>
+      <div class="stat-value">${enrolledCount}</div>
       <div class="stat-sub">Active sessions</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-card-accent" style="background:linear-gradient(90deg,var(--amber),#FFD080);"></div>
-      <div class="stat-icon" style="background:var(--amber-soft);">🏷️</div>
+    <div class="stat-card stat-card-color stat-card-amber">
+      <div class="stat-icon">🏷️</div>
       <div class="stat-label">Grade</div>
-      <div style="margin-top:8px;"><span class="badge ${gradeColor(u.grade)}" style="font-size:14px;padding:5px 16px;">${u.grade}</span></div>
+      <div style="margin-top:8px;"><span class="badge" style="font-size:14px;padding:5px 16px;">${u.grade}</span></div>
     </div>
   </div>`;
 
@@ -1066,20 +1098,24 @@ function renderRaceLeaderboard(adminData, myDivision) {
 }
 
 // ── ASSESSMENT ──────────────────────────────────────────────────
+// CHANGED (v2.3): sends nik so the backend can compute gap-filtering
+// (currently OFF by default — see ENABLE_GAP_FILTER). Response shape is
+// now {competencies, achieved_competencies} regardless of flag state.
 async function loadAssessment() {
   const u = state.user;
   const statusRes = await api('getAssessmentStatus', { nik: u.nik });
   if (statusRes.success && statusRes.data.has_submitted_final) {
     html('assessment-content', `<div class="card"><div class="card-body"><div class="empty-state">
       <div class="empty-icon">✅</div><div class="empty-title">Assessment Completed</div>
-      <div class="empty-desc">You have submitted your self assessment. Results are being reviewed by your leader.</div>
+      <div class="empty-desc">You have submitted your self assessment for this cycle. Results are being reviewed by your leader.</div>
     </div></div></div>`);
     return;
   }
   if (!state.compLibrary) {
-    const libRes = await api('getCompetencyLibrary', { department: u.department, division: u.division, grade: u.grade, has_subordinates: u.has_subordinates });
+    const libRes = await api('getCompetencyLibrary', { nik: u.nik, department: u.department, division: u.division, grade: u.grade, has_subordinates: u.has_subordinates });
     if (!libRes.success) { html('assessment-content', `<p class="text-muted">${libRes.message}</p>`); return; }
-    state.compLibrary = libRes.data;
+    state.compLibrary = libRes.data.competencies || [];
+    state.achievedCompetencies = libRes.data.achieved_competencies || [];
     state.compLibrary.forEach(comp => {
       if (!state.assessmentChecks[comp.competency_id]) {
         state.assessmentChecks[comp.competency_id] = {};
@@ -1097,32 +1133,72 @@ async function loadAssessment() {
 
 function renderAssessmentForm() {
   const lib = state.compLibrary;
-  if (!lib || lib.length === 0) {
+  const achieved = state.achievedCompetencies || [];
+  if ((!lib || lib.length === 0) && !achieved.length) {
     html('assessment-content', `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No competencies found</div><div class="empty-desc">Contact admin to configure your competency data.</div></div>`);
     return;
   }
-  const typeOrder = { core:0, role:1, jf:2 };
-  const typeLabel = { core:'Core Competency', role:'Role Competency', jf:'Job Family Competency' };
-  const typeColor = { core:'badge-indigo', role:'badge-violet', jf:'badge-sky' };
-  const grouped   = {};
-  lib.forEach(comp => { const t = comp.competency_type; if (!grouped[t]) grouped[t]=[]; grouped[t].push(comp); });
   let content = `<div class="notice notice-amber"><div class="notice-icon">💡</div>
     <div><strong>Instructions:</strong> Check all behavioral indicators that you <strong>consistently</strong> demonstrate. Be honest — this is for your own development.</div>
   </div>`;
-  Object.keys(grouped).sort((a,b) => (typeOrder[a]||0)-(typeOrder[b]||0)).forEach(type => {
-    content += `<div style="margin-bottom:8px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-        <span class="badge ${typeColor[type]||'badge-gray'}" style="font-size:11px;">${typeLabel[type]||type}</span>
-        <div style="flex:1;height:1px;background:var(--border);"></div>
-      </div>`;
-    grouped[type].forEach(comp => { content += renderCompetencyBlock(comp); });
-    content += `</div>`;
-  });
-  content += `<div style="display:flex;gap:12px;margin-top:28px;padding-top:20px;border-top:1px solid var(--border);">
-    <button class="btn btn-ghost" onclick="saveDraftAssessment()">💾 Save Draft</button>
-    <button class="btn btn-primary btn-lg" onclick="confirmFinalSubmit()">Submit Final →</button>
-  </div>`;
+
+  // NEW: collapsed reference section for competencies already achieved in
+  // a prior cycle — only populated when ENABLE_GAP_FILTER is on. Shown as
+  // a read-only summary rather than hidden entirely, so the person can
+  // still see what's being excluded and why.
+  if (achieved.length > 0) {
+    content += `<div class="card" style="margin-bottom:16px;">
+      <div class="assessment-section-header" style="cursor:pointer;" onclick="toggleAchievedSection()">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="badge badge-green">✓</span>
+          <span style="font-weight:700;font-size:13px;">${achieved.length} kompetensi sudah tercapai — tidak perlu dinilai ulang</span>
+        </div>
+        <span id="achieved-arrow" style="font-size:11px;color:var(--text-muted);">▼</span>
+      </div>
+      <div id="achieved-body" style="display:none;padding:0 20px 16px;">
+        ${achieved.map(c => `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
+          <span>${c.competency_name} <span style="color:var(--text-muted);font-family:var(--mono);font-size:11px;">${c.competency_id}</span></span>
+          <span style="font-weight:700;color:var(--mint);">Level ${c.achieved_level}</span>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  if (lib && lib.length > 0) {
+    const typeOrder = { core:0, role:1, jf:2 };
+    const typeLabel = { core:'Core Competency', role:'Role Competency', jf:'Job Family Competency' };
+    const typeColor = { core:'badge-indigo', role:'badge-violet', jf:'badge-sky' };
+    const grouped   = {};
+    lib.forEach(comp => { const t = comp.competency_type; if (!grouped[t]) grouped[t]=[]; grouped[t].push(comp); });
+    Object.keys(grouped).sort((a,b) => (typeOrder[a]||0)-(typeOrder[b]||0)).forEach(type => {
+      content += `<div style="margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <span class="badge ${typeColor[type]||'badge-gray'}" style="font-size:11px;">${typeLabel[type]||type}</span>
+          <div style="flex:1;height:1px;background:var(--border);"></div>
+        </div>`;
+      grouped[type].forEach(comp => { content += renderCompetencyBlock(comp); });
+      content += `</div>`;
+    });
+    content += `<div style="display:flex;gap:12px;margin-top:28px;padding-top:20px;border-top:1px solid var(--border);">
+      <button class="btn btn-ghost" onclick="saveDraftAssessment()">💾 Save Draft</button>
+      <button class="btn btn-primary btn-lg" onclick="confirmFinalSubmit()">Submit Final →</button>
+    </div>`;
+  } else {
+    content += `<div class="card"><div class="card-body"><div class="empty-state">
+      <div class="empty-icon">✅</div><div class="empty-title">Semua kompetensi sudah tercapai</div>
+      <div class="empty-desc">Tidak ada kompetensi yang perlu dinilai ulang siklus ini.</div>
+    </div></div></div>`;
+  }
   html('assessment-content', content);
+}
+
+function toggleAchievedSection() {
+  const body  = el('achieved-body');
+  const arrow = el('achieved-arrow');
+  if (!body) return;
+  const isOpen = body.style.display !== 'none';
+  body.style.display  = isOpen ? 'none' : 'block';
+  arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
 }
 
 function renderCompetencyBlock(comp) {
@@ -1553,26 +1629,23 @@ async function loadCorporate() {
     return;
   }
 
-  const completionColor = d.completion_pct >= 100 ? 'var(--mint)' : d.completion_pct >= 50 ? 'var(--amber)' : 'var(--coral)';
+  const completionColorClass = d.completion_pct >= 100 ? 'stat-card-mint' : d.completion_pct >= 50 ? 'stat-card-amber' : 'stat-card-coral';
   let content = `<div class="stats-grid" style="margin-bottom:20px;">
-    <div class="stat-card">
-      <div class="stat-card-accent" style="background:linear-gradient(90deg,var(--indigo),var(--indigo-light));"></div>
-      <div class="stat-icon" style="background:var(--indigo-soft);">📚</div>
+    <div class="stat-card stat-card-color stat-card-blue">
+      <div class="stat-icon">📚</div>
       <div class="stat-label">Total Training</div>
       <div class="stat-value">${d.total}</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-card-accent" style="background:linear-gradient(90deg,var(--mint),#4DD9C0);"></div>
-      <div class="stat-icon" style="background:var(--mint-soft);">✅</div>
+    <div class="stat-card stat-card-color stat-card-cyan">
+      <div class="stat-icon">✅</div>
       <div class="stat-label">Completed</div>
-      <div class="stat-value" style="color:var(--mint);">${d.completed}</div>
+      <div class="stat-value">${d.completed}</div>
     </div>
-    <div class="stat-card" style="grid-column:span 2;">
-      <div class="stat-card-accent" style="background:linear-gradient(90deg,${completionColor},${completionColor}88);"></div>
-      <div class="stat-icon" style="background:var(--surface2);">📊</div>
+    <div class="stat-card stat-card-color ${completionColorClass}" style="grid-column:span 2;">
+      <div class="stat-icon">📊</div>
       <div class="stat-label">Completion Rate</div>
-      <div class="stat-value" style="color:${completionColor};">${d.completion_pct}%</div>
-      <div style="margin-top:10px;">${progressBar(d.completed, d.total, d.completion_pct>=100?'green':d.completion_pct>=50?'gold':'coral', 8)}</div>
+      <div class="stat-value">${d.completion_pct}%</div>
+      <div style="margin-top:10px;">${progressBar(d.completed, d.total, 'blue', 8)}</div>
     </div>
   </div>`;
 
@@ -1696,6 +1769,11 @@ async function downloadAssignmentPDF() {
   finally { showLoading(false); }
 }
 
+// CHANGED (v2.3): competencies now carry achievement_status ('achieved' |
+// 'gap' | 'not_assessed') computed from cross-cycle history. Within each
+// type group, gap/not_assessed competencies are sorted first so the
+// leader's attention goes there by default; achieved ones sink to the
+// bottom with a badge and an upskilling hint instead of disappearing.
 function openAssignModal(memberNik) {
   const member = state.teamData.find(m => m.nik === memberNik);
   if (!member) return;
@@ -1706,17 +1784,31 @@ function openAssignModal(memberNik) {
   const typeColor = { core:'badge-indigo', role:'badge-violet', jf:'badge-sky' };
   const grouped   = {};
   member.competencies.forEach(c => { const t=c.competency_type; if(!grouped[t])grouped[t]=[]; grouped[t].push(c); });
+  Object.keys(grouped).forEach(t => {
+    grouped[t].sort((a, b) => (a.achievement_status === 'achieved' ? 1 : 0) - (b.achievement_status === 'achieved' ? 1 : 0));
+  });
   let compRows = '';
   Object.keys(grouped).forEach(type => {
     compRows += `<div style="font-size:11px;font-weight:800;color:var(--text-muted);letter-spacing:0.6px;text-transform:uppercase;margin:16px 0 8px;">${typeLabel[type]||type}</div>`;
     grouped[type].forEach(c => {
       const checkedIndicators = buildCheckedIndicators(c);
-      compRows += `<div id="comp-assign-${memberNik}-${c.competency_id}" style="border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden;">
+      const isAchieved    = c.achievement_status === 'achieved';
+      const isNotAssessed = c.achievement_status === 'not_assessed';
+      const statusBadgeHtml = isAchieved
+        ? `<span class="badge badge-green">✓ Sudah Tercapai (L${c.last_known_level})</span>`
+        : isNotAssessed
+          ? `<span class="badge badge-gray">Belum Pernah Dinilai</span>`
+          : `<span class="badge badge-amber">Gap — L${c.last_known_level} → Target L${c.target_level}</span>`;
+      const suggestedUpskill = Math.min(c.target_level + 1, 5);
+      const upskillHint = isAchieved && c.target_level < 5
+        ? `<div style="font-size:11px;color:var(--mint);margin-top:6px;">Tidak ada gap pada level target. Kalau ingin upskilling, pilih Observed Level ${suggestedUpskill} atau lebih tinggi di bawah.</div>`
+        : '';
+      compRows += `<div id="comp-assign-${memberNik}-${c.competency_id}" style="border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden;${isAchieved?'opacity:0.88;':''}">
         <div style="padding:13px 15px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;background:var(--surface);">
-          <div style="display:flex;align-items:center;gap:8px;">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             <span class="badge ${typeColor[c.competency_type]||'badge-gray'}">${c.competency_id}</span>
             <div><div style="font-weight:700;font-size:13px;">${c.competency_name||c.competency_id}</div>
-            <div style="font-size:11px;color:var(--text-muted);">Self: L${c.self_score} · Target: L${c.target_level} · Gap: ${c.gap}</div></div>
+            <div style="font-size:11px;color:var(--text-muted);">${c.self_score>0?`Self (siklus ini): L${c.self_score} · `:'Belum self-assess siklus ini · '}Target: L${c.target_level}</div></div>
           </div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;" id="decision-btns-${memberNik}-${c.competency_id}">
             <button class="btn btn-sm ${c.decision==='mandatory'?'btn-accent':'btn-ghost'}" onclick="setDecision('${memberNik}','${c.competency_id}','mandatory')">Mandatory</button>
@@ -1724,14 +1816,14 @@ function openAssignModal(memberNik) {
             <button class="btn btn-sm btn-ghost" onclick="setDecision('${memberNik}','${c.competency_id}','')">—</button>
           </div>
         </div>
+        <div style="padding:8px 15px;background:var(--surface2);border-top:1px solid var(--border);">${statusBadgeHtml}${upskillHint}</div>
         <div style="padding:10px 15px;background:var(--indigo-soft);border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
           <label style="font-size:11px;font-weight:700;color:var(--indigo-dark);white-space:nowrap;">Observed level:</label>
           <select id="leader-level-${memberNik}-${c.competency_id}" onchange="setLeaderLevel('${memberNik}','${c.competency_id}',this.value)"
             style="padding:5px 10px;border:1.5px solid var(--indigo);border-radius:var(--r-sm);font-size:12px;font-family:var(--font);font-weight:600;background:white;color:var(--text);cursor:pointer;outline:none;">
             <option value="">— Select observed level —</option>
-            ${[1,2,3,4,5].map(l=>`<option value="${l}" ${c.leader_level==l?'selected':''}>Level ${l}</option>`).join('')}
+            ${[1,2,3,4,5].map(l=>`<option value="${l}" ${c.leader_level==l?'selected':''}>Level ${l}${isAchieved && l===suggestedUpskill?' (disarankan — upskill)':''}</option>`).join('')}
           </select>
-          ${c.gap<=0?'<span style="font-size:11px;color:var(--mint);font-weight:600;">✓ Target achieved</span>':''}
         </div>
         ${checkedIndicators?`
         <div style="border-top:1px solid var(--border);">
@@ -1835,10 +1927,10 @@ async function loadTeamMonitor() {
   const teamPct  = pct(totalCompleted, totalMandatory);
   const maxDepth = Math.max(...team.map(m=>m.depth||1));
   let content = `<div class="stats-grid" style="margin-bottom:20px;">
-    <div class="stat-card"><div class="stat-card-accent" style="background:linear-gradient(90deg,var(--indigo),var(--indigo-light));"></div><div class="stat-icon" style="background:var(--indigo-soft);">👥</div><div class="stat-label">Total Members</div><div class="stat-value">${team.length}</div><div class="stat-sub">${maxDepth} level${maxDepth>1?'s':''} deep</div></div>
-    <div class="stat-card"><div class="stat-card-accent" style="background:linear-gradient(90deg,var(--mint),#4DD9C0);"></div><div class="stat-icon" style="background:var(--mint-soft);">📈</div><div class="stat-label">Completion Rate</div><div class="stat-value" style="color:var(--mint);">${teamPct}%</div></div>
-    <div class="stat-card"><div class="stat-card-accent" style="background:linear-gradient(90deg,var(--amber),#FFD080);"></div><div class="stat-icon" style="background:var(--amber-soft);">🎯</div><div class="stat-label">Mandatory Done</div><div class="stat-value">${totalCompleted}<span style="font-size:14px;color:var(--text-muted);">/${totalMandatory}</span></div></div>
-    <div class="stat-card"><div class="stat-card-accent" style="background:linear-gradient(90deg,var(--sky),#7ED9FA);"></div><div class="stat-icon" style="background:var(--sky-soft);">📅</div><div class="stat-label">Active Enrollments</div><div class="stat-value" style="color:var(--sky);">${team.reduce((s,m)=>s+m.enrolled_session_ids.length,0)}</div></div>
+    <div class="stat-card stat-card-color stat-card-blue"><div class="stat-icon">👥</div><div class="stat-label">Total Members</div><div class="stat-value">${team.length}</div><div class="stat-sub">${maxDepth} level${maxDepth>1?'s':''} deep</div></div>
+    <div class="stat-card stat-card-color stat-card-mint"><div class="stat-icon">📈</div><div class="stat-label">Completion Rate</div><div class="stat-value">${teamPct}%</div></div>
+    <div class="stat-card stat-card-color stat-card-amber"><div class="stat-icon">🎯</div><div class="stat-label">Mandatory Done</div><div class="stat-value">${totalCompleted}<span style="font-size:14px;">/${totalMandatory}</span></div></div>
+    <div class="stat-card stat-card-color stat-card-cyan"><div class="stat-icon">📅</div><div class="stat-label">Active Enrollments</div><div class="stat-value">${team.reduce((s,m)=>s+m.enrolled_session_ids.length,0)}</div></div>
   </div>`;
   const depths = [...new Set(team.map(m=>m.depth||1))].sort();
   if (depths.length > 1) {
@@ -1951,10 +2043,10 @@ async function loadL3Eval() {
   const inProgress = evaluatees.filter(e => e.l3_status === 'in_progress').length;
 
   let content = `<div class="stats-grid" style="margin-bottom:20px;">
-    <div class="stat-card"><div class="stat-card-accent" style="background:linear-gradient(90deg,var(--indigo),var(--cyan));"></div><div class="stat-icon" style="background:var(--indigo-soft);">👥</div><div class="stat-label">Total Evaluatees</div><div class="stat-value">${total}</div></div>
-    <div class="stat-card"><div class="stat-card-accent" style="background:linear-gradient(90deg,var(--mint),#4DD9C0);"></div><div class="stat-icon" style="background:var(--mint-soft);">✅</div><div class="stat-label">Submitted</div><div class="stat-value" style="color:var(--mint);">${submitted}</div></div>
-    <div class="stat-card"><div class="stat-card-accent" style="background:linear-gradient(90deg,var(--amber),#FFD080);"></div><div class="stat-icon" style="background:var(--amber-soft);">📝</div><div class="stat-label">In Progress</div><div class="stat-value" style="color:var(--amber);">${inProgress}</div></div>
-    <div class="stat-card"><div class="stat-card-accent" style="background:linear-gradient(90deg,var(--sky),#7ED9FA);"></div><div class="stat-icon" style="background:var(--sky-soft);">📊</div><div class="stat-label">Completion</div><div class="stat-value" style="color:var(--sky);">${pct(submitted,total)}%</div></div>
+    <div class="stat-card stat-card-color stat-card-blue"><div class="stat-icon">👥</div><div class="stat-label">Total Evaluatees</div><div class="stat-value">${total}</div></div>
+    <div class="stat-card stat-card-color stat-card-mint"><div class="stat-icon">✅</div><div class="stat-label">Submitted</div><div class="stat-value">${submitted}</div></div>
+    <div class="stat-card stat-card-color stat-card-amber"><div class="stat-icon">📝</div><div class="stat-label">In Progress</div><div class="stat-value">${inProgress}</div></div>
+    <div class="stat-card stat-card-color stat-card-cyan"><div class="stat-icon">📊</div><div class="stat-label">Completion</div><div class="stat-value">${pct(submitted,total)}%</div></div>
   </div>`;
 
   const statusLabel    = { not_started:'Not Started', in_progress:'In Progress', submitted:'Submitted' };
@@ -2355,10 +2447,10 @@ async function loadAdmin() {
   const deptStats  = d.department_stats || {};
   const compDemand = d.competency_demand || {};
   let content = `<div class="stats-grid" style="margin-bottom:24px;">
-    <div class="stat-card"><div class="stat-card-accent" style="background:linear-gradient(90deg,var(--indigo),var(--indigo-light));"></div><div class="stat-icon" style="background:var(--indigo-soft);">👤</div><div class="stat-label">Total Employees</div><div class="stat-value">${s.total_employees}</div></div>
-    <div class="stat-card"><div class="stat-card-accent" style="background:linear-gradient(90deg,var(--sky),#7ED9FA);"></div><div class="stat-icon" style="background:var(--sky-soft);">📋</div><div class="stat-label">Assessments</div><div class="stat-value" style="color:var(--sky);">${s.total_assessed}</div><div class="stat-sub">${pct(s.total_assessed,s.total_employees)}% completed</div></div>
-    <div class="stat-card"><div class="stat-card-accent" style="background:linear-gradient(90deg,var(--violet),#A78BFA);"></div><div class="stat-icon" style="background:var(--violet-soft);">👥</div><div class="stat-label">Leaders Assigned</div><div class="stat-value" style="color:var(--violet);">${s.leaders_assigned}<span style="font-size:14px;color:var(--text-muted);">/${s.total_leaders}</span></div></div>
-    <div class="stat-card"><div class="stat-card-accent" style="background:linear-gradient(90deg,var(--mint),#4DD9C0);"></div><div class="stat-icon" style="background:var(--mint-soft);">✅</div><div class="stat-label">Mandatory Done</div><div class="stat-value" style="color:var(--mint);">${s.mandatory_completed}<span style="font-size:14px;color:var(--text-muted);">/${s.mandatory_total}</span></div></div>
+    <div class="stat-card stat-card-color stat-card-blue"><div class="stat-icon">👤</div><div class="stat-label">Total Employees</div><div class="stat-value">${s.total_employees}</div></div>
+    <div class="stat-card stat-card-color stat-card-cyan"><div class="stat-icon">📋</div><div class="stat-label">Assessments</div><div class="stat-value">${s.total_assessed}</div><div class="stat-sub">${pct(s.total_assessed,s.total_employees)}% completed</div></div>
+    <div class="stat-card stat-card-color stat-card-violet"><div class="stat-icon">👥</div><div class="stat-label">Leaders Assigned</div><div class="stat-value">${s.leaders_assigned}<span style="font-size:14px;">/${s.total_leaders}</span></div></div>
+    <div class="stat-card stat-card-color stat-card-mint"><div class="stat-icon">✅</div><div class="stat-label">Mandatory Done</div><div class="stat-value">${s.mandatory_completed}<span style="font-size:14px;">/${s.mandatory_total}</span></div></div>
   </div>`;
   const depts = Object.entries(deptStats).sort((a,b)=>b[1].total-a[1].total);
   if (depts.length > 0) {
