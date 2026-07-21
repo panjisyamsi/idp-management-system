@@ -7,59 +7,65 @@
 <title>MIRAI — PT. Amerta Indah Otsuka</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* ── DESIGN TOKENS — Festive Optimist Palette ─────────────────────── */
+/* ── DESIGN TOKENS — Calm Cheerful Palette ─────────────────────────
+   Filosofi: "Riang tapi tidak berteriak."
+   Primary: Slate-Indigo (#4F46E5 → #6366F1) — bukan purple terang.
+   Sidebar/Nav: Deep Slate (#1E1B4B → #312E81) — gelap warm, bukan neon.
+   Accent tetap colorful tapi dipakai hanya pada elemen kecil.
+   Background surface: warm white, bukan stark white.
+────────────────────────────────────────────────────────────────── */
 :root {
-  /* Primary: Vibrant Purple */
-  --purple:       #7C3AED;
-  --purple-light: #A855F7;
-  --purple-dark:  #5B21B6;
-  --purple-soft:  #F3EEFF;
+  /* Primary: Calm Indigo */
+  --purple:       #4F46E5;
+  --purple-light: #6366F1;
+  --purple-dark:  #3730A3;
+  --purple-soft:  #EEF2FF;
 
-  /* Accent 1: Sunny Amber */
+  /* Accent 1: Warm Amber */
   --amber:        #F59E0B;
-  --amber-dark:   #D97706;
+  --amber-dark:   #B45309;
   --amber-soft:   #FFFBEB;
 
-  /* Accent 2: Coral Rose */
-  --coral:        #F43F5E;
-  --coral-dark:   #E11D48;
-  --coral-soft:   #FFF1F4;
+  /* Accent 2: Soft Rose */
+  --coral:        #F87171;
+  --coral-dark:   #EF4444;
+  --coral-soft:   #FEF2F2;
 
-  /* Accent 3: Emerald */
-  --emerald:      #10B981;
-  --emerald-dark: #059669;
-  --emerald-soft: #ECFDF5;
+  /* Accent 3: Teal */
+  --emerald:      #14B8A6;
+  --emerald-dark: #0D9488;
+  --emerald-soft: #F0FDFA;
 
-  /* Accent 4: Sky Blue */
-  --sky:          #0EA5E9;
-  --sky-dark:     #0284C7;
+  /* Accent 4: Sky */
+  --sky:          #38BDF8;
+  --sky-dark:     #0EA5E9;
   --sky-soft:     #F0F9FF;
 
-  /* Accent 5: Pink */
-  --pink:         #EC4899;
-  --pink-soft:    #FDF2F8;
+  /* Accent 5: Soft Violet */
+  --pink:         #A78BFA;
+  --pink-soft:    #F5F3FF;
 
   /* Surfaces */
-  --bg:           #FAFAFA;
+  --bg:           #F8F9FC;
   --surface:      #FFFFFF;
-  --surface2:     #F8F7FF;
-  --surface3:     #F1F0FB;
+  --surface2:     #F4F5FF;
+  --surface3:     #ECEEFF;
 
   /* Text */
   --text:         #1E1B4B;
-  --text-2:       #4B5563;
-  --text-muted:   #9CA3AF;
+  --text-2:       #475569;
+  --text-muted:   #94A3B8;
 
   /* Borders */
-  --border:       #E5E7EB;
-  --border-2:     #D1D5DB;
+  --border:       #E2E8F0;
+  --border-2:     #CBD5E1;
 
-  /* Shadows */
-  --shadow-xs: 0 1px 3px rgba(124,58,237,0.08);
-  --shadow-sm: 0 2px 8px rgba(124,58,237,0.10);
-  --shadow:    0 4px 20px rgba(124,58,237,0.14);
-  --shadow-lg: 0 12px 40px rgba(124,58,237,0.18);
-  --shadow-xl: 0 24px 64px rgba(124,58,237,0.22);
+  /* Shadows — pure neutral */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-sm: 0 2px 6px rgba(0,0,0,0.07);
+  --shadow:    0 4px 16px rgba(0,0,0,0.09);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.11);
+  --shadow-xl: 0 20px 56px rgba(0,0,0,0.14);
 
   /* Shape */
   --r-xs:4px; --r-sm:8px; --r:14px; --r-lg:20px; --r-xl:28px; --r-full:100px;
@@ -106,7 +112,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 
 /* ── LOGIN ────────────────────────────────────────────────────────── */
 #page-login{min-height:100vh;display:flex;background:var(--bg);}
-.login-left{flex:1.1;background:linear-gradient(145deg,#4C1D95 0%,#7C3AED 50%,#A855F7 100%);display:none;align-items:center;justify-content:center;padding:60px 56px;position:relative;overflow:hidden;}
+.login-left{flex:1.1;background:linear-gradient(150deg,#1E1B4B 0%,#312E81 45%,#3730A3 80%,#4338CA 100%);display:none;align-items:center;justify-content:center;padding:60px 56px;position:relative;overflow:hidden;}
 @media(min-width:900px){.login-left{display:flex;}}
 .orb{position:absolute;border-radius:50%;animation:orbFloat 6s ease-in-out infinite;}
 .orb:nth-child(1){width:360px;height:360px;top:-80px;right:-60px;background:rgba(251,191,36,0.18);animation-delay:0s;}
@@ -114,7 +120,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .orb:nth-child(3){width:120px;height:120px;top:45%;left:55%;background:rgba(16,185,129,0.20);animation-delay:-1.5s;}
 @keyframes orbFloat{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-18px) scale(1.04);}}
 .login-brand{position:relative;z-index:1;text-align:center;width:100%;}
-.login-wordmark{font-size:200px;font-weight:800;letter-spacing:-4px;background:linear-gradient(135deg,#FCD34D 0%,#FDBA74 40%,rgba(255,255,255,0.9) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:16px;animation:wordmarkIn 0.8s var(--ease) both;}
+.login-wordmark{font-size:200px;font-weight:800;letter-spacing:-4px;background:linear-gradient(135deg,#FCD34D 0%,#FDBA74 50%,#FDE68A 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:16px;animation:wordmarkIn 0.8s var(--ease) both;}
 @keyframes wordmarkIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 .login-tagline{font-size:14px;color:rgba(255,255,255,0.65);font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
 .login-sub{font-size:16px;color:rgba(255,255,255,0.85);font-weight:400;}
@@ -126,7 +132,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .login-form-wrap{width:100%;max-width:360px;}
 .login-mobile-brand{display:flex;align-items:center;gap:12px;margin-bottom:36px;}
 @media(min-width:900px){.login-mobile-brand{display:none;}}
-.login-logo-pill{height:38px;padding:0 16px;background:linear-gradient(135deg,var(--purple-dark),var(--purple));border-radius:var(--r-full);display:flex;align-items:center;font-size:15px;font-weight:800;color:#fff;}
+.login-logo-pill{height:38px;padding:0 16px;background:linear-gradient(135deg,#1E1B4B,#3730A3);border-radius:var(--r-full);display:flex;align-items:center;font-size:15px;font-weight:800;color:#FCD34D;letter-spacing:-0.3px;}
 .login-heading{font-size:26px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;}
 .login-hint{font-size:13px;color:var(--text-2);margin-bottom:28px;}
 
@@ -141,8 +147,8 @@ select.form-input{cursor:pointer;}
 
 /* ── BUTTONS ──────────────────────────────────────────────────────── */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border-radius:var(--r-sm);font-family:var(--font);font-size:13px;font-weight:700;border:1.5px solid transparent;cursor:pointer;transition:all var(--t) var(--ease);white-space:nowrap;text-decoration:none;letter-spacing:0.1px;}
-.btn-primary{background:linear-gradient(135deg,var(--purple),var(--purple-light));color:#fff;box-shadow:0 2px 10px rgba(124,58,237,0.35);}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(124,58,237,0.45);}
+.btn-primary{background:linear-gradient(135deg,#312E81,#4F46E5);color:#fff;box-shadow:0 2px 8px rgba(55,48,163,0.28);}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(55,48,163,0.36);}
 .btn-amber{background:linear-gradient(135deg,var(--amber-dark),var(--amber));color:#fff;box-shadow:0 2px 10px rgba(245,158,11,0.30);}
 .btn-amber:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(245,158,11,0.40);}
 .btn-emerald{background:linear-gradient(135deg,var(--emerald-dark),var(--emerald));color:#fff;box-shadow:0 2px 10px rgba(16,185,129,0.30);}
@@ -159,14 +165,14 @@ select.form-input{cursor:pointer;}
 .btn:disabled{opacity:0.45;cursor:not-allowed;transform:none!important;box-shadow:none!important;}
 
 /* ── CHANGE PASSWORD PAGE ─────────────────────────────────────────── */
-#page-change-password{display:none;min-height:100vh;align-items:center;justify-content:center;background:linear-gradient(145deg,#4C1D95,#7C3AED);position:fixed;inset:0;z-index:500;}
+#page-change-password{display:none;min-height:100vh;align-items:center;justify-content:center;background:linear-gradient(145deg,#1E1B4B,#312E81);position:fixed;inset:0;z-index:500;}
 .form-card{background:var(--surface);border-radius:var(--r-xl);padding:44px 40px;width:100%;max-width:420px;box-shadow:var(--shadow-xl);}
 
 /* ── APP LAYOUT ───────────────────────────────────────────────────── */
 #app-layout{display:none;min-height:100vh;}
 
 /* TOP NAV */
-.top-nav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:100;background:linear-gradient(90deg,#4C1D95,#7C3AED,#A855F7);display:flex;align-items:center;padding:0 20px;box-shadow:0 2px 20px rgba(76,29,149,0.4);}
+.top-nav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:100;background:linear-gradient(90deg,#1E1B4B,#312E81,#3730A3);display:flex;align-items:center;padding:0 20px;box-shadow:0 1px 12px rgba(30,27,75,0.30);}
 .nav-brand{display:flex;align-items:center;gap:10px;margin-right:24px;}
 .nav-brand-pill{height:32px;padding:0 14px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:var(--r-full);font-size:13px;font-weight:800;color:#FCD34D;letter-spacing:-0.3px;display:flex;align-items:center;}
 .nav-brand-sub{font-size:11px;font-weight:600;color:rgba(255,255,255,0.5);display:none;}
@@ -180,7 +186,7 @@ select.form-input{cursor:pointer;}
 .nav-avatar:hover{transform:scale(1.08);}
 
 /* SIDEBAR */
-.sidebar{position:fixed;top:var(--nav-h);left:0;bottom:0;width:var(--sidebar-w);background:linear-gradient(180deg,#4C1D95 0%,#5B21B6 50%,#6D28D9 100%);padding:16px 10px;overflow-y:auto;z-index:50;display:none;box-shadow:4px 0 20px rgba(76,29,149,0.3);}
+.sidebar{position:fixed;top:var(--nav-h);left:0;bottom:0;width:var(--sidebar-w);background:linear-gradient(180deg,#1E1B4B 0%,#262058 50%,#2D2869 100%);padding:16px 10px;overflow-y:auto;z-index:50;display:none;box-shadow:3px 0 12px rgba(30,27,75,0.18);}
 @media(min-width:768px){.sidebar{display:block;}}
 .sidebar-section{font-size:10px;font-weight:800;color:rgba(252,211,77,0.6);letter-spacing:1.2px;text-transform:uppercase;padding:0 10px;margin:16px 0 4px;display:block;}
 .sidebar-section:first-child{margin-top:4px;}
@@ -222,12 +228,12 @@ select.form-input{cursor:pointer;}
 .stat-card{border-radius:var(--r);padding:20px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;transition:transform var(--t) var(--ease),box-shadow var(--t) var(--ease);color:#fff;border:none;}
 .stat-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
 .stat-card::after{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.10);}
-.stat-card-purple{background:linear-gradient(135deg,var(--purple-dark),var(--purple-light));}
-.stat-card-amber{background:linear-gradient(135deg,var(--amber-dark),var(--amber));}
-.stat-card-emerald{background:linear-gradient(135deg,var(--emerald-dark),var(--emerald));}
-.stat-card-coral{background:linear-gradient(135deg,var(--coral-dark),var(--coral));}
-.stat-card-sky{background:linear-gradient(135deg,var(--sky-dark),var(--sky));}
-.stat-card-pink{background:linear-gradient(135deg,#BE185D,var(--pink));}
+.stat-card-purple{background:linear-gradient(135deg,#312E81,#6366F1);}
+.stat-card-amber{background:linear-gradient(135deg,#92400E,#F59E0B);}
+.stat-card-emerald{background:linear-gradient(135deg,#134E4A,#14B8A6);}
+.stat-card-coral{background:linear-gradient(135deg,#991B1B,#F87171);}
+.stat-card-sky{background:linear-gradient(135deg,#0C4A6E,#38BDF8);}
+.stat-card-pink{background:linear-gradient(135deg,#3730A3,#A78BFA);}
 .stat-icon{font-size:22px;margin-bottom:10px;}
 .stat-label{font-size:11px;font-weight:700;opacity:0.85;margin-bottom:4px;letter-spacing:0.3px;}
 .stat-value{font-size:30px;font-weight:800;line-height:1;letter-spacing:-1px;margin-bottom:2px;}
@@ -360,7 +366,7 @@ tbody tr:hover{background:var(--purple-soft);}
 #mirai-bubble{background:var(--surface);border:1px solid var(--border);border-radius:12px 12px 2px 12px;padding:10px 14px;max-width:200px;font-size:12px;line-height:1.5;box-shadow:var(--shadow);font-weight:500;color:var(--text-2);}
 #mirai-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);width:320px;box-shadow:var(--shadow-lg);display:none;flex-direction:column;overflow:hidden;animation:slideUp 0.25s var(--ease);}
 #mirai-panel.open{display:flex;}
-.mirai-hdr{background:linear-gradient(135deg,#4C1D95,#7C3AED);padding:12px 14px;display:flex;align-items:center;gap:10px;}
+.mirai-hdr{background:linear-gradient(135deg,#1E1B4B,#3730A3);padding:12px 14px;display:flex;align-items:center;gap:10px;}
 .mirai-av{width:34px;height:34px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,0.3);flex-shrink:0;}
 .mirai-av img{width:100%;height:100%;object-fit:cover;object-position:top;}
 .mirai-hdr-name{font-size:13px;font-weight:700;color:#fff;}
@@ -371,18 +377,18 @@ tbody tr:hover{background:var(--purple-soft);}
 .mirai-msgs{padding:12px;max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;background:var(--surface2);}
 .mirai-msg{padding:8px 12px;border-radius:10px;font-size:12.5px;line-height:1.5;max-width:90%;}
 .mirai-msg.bot{background:var(--surface);color:var(--text);align-self:flex-start;border-bottom-left-radius:2px;box-shadow:var(--shadow-xs);}
-.mirai-msg.user{background:linear-gradient(135deg,var(--purple-dark),var(--purple));color:#fff;align-self:flex-end;border-bottom-right-radius:2px;}
+.mirai-msg.user{background:linear-gradient(135deg,#1E1B4B,#3730A3);color:#fff;align-self:flex-end;border-bottom-right-radius:2px;}
 .mirai-typing{font-size:11px;color:var(--text-muted);font-style:italic;align-self:flex-start;padding:2px 6px;}
 .mirai-input-row{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--border);background:var(--surface);}
 .mirai-input{flex:1;padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--r-full);font-size:12px;font-family:var(--font);outline:none;background:var(--surface2);transition:border-color var(--t-fast) var(--ease);}
 .mirai-input:focus{border-color:var(--purple);}
-.mirai-send{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--purple-light));border:none;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all var(--t-fast) var(--ease);}
+.mirai-send{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#312E81,#4F46E5);border:none;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all var(--t-fast) var(--ease);}
 .mirai-send:hover{transform:scale(1.05);}
 .mirai-send:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
-#mirai-fab{width:56px;height:56px;border-radius:50%;border:none;background:linear-gradient(135deg,#4C1D95,#7C3AED);cursor:pointer;overflow:hidden;padding:0;box-shadow:var(--shadow-lg),0 0 0 0 rgba(124,58,237,0.3);transition:transform var(--t) var(--ease);animation:fabPulse 3s ease-in-out infinite;}
+#mirai-fab{width:56px;height:56px;border-radius:50%;border:none;background:linear-gradient(135deg,#1E1B4B,#3730A3);cursor:pointer;overflow:hidden;padding:0;box-shadow:var(--shadow-lg),0 0 0 0 rgba(55,48,163,0.3);transition:transform var(--t) var(--ease);animation:fabPulse 3s ease-in-out infinite;}
 #mirai-fab:hover{transform:scale(1.08);animation:none;}
 #mirai-fab img{width:100%;height:100%;object-fit:cover;object-position:top;}
-@keyframes fabPulse{0%,100%{box-shadow:var(--shadow-lg),0 0 0 0 rgba(124,58,237,0.4);}50%{box-shadow:var(--shadow-lg),0 0 0 10px rgba(124,58,237,0);}}
+@keyframes fabPulse{0%,100%{box-shadow:var(--shadow-lg),0 0 0 0 rgba(55,48,163,0.35);}50%{box-shadow:var(--shadow-lg),0 0 0 10px rgba(55,48,163,0);}}
 
 /* ── JADWAL LEVEL MISMATCH ────────────────────────────────────────── */
 .level-mismatch-row td{background:var(--coral-soft)!important;}
@@ -427,12 +433,11 @@ tbody tr:hover{background:var(--purple-soft);}
     <div class="login-brand">
       <div class="login-wordmark">MIRAI</div>
       <div class="login-tagline">Mapping Individual Readiness, Aspirations &amp; Impact</div>
-      <div class="login-sub">Your development journey starts here</div>
+      <div class="login-sub">Your development journey, mapped.</div>
       <div class="login-features">
-        <div class="login-feat"><div class="login-feat-icon">📋</div>Self Assessment berbasis kompetensi</div>
-        <div class="login-feat"><div class="login-feat-icon">🎯</div>Scoring 30:70 Self + Leader</div>
-        <div class="login-feat"><div class="login-feat-icon">📅</div>Jadwal Training &amp; Enrollment</div>
-        <div class="login-feat"><div class="login-feat-icon">📈</div>Progress IDP &amp; L3 Evaluation</div>
+        <div class="login-feat"><div class="login-feat-icon">📋</div>Assessment — Competency Self-Evaluation</div>
+        <div class="login-feat"><div class="login-feat-icon">📅</div>Training Enrollment — Schedule &amp; Registration</div>
+        <div class="login-feat"><div class="login-feat-icon">🎯</div>Behavior Evaluation — L3 Kirkpatrick</div>
       </div>
     </div>
   </div>
@@ -440,24 +445,24 @@ tbody tr:hover{background:var(--purple-soft);}
     <div class="login-form-wrap">
       <div class="login-mobile-brand">
         <div class="login-logo-pill">MIRAI</div>
-        <div style="font-size:12px;color:var(--text-muted);line-height:1.4;">PT. Amerta Indah Otsuka<br>Development Platform</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.4;">PT. Amerta Indah Otsuka<br>IDP Platform</div>
       </div>
-      <div class="login-heading">Selamat datang 👋</div>
-      <div class="login-hint">Masuk dengan NIK kamu untuk mulai</div>
+      <div class="login-heading">Welcome back 👋</div>
+      <div class="login-hint">Sign in with your Employee ID to continue</div>
       <div class="form-group">
         <label class="form-label">Employee ID (NIK)</label>
-        <input type="text" id="login-nik" class="form-input mono" placeholder="Ketik NIK kamu" autocomplete="off">
+        <input type="text" id="login-nik" class="form-input mono" placeholder="Enter your NIK" autocomplete="off">
       </div>
       <div class="form-group">
         <label class="form-label">Password</label>
-        <input type="password" id="login-password" class="form-input" placeholder="Ketik password kamu">
+        <input type="password" id="login-password" class="form-input" placeholder="Enter your password">
       </div>
-      <button class="btn btn-primary btn-full btn-lg" onclick="doLogin()" style="margin-bottom:14px;">Masuk →</button>
+      <button class="btn btn-primary btn-full btn-lg" onclick="doLogin()" style="margin-bottom:14px;">Sign In →</button>
       <div style="text-align:center;">
-        <button onclick="showForgotPassword()" style="background:none;border:none;color:var(--purple);font-size:13px;cursor:pointer;font-family:var(--font);font-weight:600;text-decoration:underline;text-underline-offset:3px;">Lupa password?</button>
+        <button onclick="showForgotPassword()" style="background:none;border:none;color:var(--purple);font-size:13px;cursor:pointer;font-family:var(--font);font-weight:600;text-decoration:underline;text-underline-offset:3px;">Forgot password?</button>
       </div>
       <div style="margin-top:18px;padding:12px 14px;background:var(--purple-soft);border-radius:var(--r-sm);font-size:12px;color:var(--text-2);text-align:center;border:1px solid rgba(124,58,237,0.15);">
-        Password default: <strong style="font-family:var(--mono);">AIO + NIK</strong> · Harus diganti saat pertama login
+        Default password: <strong style="font-family:var(--mono);">AIO + NIK</strong> · Must be changed on first login
       </div>
     </div>
   </div>
@@ -468,12 +473,12 @@ tbody tr:hover{background:var(--purple-soft);}
   <div class="form-card">
     <div style="text-align:center;margin-bottom:24px;">
       <div style="width:52px;height:52px;background:var(--amber-soft);border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 12px;">🔐</div>
-      <div style="font-size:20px;font-weight:800;margin-bottom:4px;">Buat Password Baru</div>
-      <div style="font-size:13px;color:var(--text-2);">Password default harus diganti untuk keamanan akun.</div>
+      <div style="font-size:20px;font-weight:800;margin-bottom:4px;">Create New Password</div>
+      <div style="font-size:13px;color:var(--text-2);">Your default password must be changed for account security.</div>
     </div>
-    <div class="form-group"><label class="form-label">Password Baru</label><input type="password" id="new-password" class="form-input" placeholder="Minimal 6 karakter"></div>
-    <div class="form-group"><label class="form-label">Ulangi Password</label><input type="password" id="confirm-password" class="form-input" placeholder="Ketik ulang password baru"></div>
-    <button class="btn btn-primary btn-full btn-lg" onclick="doChangePassword()">Simpan Password</button>
+    <div class="form-group"><label class="form-label">New Password</label><input type="password" id="new-password" class="form-input" placeholder="Minimum 6 characters"></div>
+    <div class="form-group"><label class="form-label">Confirm Password</label><input type="password" id="confirm-password" class="form-input" placeholder="Ketik ulang password baru"></div>
+    <button class="btn btn-primary btn-full btn-lg" onclick="doChangePassword()">Save Password</button>
   </div>
 </div>
 
@@ -495,17 +500,17 @@ tbody tr:hover{background:var(--purple-soft);}
   <aside class="sidebar" id="sidebar"></aside>
   <nav class="bottom-nav" id="bottom-nav"></nav>
   <main class="main-content">
-    <div id="view-dashboard"       class="page-view"><div class="page-header"><div class="page-eyebrow">Overview</div><h1>Dashboard</h1><p id="dash-greeting">Selamat datang</p></div><div id="dash-content"></div></div>
-    <div id="view-assessment"      class="page-view"><div class="page-header"><div class="page-eyebrow">Self Assessment</div><h1>Competency Assessment</h1><p>Nilai kompetensimu berdasarkan indikator perilaku</p></div><div id="assessment-content"></div></div>
-    <div id="view-jadwal"          class="page-view"><div class="page-header"><div class="page-eyebrow">Training</div><h1>Jadwal Training</h1><p>Lihat dan daftar sesi training yang tersedia</p></div><div class="tab-row" id="jadwal-tabs"><button class="btn btn-primary btn-sm" onclick="setJadwalTab('my')" id="tab-my">Mandatory Saya</button><button class="btn btn-ghost btn-sm" onclick="setJadwalTab('all')" id="tab-all">Semua Jadwal</button></div><div id="jadwal-content"></div></div>
-    <div id="view-progress"        class="page-view"><div class="page-header"><div class="page-eyebrow">Development</div><h1>Progress IDP</h1><p>Pantau perkembangan program pengembangan individu kamu</p></div><div id="progress-content"></div></div>
-    <div id="view-corporate"       class="page-view"><div class="page-header"><div class="page-eyebrow">Training</div><h1>Corporate Mandatory</h1><p>Training wajib perusahaan untuk semua karyawan</p></div><div id="corporate-content"></div></div>
-    <div id="view-team-assessment" class="page-view"><div class="page-header"><div class="page-eyebrow">Leader</div><h1>Team Assessment</h1><p>Review hasil self-assessment dan tetapkan prioritas pengembangan</p></div><div id="team-assessment-content"></div></div>
-    <div id="view-team-monitor"    class="page-view"><div class="page-header"><div class="page-eyebrow">Leader</div><h1>Team Monitor</h1><p>Pantau progress training seluruh anggota tim</p></div><div class="tab-row"><button class="btn btn-primary btn-sm" onclick="setMonitorTab('progress')" id="tab-mon-p">Team Progress</button><button class="btn btn-ghost btn-sm" onclick="setMonitorTab('schedule')" id="tab-mon-s">Team Schedule</button></div><div id="team-monitor-content"></div></div>
-    <div id="view-l3-eval"         class="page-view"><div class="page-header"><div class="page-eyebrow">Leader</div><h1>L3 Kirkpatrick Evaluation</h1><p>Evaluasi implementasi perilaku hasil training</p></div><div id="l3-eval-content"></div></div>
-    <div id="view-admin"           class="page-view"><div class="page-header"><div class="page-eyebrow">Admin</div><h1>Admin Dashboard</h1><p>Ringkasan program IDP seluruh divisi</p></div><div id="admin-content"></div></div>
-    <div id="view-admin-users"     class="page-view"><div class="page-header"><div class="page-eyebrow">Admin</div><h1>Kelola Pengguna</h1><p>Data karyawan dan manajemen akses sistem</p></div><div id="admin-users-content"></div></div>
-    <div id="view-account"         class="page-view"><div class="page-header"><div class="page-eyebrow">Pengaturan</div><h1>Akun Saya</h1><p>Informasi profil dan pengaturan akun</p></div><div id="account-content"></div></div>
+    <div id="view-dashboard"       class="page-view"><div class="page-header"><div class="page-eyebrow">Overview</div><h1>Dashboard</h1><p id="dash-greeting">Welcome</p></div><div id="dash-content"></div></div>
+    <div id="view-assessment"      class="page-view"><div class="page-header"><div class="page-eyebrow">Self Assessment</div><h1>Competency Assessment</h1><p>Rate your competencies based on behavioral indicators</p></div><div id="assessment-content"></div></div>
+    <div id="view-jadwal"          class="page-view"><div class="page-header"><div class="page-eyebrow">Training</div><h1>Training Schedule</h1><p>View and enroll in available training sessions</p></div><div class="tab-row" id="jadwal-tabs"><button class="btn btn-primary btn-sm" onclick="setJadwalTab('my')" id="tab-my">My Mandatory</button><button class="btn btn-ghost btn-sm" onclick="setJadwalTab('all')" id="tab-all">All Schedules</button></div><div id="jadwal-content"></div></div>
+    <div id="view-progress"        class="page-view"><div class="page-header"><div class="page-eyebrow">Development</div><h1>Progress IDP</h1><p>Track your individual development program progress</p></div><div id="progress-content"></div></div>
+    <div id="view-corporate"       class="page-view"><div class="page-header"><div class="page-eyebrow">Training</div><h1>Corporate Mandatory</h1><p>Company-wide mandatory training sessions</p></div><div id="corporate-content"></div></div>
+    <div id="view-team-assessment" class="page-view"><div class="page-header"><div class="page-eyebrow">Leader</div><h1>Team Assessment</h1><p>Review team assessment results and set development priorities</p></div><div id="team-assessment-content"></div></div>
+    <div id="view-team-monitor"    class="page-view"><div class="page-header"><div class="page-eyebrow">Leader</div><h1>Team Monitor</h1><p>Monitor training progress across all team members</p></div><div class="tab-row"><button class="btn btn-primary btn-sm" onclick="setMonitorTab('progress')" id="tab-mon-p">Team Progress</button><button class="btn btn-ghost btn-sm" onclick="setMonitorTab('schedule')" id="tab-mon-s">Team Schedule</button></div><div id="team-monitor-content"></div></div>
+    <div id="view-l3-eval"         class="page-view"><div class="page-header"><div class="page-eyebrow">Leader</div><h1>L3 Kirkpatrick Evaluation</h1><p>Evaluate post-training behavioral implementation</p></div><div id="l3-eval-content"></div></div>
+    <div id="view-admin"           class="page-view"><div class="page-header"><div class="page-eyebrow">Admin</div><h1>Admin Dashboard</h1><p>Overall IDP program summary across all divisions</p></div><div id="admin-content"></div></div>
+    <div id="view-admin-users"     class="page-view"><div class="page-header"><div class="page-eyebrow">Admin</div><h1>Manage Users</h1><p>Employee data and system access management</p></div><div id="admin-users-content"></div></div>
+    <div id="view-account"         class="page-view"><div class="page-header"><div class="page-eyebrow">Settings</div><h1>My Account</h1><p>Profile information and account settings</p></div><div id="account-content"></div></div>
   </main>
 </div>
 
@@ -684,17 +689,17 @@ function buildNav() {
   const u = state.user;
   const isLeader = u.role && u.role.includes('leader');
   const isAdmin  = u.role === 'admin';
-  const empItems   = [{id:'dashboard',icon:'🏠',label:'Dashboard'},{id:'assessment',icon:'📋',label:'Assessment'},{id:'jadwal',icon:'📅',label:'Jadwal'},{id:'progress',icon:'📈',label:'Progress'},{id:'corporate',icon:'🏢',label:'Corporate'}];
-  const leaderItems = [{id:'team-assessment',icon:'👥',label:'Tim'},{id:'team-monitor',icon:'📊',label:'Monitor'},{id:'l3-eval',icon:'🎯',label:'L3 Eval'}];
+  const empItems   = [{id:'dashboard',icon:'🏠',label:'Dashboard'},{id:'assessment',icon:'📋',label:'Assessment'},{id:'jadwal',icon:'📅',label:'Schedule'},{id:'progress',icon:'📈',label:'Progress'},{id:'corporate',icon:'🏢',label:'Corporate'}];
+  const leaderItems = [{id:'team-assessment',icon:'👥',label:'Team'},{id:'team-monitor',icon:'📊',label:'Monitor'},{id:'l3-eval',icon:'🎯',label:'L3 Eval'}];
   const adminItems  = [{id:'admin',icon:'🛡️',label:'Admin'},{id:'admin-users',icon:'👤',label:'Pengguna'}];
-  let s = `<span class="sidebar-section">Menu Utama</span>`;
+  let s = `<span class="sidebar-section">Main Menu</span>`;
   empItems.forEach(i => { s += sItem(i); });
   if (isLeader) { s += `<span class="sidebar-section">Leader</span>`; leaderItems.forEach(i => { s += sItem(i); }); }
   if (isAdmin)  { s += `<span class="sidebar-section">Admin</span>`;  adminItems.forEach(i => { s += sItem(i); }); }
-  s += `<span class="sidebar-section">Akun</span>${sItem({id:'account',icon:'⚙️',label:'Akun'})}`;
-  s += `<div style="margin-top:6px;"><button class="sidebar-item" style="color:#FC8181;" onclick="doLogout()"><span class="sidebar-icon">🚪</span> Keluar</button></div>`;
+  s += `<span class="sidebar-section">Account</span>${sItem({id:'account',icon:'⚙️',label:'Account'})}`;
+  s += `<div style="margin-top:6px;"><button class="sidebar-item" style="color:#FC8181;" onclick="doLogout()"><span class="sidebar-icon">🚪</span> Sign Out</button></div>`;
   el('sidebar').innerHTML = s;
-  const mItems = [{id:'dashboard',icon:'🏠',label:'Home'},{id:'assessment',icon:'📋',label:'Assess'},{id:'jadwal',icon:'📅',label:'Jadwal'},{id:'progress',icon:'📈',label:'Progress'},{id:'account',icon:'⚙️',label:'Akun'}];
+  const mItems = [{id:'dashboard',icon:'🏠',label:'Home'},{id:'assessment',icon:'📋',label:'Assess'},{id:'jadwal',icon:'📅',label:'Schedule'},{id:'progress',icon:'📈',label:'Progress'},{id:'account',icon:'⚙️',label:'Account'}];
   el('bottom-nav').innerHTML = mItems.map(i => `<button class="bnav-item" id="bnav-${i.id}" onclick="navigateTo('${i.id}')"><div class="bnav-icon">${i.icon}</div><span>${i.label}</span></button>`).join('');
 }
 
@@ -731,8 +736,7 @@ async function loadDashboard() {
   // Assessment pending CTA
   if (d.assessment_status === 'pending') {
     content += `<div class="cta-card cta-card-amber">
-      <div><div style="font-weight:800;margin-bottom:3px;">Selesaikan Self Assessment</div>
-      <div style="font-size:13px;color:var(--text-2);">Mulai perjalanan IDP-mu dengan menilai kompetensi yang belum tercapai.</div></div>
+      <div><div style="font-weight:800;">Selesaikan Self Assessment</div></div>
       <button class="btn btn-primary" onclick="navigateTo('assessment')">Mulai Assessment →</button>
     </div>`;
   }
@@ -796,10 +800,24 @@ async function loadAssessment() {
   const u = state.user;
   const statusRes = await api('getAssessmentStatus', { nik: u.nik });
   if (statusRes.success && statusRes.data.has_submitted_final) {
-    // Show gap recommendation if already submitted
-    const gapRes = await api('getGapRecommendation', { nik: u.nik });
-    if (gapRes.success) { renderGapRecommendation(gapRes.data); return; }
-    html('assessment-content', `<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">✅</div><div class="empty-title">Assessment Selesai</div><div class="empty-desc">Kamu sudah submit self-assessment siklus ini. Menunggu review leader.</div></div></div></div>`);
+    // Revisi 3: Karyawan hanya lihat konfirmasi sederhana setelah submit.
+    // Gap recommendation dan achieved/gap info TIDAK ditampilkan ke karyawan.
+    // Data tersebut hanya tersedia di sisi leader (Team Assessment) dan HCD.
+    html('assessment-content', `
+      <div class="card" style="max-width:520px;margin:0 auto;">
+        <div class="card-body" style="text-align:center;padding:48px 32px;">
+          <div style="width:72px;height:72px;background:var(--emerald-soft);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 20px;">✅</div>
+          <div style="font-size:20px;font-weight:800;margin-bottom:8px;">Self Assessment Selesai</div>
+          <div style="font-size:14px;color:var(--text-2);line-height:1.6;margin-bottom:24px;">
+            Terima kasih sudah menyelesaikan self-assessment siklus ini.<br>
+            Hasil akan diproses oleh atasanmu.
+          </div>
+          <div style="background:var(--surface2);border-radius:var(--r);padding:16px 20px;font-size:13px;color:var(--text-muted);border:1px solid var(--border);">
+            Kamu akan mendapat notifikasi setelah atasan menetapkan prioritas pengembangan.
+          </div>
+        </div>
+      </div>
+    `);
     return;
   }
   if (!state.compLibrary) {
@@ -868,22 +886,15 @@ function renderAssessmentForm() {
   const lib      = state.compLibrary;
   const achieved = state.achievedComps || [];
   if ((!lib || !lib.length) && !achieved.length) {
-    html('assessment-content', `<div class="empty-state"><div class="empty-icon">🎉</div><div class="empty-title">Semua kompetensi sudah tercapai!</div><div class="empty-desc">Tidak ada gap kompetensi yang perlu di-assess siklus ini.</div></div>`);
+    // Revisi 3: Pesan netral — tidak menyebut "achieved" ke karyawan
+    html('assessment-content', `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Assessment tidak diperlukan siklus ini</div><div class="empty-desc">Hubungi HCD atau atasan kamu untuk informasi lebih lanjut.</div></div>`);
     return;
   }
   let content = `<div class="notice notice-amber"><div class="notice-icon">💡</div><div><strong>Petunjuk:</strong> Centang semua indikator perilaku yang <strong>konsisten</strong> kamu tunjukkan. Jujur — ini untuk pengembanganmu sendiri.</div></div>`;
 
-  if (achieved.length > 0) {
-    content += `<div class="card" style="margin-bottom:12px;border-left:3px solid var(--emerald);">
-      <div class="assessment-section-hdr" onclick="toggleAchievedSection()">
-        <div style="display:flex;align-items:center;gap:8px;"><span class="badge badge-emerald">✓</span><span style="font-weight:700;font-size:13px;">${achieved.length} kompetensi sudah achieved — tidak perlu dinilai ulang</span></div>
-        <span id="achieved-arrow" style="font-size:11px;color:var(--text-muted);">▼</span>
-      </div>
-      <div id="achieved-body" style="display:none;padding:0 18px 14px;">
-        ${achieved.map(c=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;"><span>${c.competency_name} <span style="font-family:var(--mono);font-size:11px;color:var(--text-muted);">${c.competency_id}</span></span><span style="font-weight:700;color:var(--emerald);">Level ${c.achieved_level}</span></div>`).join('')}
-      </div>
-    </div>`;
-  }
+  // Revisi 3: Achieved competency TIDAK ditampilkan ke karyawan.
+  // Info achieved/gap hanya untuk HCD dan leader (via Team Assessment).
+  // Karyawan hanya melihat kompetensi yang perlu dinilai (belum achieved).
 
   if (lib && lib.length > 0) {
     const typeOrder = {core:0,role:1,jf:2};
@@ -904,13 +915,7 @@ function renderAssessmentForm() {
   html('assessment-content', content);
 }
 
-function toggleAchievedSection() {
-  const b = el('achieved-body'), a = el('achieved-arrow');
-  if (!b) return;
-  const open = b.style.display!=='none';
-  b.style.display = open ? 'none' : 'block';
-  if (a) a.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
-}
+// toggleAchievedSection removed — Revisi 3: achieved info tidak ditampilkan ke karyawan
 
 function renderCompBlock(comp) {
   const cid = comp.competency_id;
@@ -1076,7 +1081,7 @@ function renderJadwal() {
         </div>
       </div>`;
     });
-    if (!sessions.length && !unschHTML) { html('jadwal-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">Belum ada sesi</div><div class="empty-desc">Lihat tab Semua Jadwal untuk sesi yang tersedia.</div></div></div></div>`); return; }
+    if (!sessions.length && !unschHTML) { html('jadwal-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">Belum ada sesi</div><div class="empty-desc">Lihat tab All Schedules untuk sesi yang tersedia.</div></div></div></div>`); return; }
     html('jadwal-content', (sessions.length>0?renderJadwalTable(sessions,enrolledIds):'')+unschHTML);
     return;
   }
@@ -1937,9 +1942,9 @@ async function loadAccount() {
       <div class="card-header"><div class="card-title">Ganti Password</div></div>
       <div class="card-body">
         <div class="form-group"><label class="form-label">Password Saat Ini</label><input type="password" id="acc-old" class="form-input" placeholder="Ketik password saat ini"></div>
-        <div class="form-group"><label class="form-label">Password Baru</label><input type="password" id="acc-new" class="form-input" placeholder="Minimal 6 karakter"></div>
-        <div class="form-group"><label class="form-label">Ulangi Password Baru</label><input type="password" id="acc-confirm" class="form-input" placeholder="Ketik ulang password baru"></div>
-        <button class="btn btn-primary" onclick="doAccChangePwd()">Simpan Password Baru</button>
+        <div class="form-group"><label class="form-label">New Password</label><input type="password" id="acc-new" class="form-input" placeholder="Minimum 6 characters"></div>
+        <div class="form-group"><label class="form-label">Ulangi New Password</label><input type="password" id="acc-confirm" class="form-input" placeholder="Ketik ulang password baru"></div>
+        <button class="btn btn-primary" onclick="doAccChangePwd()">Save Password Baru</button>
       </div>
     </div>
     <button class="btn btn-ghost" style="color:var(--coral);border-color:rgba(244,63,94,0.3);" onclick="doLogout()">🚪 Keluar</button>
