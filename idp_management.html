@@ -433,7 +433,7 @@ tbody tr:hover{background:var(--purple-soft);}
     <div class="login-brand">
       <div class="login-wordmark">MIRAI</div>
       <div class="login-tagline">Mapping Individual Readiness, Aspirations &amp; Impact</div>
-      <div class="login-sub">Your development journey, strats here.</div>
+      <div class="login-sub">Your development journey, mapped.</div>
       <div class="login-features">
         <div class="login-feat"><div class="login-feat-icon">📋</div>Assessment — Competency Self-Evaluation</div>
         <div class="login-feat"><div class="login-feat-icon">📅</div>Training Enrollment — Schedule &amp; Registration</div>
@@ -477,7 +477,7 @@ tbody tr:hover{background:var(--purple-soft);}
       <div style="font-size:13px;color:var(--text-2);">Your default password must be changed for account security.</div>
     </div>
     <div class="form-group"><label class="form-label">New Password</label><input type="password" id="new-password" class="form-input" placeholder="Minimum 6 characters"></div>
-    <div class="form-group"><label class="form-label">Confirm Password</label><input type="password" id="confirm-password" class="form-input" placeholder="Ketik ulang password baru"></div>
+    <div class="form-group"><label class="form-label">Confirm Password</label><input type="password" id="confirm-password" class="form-input" placeholder="Repeat new password"></div>
     <button class="btn btn-primary btn-full btn-lg" onclick="doChangePassword()">Save Password</button>
   </div>
 </div>
@@ -518,7 +518,7 @@ tbody tr:hover{background:var(--purple-soft);}
 
 <!-- ── MIRAI CHATBOT ──────────────────────────────────────────────── -->
 <div id="mirai-widget">
-  <div id="mirai-bubble">Ada pertanyaan soal IDP? Tanya Mirai!</div>
+  <div id="mirai-bubble">Have a question? Ask Mirai!</div>
   <div id="mirai-panel">
     <div class="mirai-hdr">
       <div class="mirai-av"><img src="https://res.cloudinary.com/dy5q2vnqp/image/upload/f_auto,q_auto/Gemini_Generated_Image_meauyumeauyumeau_f1xgqn" alt="Mirai" onerror="this.parentElement.innerHTML='<div style=\'width:100%;height:100%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:16px;\'>✨</div>'"></div>
@@ -528,7 +528,7 @@ tbody tr:hover{background:var(--purple-soft);}
     </div>
     <div class="mirai-msgs" id="mirai-messages"></div>
     <div class="mirai-input-row">
-      <input class="mirai-input" id="mirai-input" placeholder="Ketik pertanyaanmu..." onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendMirai()">
+      <input class="mirai-input" id="mirai-input" placeholder="Type your question..." onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendMirai()">
       <button class="mirai-send" id="mirai-send-btn" onclick="sendMirai()">→</button>
     </div>
   </div>
@@ -640,7 +640,7 @@ async function doChangePassword() {
   if (np !== cp) { toast('Password tidak cocok', 'error'); return; }
   const res = await api('changePassword', { nik: state.user.nik, new_password: np });
   if (!res.success) { toast(res.message, 'error'); return; }
-  toast('Password berhasil diubah!', 'success');
+  toast('Password updated successfully!', 'success');
   state.user.must_change_password = false;
   el('page-change-password').style.display = 'none';
   initApp();
@@ -656,12 +656,12 @@ function doLogout() {
 
 function showForgotPassword() {
   openModal(`<div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-header"><div class="modal-title">Lupa Password</div><button class="modal-close" onclick="closeModal()">×</button></div>
+    <div class="modal-header"><div class="modal-title">Forgot Password</div><button class="modal-close" onclick="closeModal()">×</button></div>
     <div class="modal-body">
-      <p style="font-size:13px;color:var(--text-2);margin-bottom:14px;">Masukkan NIK kamu. Link reset akan dikirim ke email terdaftar.</p>
-      <div class="form-group"><label class="form-label">NIK</label><input type="text" id="forgot-nik" class="form-input mono" placeholder="Ketik NIK kamu"></div>
+      <p style="font-size:13px;color:var(--text-2);margin-bottom:14px;">Enter your NIK. A reset link will be sent to your registered email.</p>
+      <div class="form-group"><label class="form-label">NIK</label><input type="text" id="forgot-nik" class="form-input mono" placeholder="Enter your NIK"></div>
     </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">Batal</button><button class="btn btn-primary" onclick="doForgotPassword()">Kirim Link Reset</button></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doForgotPassword()">Send Reset Link</button></div>
   </div>`);
 }
 
@@ -736,7 +736,7 @@ async function loadDashboard() {
   // Assessment pending CTA
   if (d.assessment_status === 'pending') {
     content += `<div class="cta-card cta-card-amber">
-      <div><div style="font-weight:800;">Selesaikan Self Assessment</div></div>
+      <div><div style="font-weight:800;">Complete Your Assessment</div></div>
       <button class="btn btn-primary" onclick="navigateTo('assessment')">Mulai Assessment →</button>
     </div>`;
   }
@@ -745,22 +745,22 @@ async function loadDashboard() {
   const assessIcon = d.assessment_status==='submitted' ? '✅' : '📋';
   content += `<div class="stats-grid">
     <div class="stat-card stat-card-purple"><div class="stat-icon">${assessIcon}</div><div class="stat-label">Assessment</div><div style="margin-top:4px;">${statusBadge(d.assessment_status)}</div></div>
-    <div class="stat-card stat-card-emerald"><div class="stat-icon">🎯</div><div class="stat-label">Mandatory</div><div class="stat-value">${doneM}<span style="font-size:16px;opacity:0.7;">/${totalM}</span></div><div class="stat-sub">Selesai</div></div>
-    <div class="stat-card stat-card-sky"><div class="stat-icon">📚</div><div class="stat-label">Terdaftar</div><div class="stat-value">${enrolledCount}</div><div class="stat-sub">Sesi aktif</div></div>
+    <div class="stat-card stat-card-emerald"><div class="stat-icon">🎯</div><div class="stat-label">Mandatory</div><div class="stat-value">${doneM}<span style="font-size:16px;opacity:0.7;">/${totalM}</span></div><div class="stat-sub">Completed</div></div>
+    <div class="stat-card stat-card-sky"><div class="stat-icon">📚</div><div class="stat-label">Enrolled</div><div class="stat-value">${enrolledCount}</div><div class="stat-sub">Active sessions</div></div>
     <div class="stat-card stat-card-amber"><div class="stat-icon">🏷️</div><div class="stat-label">Grade</div><div style="margin-top:8px;"><span class="badge" style="font-size:14px;padding:5px 16px;background:rgba(255,255,255,0.2);color:#fff;">${u.grade}</span></div></div>
   </div>`;
 
   // Mandatory progress bar
   if (totalM > 0) {
     content += `<div class="card" style="margin-bottom:14px;">
-      <div class="card-header"><div class="card-title">Progress Mandatory</div><span style="font-weight:800;color:var(--emerald);">${pct(doneM,totalM)}%</span></div>
-      <div class="card-body">${progBar(doneM,totalM,'emerald',10)}<div style="margin-top:6px;font-size:12px;color:var(--text-muted);">${doneM} dari ${totalM} kompetensi mandatory selesai</div></div>
+      <div class="card-header"><div class="card-title">Mandatory Progress</div><span style="font-weight:800;color:var(--emerald);">${pct(doneM,totalM)}%</span></div>
+      <div class="card-body">${progBar(doneM,totalM,'emerald',10)}<div style="margin-top:6px;font-size:12px;color:var(--text-muted);">${doneM} of ${totalM} mandatory competencies completed</div></div>
     </div>`;
   }
 
   // Pipeline
   if (pipeline.length > 0) {
-    content += `<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title">Kompetensi Saya</div></div><div class="card-body" style="padding:0 22px;">`;
+    content += `<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title">Competency Saya</div></div><div class="card-body" style="padding:0 22px;">`;
     pipeline.forEach(p => {
       const icons  = { assigned:'🎯', enrolled:'📚', completed:'✅' };
       const bgs    = { assigned:'var(--amber-soft)', enrolled:'var(--sky-soft)', completed:'var(--emerald-soft)' };
@@ -777,14 +777,14 @@ async function loadDashboard() {
     });
     content += `</div></div>`;
   } else if (d.assessment_status === 'submitted') {
-    content += `<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">Menunggu Leader</div><div class="empty-desc">Leader belum menetapkan prioritas pengembangan kamu.</div></div></div></div>`;
+    content += `<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">Awaiting Review</div><div class="empty-desc">Your manager has not yet set your development priorities.</div></div></div></div>`;
   }
 
   // Leader tools CTA
   if (isLeader) {
     content += `<div class="cta-card cta-card-purple" style="margin-top:14px;">
       <div><div style="font-weight:800;margin-bottom:3px;">Leader Tools</div>
-      <div style="font-size:13px;color:var(--text-2);">Review team assessment, monitor progress, dan evaluasi L3</div></div>
+      <div style="font-size:13px;color:var(--text-2);">Review team assessments, monitor progress, and conduct L3 evaluations</div></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn btn-ghost btn-sm" onclick="navigateTo('team-assessment')">Team Assessment</button>
         <button class="btn btn-ghost btn-sm" onclick="navigateTo('l3-eval')">L3 Eval</button>
@@ -799,27 +799,28 @@ async function loadDashboard() {
 async function loadAssessment() {
   const u = state.user;
   const statusRes = await api('getAssessmentStatus', { nik: u.nik });
+
+  // Gate: once submitted, form is fully locked — no content shown at all.
+  // Backend returns has_submitted_final=true regardless of period edge cases.
   if (statusRes.success && statusRes.data.has_submitted_final) {
-    // Revisi 3: Karyawan hanya lihat konfirmasi sederhana setelah submit.
-    // Gap recommendation dan achieved/gap info TIDAK ditampilkan ke karyawan.
-    // Data tersebut hanya tersedia di sisi leader (Team Assessment) dan HCD.
     html('assessment-content', `
       <div class="card" style="max-width:520px;margin:0 auto;">
         <div class="card-body" style="text-align:center;padding:48px 32px;">
           <div style="width:72px;height:72px;background:var(--emerald-soft);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 20px;">✅</div>
-          <div style="font-size:20px;font-weight:800;margin-bottom:8px;">Self Assessment Selesai</div>
-          <div style="font-size:14px;color:var(--text-2);line-height:1.6;margin-bottom:24px;">
-            Terima kasih sudah menyelesaikan self-assessment siklus ini.<br>
-            Hasil akan diproses oleh atasanmu.
+          <div style="font-size:20px;font-weight:800;margin-bottom:8px;color:var(--text);">Assessment Submitted</div>
+          <div style="font-size:14px;color:var(--text-2);line-height:1.7;margin-bottom:24px;">
+            Your self-assessment for this cycle has been recorded.<br>
+            Your manager will review and set your development priorities.
           </div>
-          <div style="background:var(--surface2);border-radius:var(--r);padding:16px 20px;font-size:13px;color:var(--text-muted);border:1px solid var(--border);">
-            Kamu akan mendapat notifikasi setelah atasan menetapkan prioritas pengembangan.
+          <div style="background:var(--surface2);border-radius:var(--r);padding:16px 20px;font-size:13px;color:var(--text-muted);border:1px solid var(--border);line-height:1.6;">
+            You will be notified once your manager has completed the review.
           </div>
         </div>
       </div>
     `);
     return;
   }
+
   if (!state.compLibrary) {
     const libRes = await api('getCompetencyLibrary', { nik: u.nik, department: u.department, division: u.division, grade: u.grade, has_subordinates: u.has_subordinates });
     if (!libRes.success) { html('assessment-content', `<p class="text-muted">${libRes.message}</p>`); return; }
@@ -832,6 +833,7 @@ async function loadAssessment() {
       }
     });
   }
+  // Pre-fill checkboxes from saved draft (scores tracked internally, not shown)
   if (statusRes.success && statusRes.data.scores.length > 0) {
     statusRes.data.scores.forEach(s => { state.assessmentScores[s.competency_id] = s.self_score; });
   }
@@ -856,11 +858,11 @@ function renderGapRecommendation(gaps) {
   </div>`;
 
   if (gapItems.length > 0) {
-    content += `<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title">Gap Kompetensi (${gapItems.length})</div></div><div class="table-wrap"><table class="mobile-card"><thead><tr><th>Kompetensi</th><th>Self</th><th>Leader</th><th>Final</th><th>Target</th><th>Gap</th><th>Status</th></tr></thead><tbody>`;
+    content += `<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title">Gap Competency (${gapItems.length})</div></div><div class="table-wrap"><table class="mobile-card"><thead><tr><th>Competency</th><th>Self</th><th>Leader</th><th>Final</th><th>Target</th><th>Gap</th><th>Status</th></tr></thead><tbody>`;
     gapItems.forEach(g => {
       const hasLeader = g.has_leader_score;
       content += `<tr>
-        <td data-label="Kompetensi"><strong>${g.competency_name}</strong><br><span style="font-family:var(--mono);font-size:11px;color:var(--text-muted);">${g.competency_id}</span></td>
+        <td data-label="Competency"><strong>${g.competency_name}</strong><br><span style="font-family:var(--mono);font-size:11px;color:var(--text-muted);">${g.competency_id}</span></td>
         <td data-label="Self"><span class="score-chip score-chip-self">L${g.self_score}</span></td>
         <td data-label="Leader">${hasLeader ? `<span class="score-chip score-chip-leader">L${g.leader_score}</span>` : '<span class="badge badge-gray">Belum</span>'}</td>
         <td data-label="Final"><span class="score-chip score-chip-final">${g.final_score}</span></td>
@@ -873,9 +875,9 @@ function renderGapRecommendation(gaps) {
   }
 
   if (doneItems.length > 0) {
-    content += `<div class="card"><div class="card-header"><div class="card-title">Kompetensi Sudah Tercapai (${doneItems.length})</div></div><div class="card-body" style="padding:0 22px;">`;
+    content += `<div class="card"><div class="card-header"><div class="card-title">Competency Sudah Tercapai (${doneItems.length})</div></div><div class="card-body" style="padding:0 22px;">`;
     doneItems.forEach(g => {
-      content += `<div class="pipeline-item"><div class="pipeline-icon" style="background:var(--emerald-soft);">✅</div><div class="pipeline-info"><div class="pipeline-name">${g.competency_name}</div><div class="pipeline-meta">${g.competency_id} · Level ${g.achievement_level} (dari ${g.achievement_source==='training_history'?'riwayat training':g.achievement_source==='leader'?'leader approval':'self assessment'})</div></div><span class="badge badge-emerald">Achieved</span></div>`;
+      content += `<div class="pipeline-item"><div class="pipeline-icon" style="background:var(--emerald-soft);">✅</div><div class="pipeline-info"><div class="pipeline-name">${g.competency_name}</div><div class="pipeline-meta">${g.competency_id} · Level ${g.achievement_level} (of ${g.achievement_source==='training_history'?'training history':g.achievement_source==='leader'?'leader approval':'self assessment'})</div></div><span class="badge badge-emerald">Achieved</span></div>`;
     });
     content += `</div></div>`;
   }
@@ -886,13 +888,13 @@ function renderAssessmentForm() {
   const lib      = state.compLibrary;
   const achieved = state.achievedComps || [];
   if ((!lib || !lib.length) && !achieved.length) {
-    // Revisi 3: Pesan netral — tidak menyebut "achieved" ke karyawan
-    html('assessment-content', `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Assessment tidak diperlukan siklus ini</div><div class="empty-desc">Hubungi HCD atau atasan kamu untuk informasi lebih lanjut.</div></div>`);
+    // Revisi 3: Pesan netral — tidak menyebut "achieved" ke employees
+    html('assessment-content', `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No assessment required this cycle</div><div class="empty-desc">Please contact HCD or your manager for further information.</div></div>`);
     return;
   }
-  let content = `<div class="notice notice-amber"><div class="notice-icon">💡</div><div><strong>Petunjuk:</strong> Centang semua indikator perilaku yang <strong>konsisten</strong> kamu tunjukkan. Jujur — ini untuk pengembanganmu sendiri.</div></div>`;
+  let content = `<div class="notice notice-amber"><div class="notice-icon">💡</div><div><strong>Instruction:</strong> Check all behavioral indicators that you <strong>consistently</strong> demonstrate. Be honest — this is for your own development.</div></div>`;
 
-  // Revisi 3: Achieved competency TIDAK ditampilkan ke karyawan.
+  // Revisi 3: Achieved competency TIDAK ditampilkan ke employees.
   // Info achieved/gap hanya untuk HCD dan leader (via Team Assessment).
   // Karyawan hanya melihat kompetensi yang perlu dinilai (belum achieved).
 
@@ -908,26 +910,24 @@ function renderAssessmentForm() {
       content += `</div>`;
     });
     content += `<div style="display:flex;gap:10px;margin-top:24px;padding-top:18px;border-top:1px solid var(--border);">
-      <button class="btn btn-ghost" onclick="saveDraft()">💾 Simpan Draft</button>
-      <button class="btn btn-primary btn-lg" onclick="confirmFinalSubmit()">Submit Final →</button>
+      <button class="btn btn-ghost" onclick="saveDraft()">💾 Save Draft</button>
+      <button class="btn btn-primary btn-lg" onclick="confirmFinalSubmit()">Submit →</button>
     </div>`;
   }
   html('assessment-content', content);
 }
 
-// toggleAchievedSection removed — Revisi 3: achieved info tidak ditampilkan ke karyawan
+// toggleAchievedSection removed — Revisi 3: achieved info tidak ditampilkan ke employees
 
 function renderCompBlock(comp) {
   const cid = comp.competency_id;
-  const score = state.assessmentScores[cid] || 0;
+  // FIX: No score display to employee at any point — score is internal only.
+  // state.assessmentScores is still tracked for submission, just not shown.
   const typeColor = {core:'badge-purple',role:'badge-sky',jf:'badge-amber'};
   let out = `<div class="assessment-section" id="comp-block-${cid}">
     <div class="assessment-section-hdr" onclick="toggleComp('${cid}')">
       <div style="display:flex;align-items:center;gap:8px;"><span class="badge ${typeColor[comp.competency_type]||'badge-gray'}">${cid}</span><span style="font-weight:700;font-size:14px;">${comp.competency_name}</span></div>
-      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-        <span id="score-badge-${cid}" style="font-size:12px;font-weight:800;color:${score>0?'var(--purple)':'var(--text-muted)'};">${score>0?`Level ${score}`:'Belum dinilai'}</span>
-        <span id="arrow-${cid}" style="transition:transform 0.2s;font-size:11px;color:var(--text-muted);">▼</span>
-      </div>
+      <span id="arrow-${cid}" style="transition:transform 0.2s;font-size:11px;color:var(--text-muted);">▼</span>
     </div>
     <div id="comp-body-${cid}" style="display:none;">`;
   for (let level=1; level<=5; level++) {
@@ -977,10 +977,9 @@ function recalcScore(cid) {
 }
 
 function refreshCompBlock(cid) {
+  // Score badge removed from UI — only update checkbox visuals
   const comp = state.compLibrary.find(c => c.competency_id===cid);
   if (!comp) return;
-  const sb = el(`score-badge-${cid}`);
-  if (sb) { const s=state.assessmentScores[cid]||0; sb.textContent=s>0?`Level ${s}`:'Belum dinilai'; sb.style.color=s>0?'var(--purple)':'var(--text-muted)'; }
   for (let l=1; l<=5; l++) {
     const inds = comp.levels[l]||[];
     inds.forEach((_,idx) => {
@@ -1004,19 +1003,25 @@ async function saveDraft() {
 
 function confirmFinalSubmit() {
   openModal(`<div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-header"><div class="modal-title">Konfirmasi Submit Final</div><button class="modal-close" onclick="closeModal()">×</button></div>
+    <div class="modal-header"><div class="modal-title">Confirm Final Submission</div><button class="modal-close" onclick="closeModal()">×</button></div>
     <div class="modal-body">
-      <div class="notice notice-amber"><div class="notice-icon">⚠️</div><div>Setelah submit final, assessment <strong>tidak bisa diubah</strong>. Pastikan semua indikator sudah diisi dengan jujur.</div></div>
+      <div class="notice notice-amber"><div class="notice-icon">⚠️</div><div>Once submitted, your assessment <strong>cannot be changed</strong>. Please ensure all indicators are filled in honestly.</div></div>
     </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">Batal</button><button class="btn btn-primary" onclick="doFinalSubmit()">Ya, Submit Final</button></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doFinalSubmit()">Yes, Submit</button></div>
   </div>`);
 }
 
 async function doFinalSubmit() {
   closeModal();
   const res = await api('submitAssessment', { nik:state.user.nik, scores:buildAssessmentScores(), is_final:true });
-  if (res.success) { toast('Assessment berhasil di-submit!', 'success'); state.compLibrary=null; loadAssessment(); }
-  else toast(res.message, 'error');
+  if (res.success) {
+    toast('Assessment submitted successfully.', 'success');
+    // Reset library so next loadAssessment fetches fresh data
+    state.compLibrary = null;
+    state.assessmentScores = {};
+    state.assessmentChecks = {};
+    loadAssessment();
+  } else toast(res.message, 'error');
 }
 
 // ── JADWAL ─────────────────────────────────────────────────────
@@ -1077,20 +1082,20 @@ function renderJadwal() {
           <div style="width:38px;height:38px;background:var(--amber-soft);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">📋</div>
           <div style="flex:1;"><div style="font-weight:700;margin-bottom:2px;">${name}</div>
           <div style="font-size:11px;font-family:var(--mono);color:var(--text-muted);margin-bottom:5px;">${cid}</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="badge badge-amber">Segera dijadwalkan</span>${levelBadge(al,isF)}</div></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="badge badge-amber">To be scheduled</span>${levelBadge(al,isF)}</div></div>
         </div>
       </div>`;
     });
-    if (!sessions.length && !unschHTML) { html('jadwal-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">Belum ada sesi</div><div class="empty-desc">Lihat tab All Schedules untuk sesi yang tersedia.</div></div></div></div>`); return; }
+    if (!sessions.length && !unschHTML) { html('jadwal-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">No sessions available</div><div class="empty-desc">Lihat tab All Schedules untuk sesi yang tersedia.</div></div></div></div>`); return; }
     html('jadwal-content', (sessions.length>0?renderJadwalTable(sessions,enrolledIds):'')+unschHTML);
     return;
   }
-  if (!sessions.length) { html('jadwal-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">Belum ada jadwal</div><div class="empty-desc">Belum ada sesi training untuk grade kamu.</div></div></div></div>`); return; }
+  if (!sessions.length) { html('jadwal-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">No schedule available</div><div class="empty-desc">No sessions available training untuk grade kamu.</div></div></div></div>`); return; }
   html('jadwal-content', renderJadwalTable(sessions, enrolledIds));
 }
 
 function renderJadwalTable(sessions, enrolledIds) {
-  let c = `<div class="card"><div class="table-wrap"><table class="mobile-card"><thead><tr><th>Tanggal</th><th>Waktu</th><th>Kompetensi</th><th>Trainer</th><th>Lokasi</th><th>Tipe</th><th>Assigned</th><th>Status</th><th>Aksi</th></tr></thead><tbody>`;
+  let c = `<div class="card"><div class="table-wrap"><table class="mobile-card"><thead><tr><th>Tanggal</th><th>Waktu</th><th>Competency</th><th>Trainer</th><th>Lokasi</th><th>Tipe</th><th>Assigned</th><th>Status</th><th>Aksi</th></tr></thead><tbody>`;
   sessions.forEach(s => {
     const isEnrolled = enrolledIds.includes(s.session_id);
     const tt = (s.training_type||'').toLowerCase();
@@ -1104,18 +1109,18 @@ function renderJadwalTable(sessions, enrolledIds) {
     if (al) {
       assignCell = levelBadge(al,isF);
       if (sessLvl>0&&sessLvl!==al) { rowClass='level-mismatch-row'; assignCell += `<div class="level-warn">⚠ Sesi ini L${sessLvl}, bukan L${al}</div>`; }
-      else if (sessLvl>0&&sessLvl===al) { assignCell += `<div class="level-ok">✓ Level sesuai</div>`; }
+      else if (sessLvl>0&&sessLvl===al) { assignCell += `<div class="level-ok">✓ Level matches</div>`; }
     }
     c += `<tr class="${rowClass}">
       <td data-label="Tanggal" style="white-space:nowrap;font-weight:600;">${dateDisplay}</td>
       <td data-label="Waktu" style="color:var(--text-2);">${s.time||'—'}</td>
-      <td data-label="Kompetensi"><div style="font-weight:700;">${s.competency_name||s.competency_id}</div><div style="font-size:11px;font-family:var(--mono);color:var(--text-muted);">${s.competency_id}${sessLvl>0?' · L'+sessLvl:''}</div></td>
+      <td data-label="Competency"><div style="font-weight:700;">${s.competency_name||s.competency_id}</div><div style="font-size:11px;font-family:var(--mono);color:var(--text-muted);">${s.competency_id}${sessLvl>0?' · L'+sessLvl:''}</div></td>
       <td data-label="Trainer">${s.trainer||'—'}</td>
       <td data-label="Lokasi">${s.location||s.area||'—'}</td>
       <td data-label="Tipe">${typeBadge}</td>
       <td data-label="Assigned">${assignCell}</td>
-      <td data-label="Status">${isEnrolled?'<span class="badge badge-emerald">Terdaftar</span>':'<span class="badge badge-gray">Belum daftar</span>'}</td>
-      <td>${isEnrolled?`<button class="btn btn-ghost btn-sm" onclick="doCancelEnroll('${s.session_id}')">Batal</button>`:`<button class="btn btn-primary btn-sm" onclick="doEnroll('${s.competency_id}','${s.session_id}')">Daftar</button>`}</td>
+      <td data-label="Status">${isEnrolled?'<span class="badge badge-emerald">Enrolled</span>':'<span class="badge badge-gray">Not enrolled</span>'}</td>
+      <td>${isEnrolled?`<button class="btn btn-ghost btn-sm" onclick="doCancelEnroll('${s.session_id}')">Cancel</button>`:`<button class="btn btn-primary btn-sm" onclick="doEnroll('${s.competency_id}','${s.session_id}')">Enroll</button>`}</td>
     </tr>`;
   });
   c += `</tbody></table></div></div>`;
@@ -1127,7 +1132,7 @@ async function doEnroll(compId, sessionId) {
   const al = state.mandatoryLevelMap[compId];
   const sl = Number(session.level)||0;
   if (al && sl>0 && sl!==al) {
-    const ok = confirm(`Perhatian: sesi ini Level ${sl}, level yang ditugaskan untuk kamu adalah Level ${al}.\n\nLanjutkan daftar ke sesi ini?`);
+    const ok = confirm(`Note: this session is Level ${sl}, but your assigned level is Level ${al}.\n\nProceed with enrollment?`);
     if (!ok) return;
   }
   const btn = document.querySelector(`button[onclick="doEnroll('${compId}','${sessionId}')"]`);
@@ -1140,7 +1145,7 @@ async function doEnroll(compId, sessionId) {
     showCalendarModal(session);
   } else {
     toast(res.message,'error');
-    if (btn) { btn.disabled=false; btn.textContent='Daftar'; }
+    if (btn) { btn.disabled=false; btn.textContent='Enroll'; }
   }
 }
 
@@ -1148,8 +1153,8 @@ async function doCancelEnroll(sessionId) {
   const btn = document.querySelector(`button[onclick="doCancelEnroll('${sessionId}')"]`);
   if (btn) { btn.disabled=true; btn.textContent='...'; }
   const res = await apiFast('cancelEnrollment', { nik:state.user.nik, session_id:sessionId });
-  if (res.success) { state.enrollments=state.enrollments.filter(e=>e.session_id!==sessionId); renderJadwal(); toast('Pendaftaran dibatalkan','success'); }
-  else { toast(res.message,'error'); if (btn) { btn.disabled=false; btn.textContent='Batal'; } }
+  if (res.success) { state.enrollments=state.enrollments.filter(e=>e.session_id!==sessionId); renderJadwal(); toast('Enrollment cancelled','success'); }
+  else { toast(res.message,'error'); if (btn) { btn.disabled=false; btn.textContent='Cancel'; } }
 }
 
 function buildCalendarUrl(s) {
@@ -1184,18 +1189,18 @@ function showCalendarModal(session) {
   const isSL   = (session.training_type||'').toLowerCase().includes('self');
   const dateDisplay = isSL&&session.date_end?`${session.date} – ${session.date_end}`:`${session.date}${session.time?' · '+session.time:''}`;
   openModal(`<div class="modal" onclick="event.stopPropagation()" style="max-width:420px;">
-    <div class="modal-header"><div class="modal-title">Berhasil Terdaftar!</div><button class="modal-close" onclick="closeModal()">×</button></div>
+    <div class="modal-header"><div class="modal-title">Enrollment Confirmed!</div><button class="modal-close" onclick="closeModal()">×</button></div>
     <div class="modal-body">
-      <div class="notice notice-emerald" style="margin-bottom:16px;"><div class="notice-icon">✅</div><div>Kamu berhasil mendaftar ke sesi ini.</div></div>
+      <div class="notice notice-emerald" style="margin-bottom:16px;"><div class="notice-icon">✅</div><div>You have successfully enrolled in this session.</div></div>
       <div style="background:var(--surface2);border-radius:var(--r);padding:14px;margin-bottom:16px;">
         <div style="font-weight:800;margin-bottom:6px;">${session.competency_name||session.competency_id}</div>
         <div style="font-size:12px;color:var(--text-2);display:flex;flex-direction:column;gap:4px;">
           <span>📅 ${dateDisplay}</span><span>📍 ${session.location||session.area||'—'}</span><span>👤 ${session.trainer||'—'}</span>
         </div>
       </div>
-      <a href="${calUrl}" target="_blank" rel="noopener" class="btn btn-primary btn-full" style="text-decoration:none;justify-content:center;">📅 Tambah ke Google Calendar</a>
+      <a href="${calUrl}" target="_blank" rel="noopener" class="btn btn-primary btn-full" style="text-decoration:none;justify-content:center;">📅 Add to Google Calendar</a>
     </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">Tutup</button></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">Close</button></div>
   </div>`);
 }
 
@@ -1204,7 +1209,7 @@ async function loadProgress() {
   const res = await api('getDashboard', { nik:state.user.nik });
   if (!res.success) { html('progress-content',`<p class="text-muted">${res.message}</p>`); return; }
   const pipeline = res.data.pipeline||[];
-  if (!pipeline.length) { html('progress-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📈</div><div class="empty-title">Belum ada data progress</div><div class="empty-desc">Selesaikan self-assessment dan tunggu assignment dari leader kamu.</div></div></div></div>`); return; }
+  if (!pipeline.length) { html('progress-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📈</div><div class="empty-title">No progress data yet</div><div class="empty-desc">Complete your self-assessment and wait for your manager's assignment.</div></div></div></div>`); return; }
   const mandatory  = pipeline.filter(p=>p.decision==='mandatory');
   const additional = pipeline.filter(p=>p.decision==='additional');
   const rSec = (title, items, color) => {
@@ -1234,11 +1239,11 @@ async function loadCorporate() {
   const res = await api('getCorporateMandatory', { nik:u.nik, grade:u.grade });
   if (!res.success) { html('corporate-content',`<p class="text-muted">${res.message}</p>`); return; }
   const d = res.data, sessions = d.sessions||[];
-  if (!sessions.length) { html('corporate-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">🏢</div><div class="empty-title">Belum ada training mandatory</div><div class="empty-desc">Belum ada training wajib untuk grade kamu.</div></div></div></div>`); return; }
+  if (!sessions.length) { html('corporate-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">🏢</div><div class="empty-title">No mandatory training found</div><div class="empty-desc">No mandatory training assigned to your grade yet.</div></div></div></div>`); return; }
   const colorClass = d.completion_pct>=100?'stat-card-emerald':d.completion_pct>=50?'stat-card-amber':'stat-card-coral';
   let content = `<div class="stats-grid" style="margin-bottom:18px;">
     <div class="stat-card stat-card-purple"><div class="stat-icon">📚</div><div class="stat-label">Total Training</div><div class="stat-value">${d.total}</div></div>
-    <div class="stat-card stat-card-emerald"><div class="stat-icon">✅</div><div class="stat-label">Selesai</div><div class="stat-value">${d.completed}</div></div>
+    <div class="stat-card stat-card-emerald"><div class="stat-icon">✅</div><div class="stat-label">Completed</div><div class="stat-value">${d.completed}</div></div>
     <div class="stat-card ${colorClass}" style="grid-column:span 2;"><div class="stat-icon">📊</div><div class="stat-label">Completion Rate</div><div class="stat-value">${d.completion_pct}%</div><div style="margin-top:8px;">${progBar(d.completed,d.total,'emerald',8)}</div></div>
   </div>`;
   const rCorpSec = (items, label, icon, iconBg, borderColor) => {
@@ -1246,7 +1251,7 @@ async function loadCorporate() {
     let o = `<div style="font-size:11px;font-weight:800;color:var(--text-muted);letter-spacing:0.6px;text-transform:uppercase;margin:18px 0 8px;">${label}</div>`;
     items.forEach(s => {
       const bm = {completed:'badge-emerald',overdue:'badge-coral',pending:'badge-gray'};
-      const lm = {completed:'Selesai',overdue:'Overdue',pending:'Pending'};
+      const lm = {completed:'Completed',overdue:'Overdue',pending:'Pending'};
       o += `<div class="corp-card" style="border-left:3px solid ${borderColor};">
         <div class="corp-icon" style="background:${iconBg};">${icon}</div>
         <div style="flex:1;min-width:0;"><div style="font-weight:700;margin-bottom:2px;">${s.training_name}</div>
@@ -1261,7 +1266,7 @@ async function loadCorporate() {
   content += `<div class="card"><div class="card-body">
     ${rCorpSec(overdue,'Overdue','⚠️','var(--coral-soft)','var(--coral)')}
     ${rCorpSec(pending,'Upcoming','📋','var(--purple-soft)','var(--purple)')}
-    ${rCorpSec(completed,'Selesai','✅','var(--emerald-soft)','var(--emerald)')}
+    ${rCorpSec(completed,'Completed','✅','var(--emerald-soft)','var(--emerald)')}
   </div></div>`;
   html('corporate-content', content);
 }
@@ -1280,8 +1285,8 @@ function renderTeamList() {
   const allAssigned = team.filter(m=>m.has_submitted).every(m=>m.already_assigned);
   const pendingCount = team.filter(m=>m.has_submitted&&!m.already_assigned).length;
   let content = `<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
-    <button class="btn btn-sky" onclick="downloadAssignmentPDF()" ${!allAssigned?'disabled':''}>⬇ Download PDF Assignment</button>
-    ${!allAssigned?`<span style="font-size:12px;color:var(--text-muted);">${pendingCount} anggota belum di-assign</span>`:''}
+    <button class="btn btn-sky" onclick="downloadAssignmentPDF()" ${!allAssigned?'disabled':''}>⬇ Download Assignment PDF</button>
+    ${!allAssigned?`<span style="font-size:12px;color:var(--text-muted);">${pendingCount} member(s) not yet assigned</span>`:''}
   </div>`;
   content += `<div class="card"><div class="table-wrap"><table class="mobile-card"><thead><tr><th>Nama</th><th>Grade</th><th>Dept</th><th>Assessment</th><th>Assignment</th><th>Mandatory</th><th>Aksi</th></tr></thead><tbody>`;
   team.forEach(m => {
@@ -1289,10 +1294,10 @@ function renderTeamList() {
       <td data-label="Nama"><strong>${m.name}</strong><br><span style="font-size:11px;font-family:var(--mono);color:var(--text-muted);">${m.nik}</span></td>
       <td data-label="Grade"><span class="badge ${gradeColor(m.grade)}">${m.grade}</span></td>
       <td data-label="Dept" style="font-size:12px;">${m.department}</td>
-      <td data-label="Assessment">${m.has_submitted?'<span class="badge badge-emerald">Selesai</span>':'<span class="badge badge-gray">Pending</span>'}</td>
+      <td data-label="Assessment">${m.has_submitted?'<span class="badge badge-emerald">Completed</span>':'<span class="badge badge-gray">Pending</span>'}</td>
       <td data-label="Assignment">${m.already_assigned?'<span class="badge badge-sky">Done</span>':'<span class="badge badge-amber">Pending</span>'}</td>
       <td data-label="Mandatory"><span style="font-weight:800;color:var(--coral);">${m.mandatory_count}</span>/2</td>
-      <td>${m.has_submitted?`<button class="btn btn-primary btn-sm" onclick="openAssignModal('${m.nik}')">Review & Assign</button>`:'<span class="text-muted text-sm">Menunggu assessment</span>'}</td>
+      <td>${m.has_submitted?`<button class="btn btn-primary btn-sm" onclick="openAssignModal('${m.nik}')">Review & Assign</button>`:'<span class="text-muted text-sm">Awaiting assessment</span>'}</td>
     </tr>`;
   });
   content += `</tbody></table></div></div>`;
@@ -1321,9 +1326,9 @@ function openAssignModal(memberNik) {
       const statusEl   = isAchieved
         ? `<span class="badge badge-emerald">✓ Achieved (L${c.last_known_level})</span>`
         : c.achievement_status==='not_assessed'
-          ? `<span class="badge badge-gray">Belum Pernah Dinilai</span>`
+          ? `<span class="badge badge-gray">Never Assessed</span>`
           : `<span class="badge badge-amber">Gap — L${c.last_known_level} → Target L${c.target_level}</span>`;
-      const upHint = isAchieved&&c.target_level<5 ? `<div style="font-size:11px;color:var(--emerald);margin-top:4px;">Tidak ada gap. Untuk upskilling, pilih Observed Level ${Math.min(c.target_level+1,5)}+</div>` : '';
+      const upHint = isAchieved&&c.target_level<5 ? `<div style="font-size:11px;color:var(--emerald);margin-top:4px;">No gap detected. For upskilling, select Observed Level ${Math.min(c.target_level+1,5)}+</div>` : '';
       compRows += `<div id="comp-assign-${memberNik}-${c.competency_id}" style="border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:8px;overflow:hidden;${isAchieved?'opacity:0.85;':''}">
         <div style="padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;background:var(--surface);">
           <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
@@ -1342,7 +1347,7 @@ function openAssignModal(memberNik) {
           <label style="font-size:11px;font-weight:700;color:var(--purple-dark);white-space:nowrap;">Observed level:</label>
           <select id="ll-${memberNik}-${c.competency_id}" onchange="setLeaderLevel('${memberNik}','${c.competency_id}',this.value)"
             style="padding:5px 10px;border:1.5px solid var(--purple);border-radius:var(--r-sm);font-size:12px;font-family:var(--font);font-weight:600;background:#fff;cursor:pointer;outline:none;">
-            <option value="">— Pilih level yang diobservasi —</option>
+            <option value="">— Select observed level —</option>
             ${[1,2,3,4,5].map(l=>`<option value="${l}" ${c.leader_level==l?'selected':''}>Level ${l}</option>`).join('')}
           </select>
           <span style="font-size:11px;color:var(--text-muted);">Target: L${c.target_level}</span>
@@ -1359,16 +1364,16 @@ function openAssignModal(memberNik) {
     <div class="modal-body">
       <div class="notice notice-amber"><div class="notice-icon">⚠️</div>
         <div><strong>Maks. 2 Mandatory</strong> per anggota. Observed level akan digunakan dalam perhitungan 30:70.
-        <div id="mand-counter" style="margin-top:3px;font-weight:700;">Mandatory dipilih: ${initCount}/2</div></div>
+        <div id="mand-counter" style="margin-top:3px;font-weight:700;">Mandatory selected: ${initCount}/2</div></div>
       </div>
       <div class="notice notice-purple" style="font-size:12px;"><div class="notice-icon">📊</div>
-        <div>Final Score = Self Assessment × 30% + Observed Level × 70%. Kompetensi dengan gap terbesar muncul paling atas.</div>
+        <div>Final Score = Self Assessment × 30% + Observed Level × 70%. Competencies with the largest gap appear first.</div>
       </div>
       ${compRows}
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
-      <button class="btn btn-emerald" onclick="doSaveApproval('${memberNik}')">💾 Simpan Assignment</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-emerald" onclick="doSaveApproval('${memberNik}')">💾 Save Assignment</button>
     </div>
   </div>`);
   window._curDecisions   = decisions;
@@ -1387,13 +1392,13 @@ function setDecision(mNik, compId, decision) {
   const btns = el(`dec-btns-${mNik}-${compId}`)?.querySelectorAll('button');
   if (btns) { btns[0].className=`btn btn-sm ${decision==='mandatory'?'btn-coral':'btn-ghost'}`; btns[1].className=`btn btn-sm ${decision==='additional'?'btn-primary':'btn-ghost'}`; btns[2].className='btn btn-sm btn-ghost'; }
   const ctr = el('mand-counter');
-  if (ctr) ctr.textContent=`Mandatory dipilih: ${Object.values(window._curDecisions).filter(d=>d==='mandatory').length}/2`;
+  if (ctr) ctr.textContent=`Mandatory selected: ${Object.values(window._curDecisions).filter(d=>d==='mandatory').length}/2`;
 }
 
 async function doSaveApproval(memberNik) {
   const decisions = Object.entries(window._curDecisions).map(([cid,dec]) => ({ competency_id:cid, decision:dec, suggestion:'', leader_level:window._curLeaderLvls?.[cid]||'' }));
   const res = await api('saveApproval', { leader_nik:state.user.nik, member_nik:memberNik, decisions });
-  if (res.success) { toast('Assignment berhasil disimpan!','success'); closeModal(); loadTeamAssessment(); }
+  if (res.success) { toast('Assignment saved successfully!','success'); closeModal(); loadTeamAssessment(); }
   else toast(res.message,'error');
 }
 
@@ -1409,7 +1414,7 @@ async function downloadAssignmentPDF() {
       printRows.push({ nik:idx===0?m.nik:'', name:idx===0?m.name:'', grade:idx===0?m.grade:'', position:idx===0?(m.position||m.grade||''):'', competency:c.competency_name||c.competency_id, self:String(c.self_score??'-'), final:String(c.final_score||'-'), target:String(c.target_level??'-'), decision:c.decision });
     });
   });
-  if (!printRows.length) { toast('Belum ada data assignment','warning'); return; }
+  if (!printRows.length) { toast('No assignment data to export','warning'); return; }
   showLoading(true);
   try {
     if (!window.jspdf) {
@@ -1426,7 +1431,7 @@ async function downloadAssignmentPDF() {
     doc.text(`Leader: ${state.user?.name||''}   ·   ${today}   ·   PT. Amerta Indah Otsuka`, 14, 17);
     doc.autoTable({
       startY:25,
-      head:[['NIK','Nama','Grade','Position','Kompetensi','Self','Final (30:70)','Target','Decision']],
+      head:[['NIK','Nama','Grade','Position','Competency','Self','Final (30:70)','Target','Decision']],
       body:printRows.map(r=>[r.nik,r.name,r.grade,r.position,r.competency,r.self,r.final,r.target,r.decision]),
       styles:{fontSize:8,cellPadding:3,textColor:[30,27,75]},
       headStyles:{fillColor:[124,58,237],textColor:[255,255,255],fontStyle:'bold'},
@@ -1435,7 +1440,7 @@ async function downloadAssignmentPDF() {
       margin:{left:14,right:14},
     });
     doc.save(`MIRAI_Assignment_${(state.user?.name||'').replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);
-    toast('PDF berhasil diunduh!','success');
+    toast('PDF downloaded successfully!','success');
   } catch(err) { toast('Gagal generate PDF: '+err.message,'error'); }
   finally { showLoading(false); }
 }
@@ -1447,16 +1452,16 @@ async function loadTeamMonitor() {
   const res = await api('getTeamProgress', { leader_nik:state.user.nik });
   if (!res.success) { html('team-monitor-content',`<p class="text-muted">${res.message}</p>`); return; }
   const team = res.data;
-  if (!team||!team.length) { html('team-monitor-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📊</div><div class="empty-title">Belum ada data tim</div></div></div></div>`); return; }
+  if (!team||!team.length) { html('team-monitor-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📊</div><div class="empty-title">No team data found</div></div></div></div>`); return; }
   const totalM=team.reduce((s,m)=>s+m.mandatory_total,0), doneM=team.reduce((s,m)=>s+m.mandatory_completed,0);
   const maxD = Math.max(...team.map(m=>m.depth||1));
   let content = `<div class="stats-grid" style="margin-bottom:18px;">
-    <div class="stat-card stat-card-purple"><div class="stat-icon">👥</div><div class="stat-label">Total Anggota</div><div class="stat-value">${team.length}</div><div class="stat-sub">${maxD} level</div></div>
+    <div class="stat-card stat-card-purple"><div class="stat-icon">👥</div><div class="stat-label">Total Members</div><div class="stat-value">${team.length}</div><div class="stat-sub">${maxD} level</div></div>
     <div class="stat-card stat-card-emerald"><div class="stat-icon">📈</div><div class="stat-label">Completion Rate</div><div class="stat-value">${pct(doneM,totalM)}%</div></div>
     <div class="stat-card stat-card-amber"><div class="stat-icon">🎯</div><div class="stat-label">Mandatory Done</div><div class="stat-value">${doneM}<span style="font-size:14px;opacity:0.7;">/${totalM}</span></div></div>
     <div class="stat-card stat-card-sky"><div class="stat-icon">📅</div><div class="stat-label">Active Enrollments</div><div class="stat-value">${team.reduce((s,m)=>s+m.enrolled_session_ids.length,0)}</div></div>
   </div>`;
-  content += `<div class="card"><div class="table-wrap"><table id="team-mon-tbl" class="mobile-card"><thead><tr><th>Nama</th><th>Atasan</th><th>Grade</th><th>Mandatory</th><th>Progress</th><th>Enrolled</th><th>Status</th></tr></thead><tbody>`;
+  content += `<div class="card"><div class="table-wrap"><table id="team-mon-tbl" class="mobile-card"><thead><tr><th>Nama</th><th>Supervisor</th><th>Grade</th><th>Mandatory</th><th>Progress</th><th>Enrolled</th><th>Status</th></tr></thead><tbody>`;
   const dColors=['var(--purple)','var(--sky)','var(--emerald)','var(--amber)','var(--coral)'];
   team.forEach(m => {
     const p=pct(m.mandatory_completed,m.mandatory_total);
@@ -1467,12 +1472,12 @@ async function loadTeamMonitor() {
         ${indent>0?`<div style="width:${indent*12}px;flex-shrink:0;"></div><div style="width:2px;height:28px;background:${dc};opacity:0.4;flex-shrink:0;border-radius:2px;"></div>`:''}
         <div><div style="font-weight:700;">${m.name}</div><div style="font-size:11px;color:var(--text-muted);">${m.department}</div></div>
       </div></td>
-      <td data-label="Atasan" style="font-size:12px;color:var(--text-2);">${m.spv_name||'—'}</td>
+      <td data-label="Supervisor" style="font-size:12px;color:var(--text-2);">${m.spv_name||'—'}</td>
       <td data-label="Grade"><span class="badge ${gradeColor(m.grade)}">${m.grade}</span></td>
       <td data-label="Mandatory" style="font-weight:800;">${m.mandatory_completed}/${m.mandatory_total}</td>
       <td data-label="Progress" style="min-width:90px;">${progBar(m.mandatory_completed,m.mandatory_total||1,color,7)}<div style="font-size:10px;color:var(--text-muted);margin-top:2px;">${p}%</div></td>
       <td data-label="Enrolled"><span class="badge badge-sky">${m.enrolled_session_ids.length}</span></td>
-      <td data-label="Status">${m.mandatory_total===0?'<span class="badge badge-gray">Belum assigned</span>':m.mandatory_completed>=m.mandatory_total?'<span class="badge badge-emerald">Selesai</span>':'<span class="badge badge-amber">In Progress</span>'}</td>
+      <td data-label="Status">${m.mandatory_total===0?'<span class="badge badge-gray">Not yet assigned</span>':m.mandatory_completed>=m.mandatory_total?'<span class="badge badge-emerald">Completed</span>':'<span class="badge badge-amber">In Progress</span>'}</td>
     </tr>`;
   });
   content += `</tbody></table></div></div>`;
@@ -1490,7 +1495,7 @@ async function loadTeamSchedule() {
   const res = await api('getTeamProgress',{leader_nik:state.user.nik});
   if (!res.success) { html('team-monitor-content',`<p class="text-muted">${res.message}</p>`); return; }
   const team=res.data||[];
-  if(!team.length){html('team-monitor-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">Belum ada data tim</div></div></div></div>`);return;}
+  if(!team.length){html('team-monitor-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">No team data found</div></div></div></div>`);return;}
   showLoading(true);
   try {
     const enrollPromises=team.map(m=>apiFast('getMyEnrollments',{nik:m.nik}));
@@ -1501,16 +1506,16 @@ async function loadTeamSchedule() {
     const sessMap={};allSessions.forEach(s=>{sessMap[s.session_id]=s;});
     const teamEnrs=[];
     team.forEach((m,i)=>{const eD=allEnrRes[i];(eD.success?eD.data:[]).forEach(e=>{const s=sessMap[e.session_id];if(s)teamEnrs.push({member:m,session:s});});});
-    if(!teamEnrs.length){html('team-monitor-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">Belum ada enrollment tim</div><div class="empty-desc">Belum ada anggota tim yang mendaftar ke sesi training.</div></div></div></div>`);return;}
+    if(!teamEnrs.length){html('team-monitor-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">Belum ada enrollment tim</div><div class="empty-desc">No team members have enrolled in a training session yet.</div></div></div></div>`);return;}
     teamEnrs.sort((a,b)=>(a.session.date||'').localeCompare(b.session.date||''));
-    let c=`<div class="card"><div class="table-wrap"><table class="mobile-card"><thead><tr><th>Anggota</th><th>Tanggal</th><th>Kompetensi</th><th>Trainer</th><th>Lokasi</th><th>Tipe</th></tr></thead><tbody>`;
+    let c=`<div class="card"><div class="table-wrap"><table class="mobile-card"><thead><tr><th>Anggota</th><th>Tanggal</th><th>Competency</th><th>Trainer</th><th>Lokasi</th><th>Tipe</th></tr></thead><tbody>`;
     teamEnrs.forEach(({member:m,session:s})=>{
       const tt=(s.training_type||'').toLowerCase(),isSL=tt.includes('self'),isOnline=tt.includes('online');
       const dD=isSL&&s.date_end?`${s.date} – ${s.date_end}`:`${s.date}${s.time?' · '+s.time:''}`;
       const tb=isSL?'<span class="badge badge-purple">Self Learning</span>':isOnline?'<span class="badge badge-sky">Online</span>':'<span class="badge badge-amber">Offline</span>';
       c+=`<tr><td data-label="Anggota"><div style="font-weight:700;">${m.name}</div><div style="font-size:11px;color:var(--text-muted);">${m.grade} · ${m.department}</div></td>
         <td data-label="Tanggal" style="white-space:nowrap;font-weight:600;">${dD}</td>
-        <td data-label="Kompetensi"><div style="font-weight:700;">${s.competency_name||s.competency_id}</div><div style="font-size:11px;font-family:var(--mono);color:var(--text-muted);">${s.competency_id}</div></td>
+        <td data-label="Competency"><div style="font-weight:700;">${s.competency_name||s.competency_id}</div><div style="font-size:11px;font-family:var(--mono);color:var(--text-muted);">${s.competency_id}</div></td>
         <td data-label="Trainer">${s.trainer||'—'}</td><td data-label="Lokasi">${s.location||s.area||'—'}</td><td data-label="Tipe">${tb}</td></tr>`;
     });
     c+=`</tbody></table></div></div>`;
@@ -1523,7 +1528,7 @@ async function loadL3Eval() {
   const res = await api('getL3Evaluatees',{leader_nik:state.user.nik});
   if (!res.success){html('l3-eval-content',`<p class="text-muted">${res.message}</p>`);return;}
   const evs=res.data||[];
-  if(!evs.length){html('l3-eval-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">🎯</div><div class="empty-title">Belum ada evaluatee</div><div class="empty-desc">Tidak ada karyawan di bawah supervisi kamu di sheet IDP_Semester_1_2026.</div></div></div></div>`);return;}
+  if(!evs.length){html('l3-eval-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">🎯</div><div class="empty-title">No evaluatees found</div><div class="empty-desc">No employees found under your supervision in the IDP_Semester_1_2026 sheet.</div></div></div></div>`);return;}
   const total=evs.length,submitted=evs.filter(e=>e.l3_status==='submitted').length,inProg=evs.filter(e=>e.l3_status==='in_progress').length;
   let content=`<div class="stats-grid" style="margin-bottom:18px;">
     <div class="stat-card stat-card-purple"><div class="stat-icon">👥</div><div class="stat-label">Total Evaluatee</div><div class="stat-value">${total}</div></div>
@@ -1531,7 +1536,7 @@ async function loadL3Eval() {
     <div class="stat-card stat-card-amber"><div class="stat-icon">📝</div><div class="stat-label">In Progress</div><div class="stat-value">${inProg}</div></div>
     <div class="stat-card stat-card-sky"><div class="stat-icon">📊</div><div class="stat-label">Completion</div><div class="stat-value">${pct(submitted,total)}%</div></div>
   </div>`;
-  const sLabel={not_started:'Belum Mulai',in_progress:'Sedang Diisi',submitted:'Submitted'};
+  const sLabel={not_started:'Not Started',in_progress:'In Progress',submitted:'Submitted'};
   const sBadge={not_started:'badge-gray',in_progress:'badge-amber',submitted:'badge-emerald'};
   const dotCls={not_started:'l3-dot-gray',in_progress:'l3-dot-amber',submitted:'l3-dot-emerald'};
   content+=`<div style="display:flex;flex-direction:column;gap:8px;">`;
@@ -1547,14 +1552,14 @@ async function loadL3Eval() {
         <div style="font-size:11px;color:var(--text-muted);margin-top:3px;font-family:var(--mono);">${e.competencies?.length||0} kompetensi: ${compSummary}</div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-        <span class="badge ${sBadge[e.l3_status]||'badge-gray'}">${sLabel[e.l3_status]||'Belum Mulai'}</span>
+        <span class="badge ${sBadge[e.l3_status]||'badge-gray'}">${sLabel[e.l3_status]||'Not Started'}</span>
         <span style="color:var(--text-muted);font-size:18px;">›</span>
       </div>
     </div>`;
   });
   content+=`</div>
   <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-    <div style="font-size:13px;color:var(--text-muted);">Download evaluasi seluruh tim dalam satu PDF</div>
+    <div style="font-size:13px;color:var(--text-muted);">Download full team evaluation as a single PDF</div>
     <button class="btn btn-primary" onclick="downloadAllTeamL3PDF()">⬇ Download All Team PDF</button>
   </div>`;
   html('l3-eval-content',content);
@@ -1584,7 +1589,7 @@ async function openL3Form(evaluateeNik) {
       </div>
       <div id="l3-body-${ci}" style="display:none;">`;
     Object.entries(comp.levels).sort((a,b)=>Number(a[0])-Number(b[0])).forEach(([level,inds])=>{
-      compForms+=`<div class="comp-block"><div class="level-label">Level ${level} — Indikator Perilaku</div>`;
+      compForms+=`<div class="comp-block"><div class="level-label">Level ${level} — Behavioral Indicators</div>`;
       inds.forEach((ind,ii)=>{
         compForms+=`<div class="indicator-item${ind.is_checked?' checked':''}" onclick="toggleL3Ind(${ci},${level},${ii})">
           <div class="ind-check">${ind.is_checked?'✓':''}</div>
@@ -1601,17 +1606,17 @@ async function openL3Form(evaluateeNik) {
       <button class="modal-close" onclick="closeModal()">×</button>
     </div>
     <div class="modal-body">
-      ${d.is_final?'<div class="notice notice-emerald"><div class="notice-icon">✅</div><div>Evaluasi ini sudah di-submit. Kamu masih bisa edit dan re-submit.</div></div>':''}
+      ${d.is_final?'<div class="notice notice-emerald"><div class="notice-icon">✅</div><div>This evaluation has been submitted. You can still edit and re-submit.</div></div>':''}
       <div class="notice notice-purple"><div class="notice-icon">💡</div>
-        <div>Evaluasi berdasarkan perilaku yang <strong>diobservasi setelah training</strong>. <strong>SEMUA</strong> indikator di target level harus diceklis untuk dinyatakan Achieved.</div>
+        <div>Evaluate based on behaviors <strong>observed after training</strong>. <strong>ALL</strong> indicators at the target level must be checked to be marked as Achieved.</div>
       </div>
       ${compForms}
     </div>
     <div class="modal-footer" style="flex-wrap:wrap;gap:8px;">
-      <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
-      <button class="btn btn-ghost" onclick="saveL3Draft()">💾 Simpan Draft</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-ghost" onclick="saveL3Draft()">💾 Save Draft</button>
       <button class="btn btn-amber" onclick="downloadL3PDF()">⬇ Download PDF</button>
-      <button class="btn btn-sky" onclick="sendL3Email()">📧 Kirim ke Otsuka Academy</button>
+      <button class="btn btn-sky" onclick="sendL3Email()">📧 Send to Otsuka Academy</button>
       <button class="btn btn-emerald" onclick="confirmL3Submit()">✅ Submit Final</button>
     </div>
   </div>`);
@@ -1652,20 +1657,20 @@ function buildL3Payload(isFinal) {
   };
 }
 
-async function saveL3Draft() { const p=buildL3Payload(false);if(!p)return;const r=await api('saveL3Evaluation',p);if(r.success)toast('Draft L3 disimpan','success');else toast(r.message,'error'); }
+async function saveL3Draft() { const p=buildL3Payload(false);if(!p)return;const r=await api('saveL3Evaluation',p);if(r.success)toast('L3 draft saved','success');else toast(r.message,'error'); }
 
 function confirmL3Submit() {
   openModal(`<div class="modal" style="max-width:420px;" onclick="event.stopPropagation()">
-    <div class="modal-header"><div class="modal-title">Konfirmasi Submit L3</div><button class="modal-close" onclick="openL3Form(window._l3FormData?.evaluatee_nik)">×</button></div>
-    <div class="modal-body"><div class="notice notice-amber"><div class="notice-icon">⚠️</div><div>Evaluasi akan ditandai sebagai <strong>final</strong>. Kamu masih bisa edit dan re-submit jika diperlukan.</div></div></div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="openL3Form(window._l3FormData?.evaluatee_nik)">Kembali</button><button class="btn btn-emerald" onclick="doL3FinalSubmit()">Submit Final</button></div>
+    <div class="modal-header"><div class="modal-title">Confirm L3 Submission</div><button class="modal-close" onclick="openL3Form(window._l3FormData?.evaluatee_nik)">×</button></div>
+    <div class="modal-body"><div class="notice notice-amber"><div class="notice-icon">⚠️</div><div>This evaluation will be marked as <strong>final</strong>. You can still edit and re-submit if needed.</div></div></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="openL3Form(window._l3FormData?.evaluatee_nik)">Back</button><button class="btn btn-emerald" onclick="doL3FinalSubmit()">Submit Final</button></div>
   </div>`);
 }
 
 async function doL3FinalSubmit() {
   const p=buildL3Payload(true);if(!p)return;
   const r=await api('saveL3Evaluation',p);
-  if(r.success){toast('L3 Evaluation di-submit!','success');closeModal();loadL3Eval();}else toast(r.message,'error');
+  if(r.success){toast('L3 Evaluation submitted!','success');closeModal();loadL3Eval();}else toast(r.message,'error');
 }
 
 async function downloadL3PDF() {
@@ -1735,7 +1740,7 @@ async function downloadL3PDF() {
     const pc=doc.internal.getNumberOfPages();
     for(let i=1;i<=pc;i++){doc.setPage(i);doc.setFontSize(7);doc.setTextColor(160,160,160);doc.text(`MIRAI · PT. Amerta Indah Otsuka · ${today}`,14,290);doc.text(`${i}/${pc}`,200,290,{align:'right'});}
     doc.save(`L3_Eval_${leaderName.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);
-    toast('PDF berhasil diunduh!','success');
+    toast('PDF downloaded successfully!','success');
   } catch(err){toast('Gagal generate PDF: '+err.message,'error');}
   finally{showLoading(false);}
 }
@@ -1751,7 +1756,7 @@ async function downloadAllTeamL3PDF() {
     const res=await api('getTeamL3Data',{leader_nik:state.user.nik});
     if(!res.success){toast(res.message,'error');return;}
     const teamData=res.data,evs=teamData.evaluatees||[];
-    if(!evs.length){toast('Belum ada data tim','warning');return;}
+    if(!evs.length){toast('No team data found','warning');return;}
     showLoading(true);
     const {jsPDF}=window.jspdf;
     const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
@@ -1820,7 +1825,7 @@ async function downloadAllTeamL3PDF() {
     const pc=doc.internal.getNumberOfPages();
     for(let i=1;i<=pc;i++){doc.setPage(i);doc.setFontSize(7);doc.setTextColor(160,160,160);doc.text(`MIRAI · PT. Amerta Indah Otsuka · ${today}`,14,290);doc.text(`${i}/${pc}`,200,290,{align:'right'});}
     doc.save(`L3_Team_Eval_${leaderName.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);
-    toast(`PDF berhasil diunduh — ${evs.length} evaluatee`,'success');
+    toast(`PDF downloaded — ${evs.length} evaluatees`,'success');
   } catch(err){toast('Gagal generate PDF: '+err.message,'error');}
   finally{showLoading(false);}
 }
@@ -1847,7 +1852,7 @@ async function loadAdmin() {
   const depts=Object.entries(deptStats).sort((a,b)=>b[1].total-a[1].total);
   if(depts.length>0){
     content+=`<div style="display:grid;gap:14px;">
-      <div class="card"><div class="card-header"><div class="card-title">Progress Assessment per Department</div></div><div class="card-body"><div class="bar-chart">`;
+      <div class="card"><div class="card-header"><div class="card-title">Assessment Progress by Department</div></div><div class="card-body"><div class="bar-chart">`;
     depts.slice(0,15).forEach(([dept,stat])=>{
       const p=pct(stat.assessed,stat.total);
       content+=`<div class="bar-row"><div class="bar-name" title="${dept}">${dept.length>14?dept.slice(0,13)+'…':dept}</div><div class="bar-track"><div class="bar-fill" style="width:${p}%;"></div></div><div class="bar-val">${stat.assessed}/${stat.total}</div></div>`;
@@ -1856,7 +1861,7 @@ async function loadAdmin() {
     const compEntries=Object.entries(compDemand).sort((a,b)=>(b[1].mandatory+b[1].additional)-(a[1].mandatory+a[1].additional));
     if(compEntries.length>0){
       content+=`<div class="card"><div class="card-header"><div class="card-title">Competency Demand</div></div><div class="card-body" style="padding:0 22px;"><div class="table-wrap"><table class="mobile-card">
-        <thead><tr><th>Kompetensi</th><th>Mandatory</th><th>Additional</th><th>Total</th></tr></thead><tbody>`;
+        <thead><tr><th>Competency</th><th>Mandatory</th><th>Additional</th><th>Total</th></tr></thead><tbody>`;
       compEntries.slice(0,10).forEach(([cid,cd])=>{
         content+=`<tr><td><span class="badge badge-purple">${cid}</span></td><td><span style="font-weight:800;color:var(--coral);">${cd.mandatory}</span></td><td><span style="font-weight:800;color:var(--purple);">${cd.additional}</span></td><td><strong>${cd.mandatory+cd.additional}</strong></td></tr>`;
       });
@@ -1871,10 +1876,10 @@ async function loadAdminUsers() {
   if(!res.success){html('admin-users-content',`<p class="text-muted">${res.message}</p>`);return;}
   const users=res.data;
   let content=`<div style="margin-bottom:14px;display:flex;gap:10px;align-items:center;">
-    <input type="text" id="user-search" class="form-input" placeholder="Cari nama atau NIK..." style="max-width:260px;" oninput="filterUsers(this.value)">
-    <span style="font-size:13px;color:var(--text-muted);font-weight:600;">${users.length} karyawan</span>
+    <input type="text" id="user-search" class="form-input" placeholder="Search name or NIK..." style="max-width:260px;" oninput="filterUsers(this.value)">
+    <span style="font-size:13px;color:var(--text-muted);font-weight:600;">${users.length} employees</span>
   </div>
-  <div class="card"><div class="table-wrap"><table class="mobile-card"><thead><tr><th>NIK</th><th>Nama</th><th>Grade</th><th>Divisi</th><th>Role</th><th>Ganti Pwd</th><th>Aksi</th></tr></thead><tbody id="users-tbody">`;
+  <div class="card"><div class="table-wrap"><table class="mobile-card"><thead><tr><th>NIK</th><th>Nama</th><th>Grade</th><th>Divisi</th><th>Role</th><th>Reset Pwd</th><th>Aksi</th></tr></thead><tbody id="users-tbody">`;
   users.forEach(u=>{
     content+=`<tr data-search="${u.nik} ${(u.name||'').toLowerCase()}">
       <td data-label="NIK" style="font-family:var(--mono);font-size:12px;">${u.nik}</td>
@@ -1882,7 +1887,7 @@ async function loadAdminUsers() {
       <td data-label="Grade"><span class="badge ${gradeColor(u.grade)}">${u.grade}</span></td>
       <td data-label="Divisi" style="font-size:12px;">${u.division}</td>
       <td data-label="Role">${u.role&&u.role.includes('leader')?'<span class="badge badge-purple">Leader</span>':'<span class="badge badge-gray">Employee</span>'}</td>
-      <td data-label="Ganti Pwd">${u.must_change_password?'<span class="badge badge-amber">Ya</span>':'<span class="badge badge-emerald">Tidak</span>'}</td>
+      <td data-label="Reset Pwd">${u.must_change_password?'<span class="badge badge-amber">Ya</span>':'<span class="badge badge-emerald">Tidak</span>'}</td>
       <td><button class="btn btn-ghost btn-sm" onclick="openUserEdit('${u.nik}')">Edit</button></td>
     </tr>`;
   });
@@ -1904,10 +1909,10 @@ function openUserEdit(nik) {
       <div class="form-group"><label class="form-label">Role</label><select class="form-input" id="edit-role"><option value="employee"${user.role==='employee'?' selected':''}>Employee</option><option value="leader,employee"${user.role&&user.role.includes('leader')?' selected':''}>Leader & Employee</option><option value="admin"${user.role==='admin'?' selected':''}>Admin</option></select></div>
       <div class="form-group"><label class="form-label">SPV NIK</label><input class="form-input mono" id="edit-spv" value="${user.spv_nik||''}"></div>
       <div style="padding:12px 14px;background:var(--coral-soft);border-radius:var(--r-sm);font-size:13px;border:1px solid rgba(244,63,94,0.2);">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input type="checkbox" id="edit-reset-pwd"> Reset password ke default (AIO + NIK)</label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input type="checkbox" id="edit-reset-pwd"> Reset password to default (AIO + NIK)</label>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">Batal</button><button class="btn btn-primary" onclick="doUpdateUser('${nik}')">Simpan Perubahan</button></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doUpdateUser('${nik}')">Save Changes</button></div>
   </div>`);
 }
 
@@ -1929,9 +1934,9 @@ async function loadAccount() {
       <div style="display:flex;gap:5px;flex-wrap:wrap;"><span class="badge ${gradeColor(u.grade)}">${u.grade}</span><span class="badge badge-purple">${u.division||u.department}</span>${u.role&&u.role.includes('leader')?'<span class="badge badge-amber">Leader</span>':''}</div></div>
     </div></div>
     <div class="card">
-      <div class="card-header"><div class="card-title">Informasi Akun</div></div>
+      <div class="card-header"><div class="card-title">Account Information</div></div>
       <div class="card-body">
-        ${[['NIK',u.nik,true],['Email',u.email||'—',false],['Department',u.department,false],['Division',u.division||'—',false],['Atasan',u.spv_name?(u.spv_nik+' · '+u.spv_name):(u.spv_nik||'—'),!!u.spv_nik]].map(([l,v,mono])=>`
+        ${[['NIK',u.nik,true],['Email',u.email||'—',false],['Department',u.department,false],['Division',u.division||'—',false],['Supervisor',u.spv_name?(u.spv_nik+' · '+u.spv_name):(u.spv_nik||'—'),!!u.spv_nik]].map(([l,v,mono])=>`
           <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
             <span style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;">${l}</span>
             <span style="font-size:13px;font-weight:600;${mono?'font-family:var(--mono);':''}">${v}</span>
@@ -1939,15 +1944,15 @@ async function loadAccount() {
       </div>
     </div>
     <div class="card">
-      <div class="card-header"><div class="card-title">Ganti Password</div></div>
+      <div class="card-header"><div class="card-title">Change Password</div></div>
       <div class="card-body">
-        <div class="form-group"><label class="form-label">Password Saat Ini</label><input type="password" id="acc-old" class="form-input" placeholder="Ketik password saat ini"></div>
+        <div class="form-group"><label class="form-label">Current Password</label><input type="password" id="acc-old" class="form-input" placeholder="Enter current password"></div>
         <div class="form-group"><label class="form-label">New Password</label><input type="password" id="acc-new" class="form-input" placeholder="Minimum 6 characters"></div>
-        <div class="form-group"><label class="form-label">Ulangi New Password</label><input type="password" id="acc-confirm" class="form-input" placeholder="Ketik ulang password baru"></div>
-        <button class="btn btn-primary" onclick="doAccChangePwd()">Save Password Baru</button>
+        <div class="form-group"><label class="form-label">Ulangi New Password</label><input type="password" id="acc-confirm" class="form-input" placeholder="Repeat new password"></div>
+        <button class="btn btn-primary" onclick="doAccChangePwd()">Save New Password</button>
       </div>
     </div>
-    <button class="btn btn-ghost" style="color:var(--coral);border-color:rgba(244,63,94,0.3);" onclick="doLogout()">🚪 Keluar</button>
+    <button class="btn btn-ghost" style="color:var(--coral);border-color:rgba(244,63,94,0.3);" onclick="doLogout()">🚪 Sign Out</button>
   </div>`;
   html('account-content',content);
 }
@@ -1958,7 +1963,7 @@ async function doAccChangePwd() {
   if(np.length<6){toast('Password minimal 6 karakter','error');return;}
   if(np!==cp){toast('Password tidak cocok','error');return;}
   const res=await api('changePassword',{nik:state.user.nik,old_password:old,new_password:np});
-  if(res.success){toast('Password berhasil diubah!','success');el('acc-old').value='';el('acc-new').value='';el('acc-confirm').value='';}
+  if(res.success){toast('Password updated successfully!','success');el('acc-old').value='';el('acc-new').value='';el('acc-confirm').value='';}
   else toast(res.message,'error');
 }
 
@@ -1967,7 +1972,7 @@ let miraiOpen=false, miraiBubbleTimer=null;
 
 function initMirai() {
   state.miraiHistory=[];
-  renderMiraiMsgs([{type:'bot',text:'Halo! Saya Mirai 👋 Asisten virtual MIRAI AIO. Ada yang bisa saya bantu?'}]);
+  renderMiraiMsgs([{type:'bot',text:'Hi! I'm Mirai 👋 Your MIRAI IDP virtual assistant. How can I help you today?'}]);
   miraiBubbleTimer=setTimeout(()=>{const b=el('mirai-bubble');if(b)b.style.display='none';},6000);
 }
 
@@ -2001,7 +2006,7 @@ async function sendMirai() {
   const history=state.miraiHistory.slice(-10);
   const res=await apiFast('miraiChat',{message:q,history});
   const t=el('mirai-typing');if(t)t.remove();
-  const reply=res.success&&res.data?res.data.reply:'Maaf, ada gangguan teknis. Coba lagi atau hubungi HCD: Panji Nursamsi (0857-1567-2731).';
+  const reply=res.success&&res.data?res.data.reply:'Sorry, a technical issue occurred. Please try again or contact HCD: Panji Nursamsi (0857-1567-2731).';
   appendMiraiMsg('bot',reply);
   state.miraiHistory.push({role:'user',text:q},{role:'assistant',text:reply});
   input.disabled=false;sendBtn.disabled=false;input.focus();
