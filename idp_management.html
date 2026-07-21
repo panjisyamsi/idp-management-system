@@ -433,7 +433,7 @@ tbody tr:hover{background:var(--purple-soft);}
     <div class="login-brand">
       <div class="login-wordmark">MIRAI</div>
       <div class="login-tagline">Mapping Individual Readiness, Aspirations &amp; Impact</div>
-      <div class="login-sub">Your development journey, starts here.</div>
+      <div class="login-sub">Your development journey, mapped.</div>
       <div class="login-features">
         <div class="login-feat"><div class="login-feat-icon">📋</div>Assessment — Competency Self-Evaluation</div>
         <div class="login-feat"><div class="login-feat-icon">📅</div>Training Enrollment — Schedule &amp; Registration</div>
@@ -1972,7 +1972,7 @@ let miraiOpen=false, miraiBubbleTimer=null;
 
 function initMirai() {
   state.miraiHistory=[];
-  renderMiraiMsgs([{type:'bot',text:'Hi! I'm Mirai 👋 Your MIRAI IDP virtual assistant. How can I help you today?'}]);
+  renderMiraiMsgs([{type:'bot',text:'Hi! I&#39;m Mirai 👋 Your MIRAI IDP virtual assistant. How can I help you today?'}]);
   miraiBubbleTimer=setTimeout(()=>{const b=el('mirai-bubble');if(b)b.style.display='none';},6000);
 }
 
