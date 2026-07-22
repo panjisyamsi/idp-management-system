@@ -433,7 +433,7 @@ tbody tr:hover{background:var(--purple-soft);}
     <div class="login-brand">
       <div class="login-wordmark">MIRAI</div>
       <div class="login-tagline">Mapping Individual Readiness, Aspirations &amp; Impact</div>
-      <div class="login-sub">Your development journey, starts here.</div>
+      <div class="login-sub">Your development journey, mapped.</div>
       <div class="login-features">
         <div class="login-feat"><div class="login-feat-icon">📋</div>Assessment — Competency Self-Evaluation</div>
         <div class="login-feat"><div class="login-feat-icon">📅</div>Training Enrollment — Schedule &amp; Registration</div>
@@ -1054,13 +1054,11 @@ async function loadDashboard() {
     pipeline.forEach(p => {
       const icons  = { assigned:'🎯', enrolled:'📚', completed:'✅' };
       const bgs    = { assigned:'var(--amber-soft)', enrolled:'var(--sky-soft)', completed:'var(--emerald-soft)' };
-      const finalScore = p.final_score ? `<span class="score-chip score-chip-final" style="margin-top:4px;">Final Score: ${p.final_score}</span>` : '';
       content += `<div class="pipeline-item">
         <div class="pipeline-icon" style="background:${bgs[p.status]||'var(--surface3)'};">${icons[p.status]||'📋'}</div>
         <div class="pipeline-info">
           <div class="pipeline-name">${p.competency_name||p.competency_id}</div>
-          <div class="pipeline-meta">${p.competency_id} · Gap: ${p.gap} · Target: L${p.target_level} · Self: L${p.self_score}</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">${finalScore}</div>
+          <div class="pipeline-meta">${p.competency_id} · Gap: ${p.gap} · Target: L${p.target_level}</div>
         </div>
         <div style="flex-shrink:0;text-align:right;">${statusBadge(p.decision)}<br><span style="display:block;margin-top:3px;">${statusBadge(p.status)}</span></div>
       </div>`;
@@ -1150,27 +1148,17 @@ function renderGapRecommendation(gaps) {
   const doneItems = gaps.filter(g => g.achievement_status === 'achieved');
   let content = `<div class="notice notice-emerald"><div class="notice-icon">✅</div><div><strong>Assessment Submitted!</strong> ${t('score.gap_notice')}</div></div>`;
 
-  // Scoring formula explanation
-  content += `<div class="card" style="margin-bottom:14px;">
-    <div class="card-header"><div class="card-title">${t('score.formula_title')}</div></div>
-    <div class="card-body" style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
-      <span class="score-chip score-chip-self">Self Assessment × 30%</span>
-      <span style="font-size:18px;color:var(--text-muted);">+</span>
-      <span class="score-chip score-chip-leader">Leader Judgment × 70%</span>
-      <span style="font-size:18px;color:var(--text-muted);">=</span>
-      <span class="score-chip score-chip-final">Final Score</span>
-    </div>
-  </div>`;
+  // No formula card shown to employees
 
   if (gapItems.length > 0) {
-    content += `<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title">${t('score.gap_title')} (${gapItems.length})</div></div><div class="table-wrap"><table class="mobile-card"><thead><tr><th>Competency</th><th>Self</th><th>Leader</th><th>Final</th><th>Target</th><th>Gap</th><th>Status</th></tr></thead><tbody>`;
+    content += `<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title">${t('score.gap_title')} (${gapItems.length})</div></div><div class="table-wrap"><table class="mobile-card"><thead><tr><th>Competency</th><th>Self</th><th>Leader</th><th style="display:none;"></th><th>Target</th><th>Gap</th><th>Status</th></tr></thead><tbody>`;
     gapItems.forEach(g => {
       const hasLeader = g.has_leader_score;
       content += `<tr>
         <td data-label="Competency"><strong>${g.competency_name}</strong><br><span style="font-family:var(--mono);font-size:11px;color:var(--text-muted);">${g.competency_id}</span></td>
         <td data-label="Self"><span class="score-chip score-chip-self">L${g.self_score}</span></td>
         <td data-label="Leader">${hasLeader ? `<span class="score-chip score-chip-leader">L${g.leader_score}</span>` : `<span class="badge badge-gray">${t('score.pending_leader')}</span>`}</td>
-        <td data-label="Final"><span class="score-chip score-chip-final">${g.final_score}</span></td>
+        <td data-label="Final" style="display:none;"></td>
         <td data-label="Target"><strong>L${g.target_level}</strong></td>
         <td data-label="Gap"><span class="score-chip score-chip-gap">-${g.gap}</span></td>
         <td data-label="Status">${statusBadge(g.achievement_status==='not_assessed'?'pending':'assigned')}</td>
@@ -1530,13 +1518,12 @@ async function loadProgress() {
     let s = `<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title">${title}</div></div><div class="card-body" style="padding:0 22px;">`;
     items.forEach(p => {
       const pBar = p.status==='completed'?100:p.status==='enrolled'?50:10;
-      const finalChip = p.final_score ? `<span class="score-chip score-chip-final" style="font-size:11px;">Final: ${p.final_score}</span>` : '';
       s += `<div class="pipeline-item">
         <div class="pipeline-icon" style="background:${p.status==='completed'?'var(--emerald-soft)':p.status==='enrolled'?'var(--sky-soft)':'var(--amber-soft)'};">${p.status==='completed'?'✅':p.status==='enrolled'?'📚':'🎯'}</div>
         <div class="pipeline-info">
           <div class="pipeline-name">${p.competency_name||p.competency_id}</div>
           <div style="margin:5px 0;">${progBar(pBar,100,color,7)}</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:3px;"><div class="pipeline-meta">L${p.self_score} → Target L${p.target_level}</div>${finalChip}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:3px;"><div class="pipeline-meta">Target: L${p.target_level}</div></div>
         </div>
         <div style="flex-shrink:0;">${statusBadge(p.status)}</div>
       </div>`;
@@ -1631,23 +1618,68 @@ function openAssignModal(memberNik) {
   Object.keys(grouped).forEach(type => {
     compRows += `<div style="font-size:10px;font-weight:800;color:var(--text-muted);letter-spacing:0.8px;text-transform:uppercase;margin:14px 0 8px;">${typeLabel[type]||type}</div>`;
     grouped[type].forEach(c => {
-      const isAchieved = c.achievement_status==='achieved';
-      const selfScore  = c.self_score || 0;
-      const weighted   = c.final_score || 0;
-      const weightedLabel = weighted>0 ? `<span class="score-chip score-chip-final">Final: ${weighted}</span>` : '';
-      const selfLabel  = selfScore>0 ? `<span class="score-chip score-chip-self">Self: L${selfScore}</span>` : '';
-      const statusEl   = isAchieved
+      const isAchieved  = c.achievement_status === 'achieved';
+      const selfScore   = c.self_score || 0;
+      const targetLevel = c.target_level || 3;
+
+      // Gap status badge
+      const gapBadge = isAchieved
         ? `<span class="badge badge-emerald">✓ Achieved (L${c.last_known_level})</span>`
-        : c.achievement_status==='not_assessed'
-          ? `<span class="badge badge-gray">Never Assessed</span>`
-          : `<span class="badge badge-amber">Gap — L${c.last_known_level} → Target L${c.target_level}</span>`;
-      const upHint = isAchieved&&c.target_level<5 ? `<div style="font-size:11px;color:var(--emerald);margin-top:4px;">No gap detected. For upskilling, select Observed Level ${Math.min(c.target_level+1,5)}+</div>` : '';
-      compRows += `<div id="comp-assign-${memberNik}-${c.competency_id}" style="border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:8px;overflow:hidden;${isAchieved?'opacity:0.85;':''}">
+        : selfScore === 0
+          ? `<span class="badge badge-gray">Not Yet Assessed</span>`
+          : `<span class="badge badge-amber">Gap — Self: L${selfScore} → Target: L${targetLevel}</span>`;
+
+      // Border color reflects gap urgency
+      const borderColor = isAchieved ? 'var(--emerald)' : selfScore === 0 ? 'var(--border)' : 'var(--amber)';
+
+      // Build checked indicators from self-assessment (levels 1..selfScore)
+      let indHTML = '';
+      if (selfScore > 0 && c.levels && Object.keys(c.levels).length > 0) {
+        const checkedInds = c.checked_indicators || [];
+        if (checkedInds.length > 0) {
+          // Group by level
+          const byLevel = {};
+          checkedInds.forEach(ind => {
+            if (!byLevel[ind.level]) byLevel[ind.level] = [];
+            byLevel[ind.level].push(ind);
+          });
+          indHTML = `<div style="margin-top:10px;padding:10px 12px;background:var(--surface);border-radius:var(--r-sm);border:1px solid var(--border);">
+            <div style="font-size:10px;font-weight:800;color:var(--text-muted);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;">Self-Assessed Indicators (checked by employee)</div>`;
+          Object.keys(byLevel).sort((a,b)=>Number(a)-Number(b)).forEach(lvl => {
+            indHTML += `<div style="font-size:10px;font-weight:700;color:var(--purple);margin:6px 0 4px;">Level ${lvl}</div>`;
+            byLevel[lvl].forEach(ind => {
+              indHTML += `<div style="display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-bottom:1px solid var(--border);">
+                <span style="color:var(--emerald);font-weight:800;font-size:12px;flex-shrink:0;margin-top:1px;">✓</span>
+                <span style="font-size:12px;line-height:1.5;color:var(--text);">${ind.indicator}</span>
+              </div>`;
+            });
+          });
+
+          // Show unchecked indicators at target level (what employee missed)
+          const targetInds = (c.levels[targetLevel] || []);
+          const checkedTexts = checkedInds.filter(i=>i.level==targetLevel).map(i=>i.indicator);
+          const unchecked = targetInds.filter(ind => !checkedTexts.includes(ind.behavioral_indicator));
+          if (unchecked.length > 0 && !isAchieved) {
+            indHTML += `<div style="font-size:10px;font-weight:700;color:var(--coral);margin:8px 0 4px;">Level ${targetLevel} — Not yet demonstrated (gap):</div>`;
+            unchecked.forEach(ind => {
+              indHTML += `<div style="display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-bottom:1px solid var(--border);">
+                <span style="color:var(--coral);font-weight:800;font-size:12px;flex-shrink:0;margin-top:1px;">✗</span>
+                <span style="font-size:12px;line-height:1.5;color:var(--text-2);">${ind.behavioral_indicator}</span>
+              </div>`;
+            });
+          }
+          indHTML += `</div>`;
+        }
+      } else if (selfScore === 0 && !isAchieved) {
+        indHTML = `<div style="margin-top:8px;padding:8px 12px;background:var(--surface3);border-radius:var(--r-sm);font-size:12px;color:var(--text-muted);">Employee has not yet self-assessed this competency.</div>`;
+      }
+
+      compRows += `<div id="comp-assign-${memberNik}-${c.competency_id}" style="border:1.5px solid ${borderColor};border-radius:var(--r);margin-bottom:12px;overflow:hidden;${isAchieved?'opacity:0.75;':''}">
+        <!-- Header: name + decision buttons -->
         <div style="padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;background:var(--surface);">
           <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
             <span class="badge ${typeColor[c.competency_type]||'badge-gray'}">${c.competency_id}</span>
-            <div><div style="font-weight:700;font-size:13px;">${c.competency_name}</div>
-            <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:3px;">${selfLabel}${weightedLabel}</div></div>
+            <span style="font-weight:700;font-size:13px;">${c.competency_name}</span>
           </div>
           <div style="display:flex;gap:5px;flex-wrap:wrap;" id="dec-btns-${memberNik}-${c.competency_id}">
             <button class="btn btn-sm ${c.decision==='mandatory'?'btn-coral':'btn-ghost'}" onclick="setDecision('${memberNik}','${c.competency_id}','mandatory')">Mandatory</button>
@@ -1655,15 +1687,21 @@ function openAssignModal(memberNik) {
             <button class="btn btn-sm btn-ghost" onclick="setDecision('${memberNik}','${c.competency_id}','')">—</button>
           </div>
         </div>
-        <div style="padding:7px 14px;background:var(--surface2);border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap;">${statusEl}${upHint}</div>
+        <!-- Gap status -->
+        <div style="padding:7px 14px;background:var(--surface2);border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          ${gapBadge}
+          <span style="font-size:11px;color:var(--text-muted);">Target: L${targetLevel}</span>
+        </div>
+        <!-- Indicators from self-assessment -->
+        ${indHTML ? `<div style="padding:4px 14px 12px;">${indHTML}</div>` : ''}
+        <!-- Leader observed level -->
         <div style="padding:9px 14px;background:var(--purple-soft);border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-          <label style="font-size:11px;font-weight:700;color:var(--purple-dark);white-space:nowrap;">Observed level:</label>
+          <label style="font-size:11px;font-weight:700;color:var(--purple-dark);white-space:nowrap;">Your observed level:</label>
           <select id="ll-${memberNik}-${c.competency_id}" onchange="setLeaderLevel('${memberNik}','${c.competency_id}',this.value)"
             style="padding:5px 10px;border:1.5px solid var(--purple);border-radius:var(--r-sm);font-size:12px;font-family:var(--font);font-weight:600;background:#fff;cursor:pointer;outline:none;">
             <option value="">— Select observed level —</option>
             ${[1,2,3,4,5].map(l=>`<option value="${l}" ${c.leader_level==l?'selected':''}>Level ${l}</option>`).join('')}
           </select>
-          <span style="font-size:11px;color:var(--text-muted);">Target: L${c.target_level}</span>
         </div>
       </div>`;
     });
@@ -1676,11 +1714,8 @@ function openAssignModal(memberNik) {
     </div>
     <div class="modal-body">
       <div class="notice notice-amber"><div class="notice-icon">⚠️</div>
-        <div><strong>Maks. 2 Mandatory</strong> per anggota. Observed level akan digunakan dalam perhitungan 30:70.
+        <div><strong>Max. 2 Mandatory</strong> per member. Review the indicators each employee checked to identify gaps, then assign priority.
         <div id="mand-counter" style="margin-top:3px;font-weight:700;">Mandatory selected: ${initCount}/2</div></div>
-      </div>
-      <div class="notice notice-purple" style="font-size:12px;"><div class="notice-icon">📊</div>
-        <div>Final Score = Self Assessment × 30% + Observed Level × 70%. Competencies with the largest gap appear first.</div>
       </div>
       ${compRows}
     </div>
@@ -1724,7 +1759,7 @@ async function downloadAssignmentPDF() {
     const assigned = m.competencies.filter(c=>c.decision==='mandatory'||c.decision==='additional');
     if (!assigned.length) return;
     assigned.forEach((c,idx) => {
-      printRows.push({ nik:idx===0?m.nik:'', name:idx===0?m.name:'', grade:idx===0?m.grade:'', position:idx===0?(m.position||m.grade||''):'', competency:c.competency_name||c.competency_id, self:String(c.self_score??'-'), final:String(c.final_score||'-'), target:String(c.target_level??'-'), decision:c.decision });
+      printRows.push({ nik:idx===0?m.nik:'', name:idx===0?m.name:'', grade:idx===0?m.grade:'', position:idx===0?(m.position||m.grade||''):'', competency:c.competency_name||c.competency_id, self:String(c.self_score??'-'), target:String(c.target_level??'-'), gap:String(c.gap??'-'), decision:c.decision });
     });
   });
   if (!printRows.length) { toast('No assignment data to export','warning'); return; }
@@ -1744,11 +1779,11 @@ async function downloadAssignmentPDF() {
     doc.text(`Leader: ${state.user?.name||''}   ·   ${today}   ·   PT. Amerta Indah Otsuka`, 14, 17);
     doc.autoTable({
       startY:25,
-      head:[['NIK','Nama','Grade','Position','Competency','Self','Final (30:70)','Target','Decision']],
-      body:printRows.map(r=>[r.nik,r.name,r.grade,r.position,r.competency,r.self,r.final,r.target,r.decision]),
+      head:[['NIK','Nama','Grade','Position','Competency','Self Score','Target Level','Gap','Decision']],
+      body:printRows.map(r=>[r.nik,r.name,r.grade,r.position,r.competency,r.self,r.target,r.gap,r.decision]),
       styles:{fontSize:8,cellPadding:3,textColor:[30,27,75]},
       headStyles:{fillColor:[124,58,237],textColor:[255,255,255],fontStyle:'bold'},
-      columnStyles:{0:{cellWidth:20,font:'courier'},1:{cellWidth:44,fontStyle:'bold'},2:{cellWidth:14,halign:'center'},3:{cellWidth:36},4:{cellWidth:68},5:{cellWidth:14,halign:'center'},6:{cellWidth:22,halign:'center',fontStyle:'bold'},7:{cellWidth:14,halign:'center'},8:{cellWidth:24,halign:'center'}},
+      columnStyles:{0:{cellWidth:20,font:'courier'},1:{cellWidth:44,fontStyle:'bold'},2:{cellWidth:14,halign:'center'},3:{cellWidth:32},4:{cellWidth:64},5:{cellWidth:16,halign:'center'},6:{cellWidth:18,halign:'center'},7:{cellWidth:12,halign:'center'},8:{cellWidth:24,halign:'center'}},
       alternateRowStyles:{fillColor:[243,238,255]},
       margin:{left:14,right:14},
     });
