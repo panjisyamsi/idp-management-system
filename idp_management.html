@@ -1632,46 +1632,51 @@ function openAssignModal(memberNik) {
       // Border color reflects gap urgency
       const borderColor = isAchieved ? 'var(--emerald)' : selfScore === 0 ? 'var(--border)' : 'var(--amber)';
 
-      // Build checked indicators from self-assessment (levels 1..selfScore)
+      // Build full indicator view — ALL levels shown with check/uncheck status
+      // Leader can see exactly what employee checked and what they didn't,
+      // enabling objective scoring that can raise or lower the self-assessment.
       let indHTML = '';
-      if (selfScore > 0 && c.levels && Object.keys(c.levels).length > 0) {
+      if (c.levels && Object.keys(c.levels).length > 0) {
+        // Build a set of checked indicator texts from self-assessment data
         const checkedInds = c.checked_indicators || [];
-        if (checkedInds.length > 0) {
-          // Group by level
-          const byLevel = {};
-          checkedInds.forEach(ind => {
-            if (!byLevel[ind.level]) byLevel[ind.level] = [];
-            byLevel[ind.level].push(ind);
-          });
-          indHTML = `<div style="margin-top:10px;padding:10px 12px;background:var(--surface);border-radius:var(--r-sm);border:1px solid var(--border);">
-            <div style="font-size:10px;font-weight:800;color:var(--text-muted);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;">Self-Assessed Indicators (checked by employee)</div>`;
-          Object.keys(byLevel).sort((a,b)=>Number(a)-Number(b)).forEach(lvl => {
-            indHTML += `<div style="font-size:10px;font-weight:700;color:var(--purple);margin:6px 0 4px;">Level ${lvl}</div>`;
-            byLevel[lvl].forEach(ind => {
-              indHTML += `<div style="display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-bottom:1px solid var(--border);">
-                <span style="color:var(--emerald);font-weight:800;font-size:12px;flex-shrink:0;margin-top:1px;">✓</span>
-                <span style="font-size:12px;line-height:1.5;color:var(--text);">${ind.indicator}</span>
-              </div>`;
-            });
-          });
+        const checkedSet  = new Set(checkedInds.map(i => i.indicator));
 
-          // Show unchecked indicators at target level (what employee missed)
-          const targetInds = (c.levels[targetLevel] || []);
-          const checkedTexts = checkedInds.filter(i=>i.level==targetLevel).map(i=>i.indicator);
-          const unchecked = targetInds.filter(ind => !checkedTexts.includes(ind.behavioral_indicator));
-          if (unchecked.length > 0 && !isAchieved) {
-            indHTML += `<div style="font-size:10px;font-weight:700;color:var(--coral);margin:8px 0 4px;">Level ${targetLevel} — Not yet demonstrated (gap):</div>`;
-            unchecked.forEach(ind => {
-              indHTML += `<div style="display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-bottom:1px solid var(--border);">
-                <span style="color:var(--coral);font-weight:800;font-size:12px;flex-shrink:0;margin-top:1px;">✗</span>
-                <span style="font-size:12px;line-height:1.5;color:var(--text-2);">${ind.behavioral_indicator}</span>
-              </div>`;
-            });
-          }
-          indHTML += `</div>`;
-        }
-      } else if (selfScore === 0 && !isAchieved) {
-        indHTML = `<div style="margin-top:8px;padding:8px 12px;background:var(--surface3);border-radius:var(--r-sm);font-size:12px;color:var(--text-muted);">Employee has not yet self-assessed this competency.</div>`;
+        indHTML = `<div style="margin-top:10px;padding:10px 12px;background:var(--surface);border-radius:var(--r-sm);border:1px solid var(--border);">
+          <div style="font-size:10px;font-weight:800;color:var(--text-muted);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;">Behavioral Indicators — Employee Self-Assessment Result</div>`;
+
+        // Show all levels that exist in the library
+        const allLevels = Object.keys(c.levels).map(Number).sort((a,b)=>a-b);
+        allLevels.forEach(lvl => {
+          const inds = c.levels[lvl] || [];
+          if (!inds.length) return;
+
+          // Level label color: green if fully checked, amber if partial, gray if none
+          const checkedCount  = inds.filter(ind => checkedSet.has(ind.behavioral_indicator)).length;
+          const lvlColor = checkedCount === inds.length ? 'var(--emerald)' : checkedCount > 0 ? 'var(--amber)' : 'var(--text-muted)';
+          const lvlNote  = checkedCount === inds.length
+            ? ` — <span style="color:var(--emerald);font-weight:700;">All checked ✓</span>`
+            : checkedCount > 0
+              ? ` — <span style="color:var(--amber);">${checkedCount}/${inds.length} checked</span>`
+              : ` — <span style="color:var(--text-muted);">None checked</span>`;
+
+          indHTML += `<div style="font-size:10px;font-weight:800;color:${lvlColor};margin:10px 0 5px;padding-bottom:3px;border-bottom:2px solid ${lvlColor}20;">
+            Level ${lvl}${lvlNote}${lvl === targetLevel ? ' &nbsp;<span style="background:var(--amber);color:#fff;font-size:9px;padding:1px 6px;border-radius:4px;font-weight:700;">TARGET</span>' : ''}
+          </div>`;
+
+          inds.forEach(ind => {
+            const isChecked = checkedSet.has(ind.behavioral_indicator);
+            const checkColor = isChecked ? 'var(--emerald)' : 'var(--coral)';
+            const checkMark  = isChecked ? '✓' : '✗';
+            const textColor  = isChecked ? 'var(--text)' : 'var(--text-2)';
+            const rowBg      = isChecked ? 'rgba(16,185,129,0.04)' : 'rgba(248,113,113,0.04)';
+            indHTML += `<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 4px;border-bottom:1px solid var(--border);background:${rowBg};border-radius:3px;margin-bottom:2px;">
+              <span style="color:${checkColor};font-weight:800;font-size:13px;flex-shrink:0;margin-top:1px;width:14px;text-align:center;">${checkMark}</span>
+              <span style="font-size:12px;line-height:1.55;color:${textColor};">${ind.behavioral_indicator}</span>
+            </div>`;
+          });
+        });
+
+        indHTML += `</div>`;
       }
 
       compRows += `<div id="comp-assign-${memberNik}-${c.competency_id}" style="border:1.5px solid ${borderColor};border-radius:var(--r);margin-bottom:12px;overflow:hidden;${isAchieved?'opacity:0.75;':''}">
