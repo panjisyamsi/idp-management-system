@@ -561,6 +561,7 @@ let state = {
   _pipeline: [],
   miraiHistory: [],
   trainingHistory: [],
+  _assessmentSubmitted: false, // client-side lock after final submit
 };
 
 // ── API ────────────────────────────────────────────────────────
@@ -648,7 +649,11 @@ async function doChangePassword() {
 
 function doLogout() {
   closeModal();
-  state = { user:null, currentView:'dashboard', jadwalTab:'my', monitorTab:'progress', compLibrary:null, achievedComps:[], assessmentScores:{}, assessmentChecks:{}, teamData:null, enrollments:[], jadwal:[], mandatoryCompIds:[], mandatoryLevelMap:{}, mandatoryLevelIsFallback:{}, _pipeline:[], miraiHistory:[], trainingHistory:[] };
+  // Clear session-level submission flag for this user before state reset
+  if (state.user && state.user.nik) {
+    sessionStorage.removeItem('mirai_submitted_' + state.user.nik);
+  }
+  state = { user:null, currentView:'dashboard', jadwalTab:'my', monitorTab:'progress', compLibrary:null, achievedComps:[], assessmentScores:{}, assessmentChecks:{}, teamData:null, enrollments:[], jadwal:[], mandatoryCompIds:[], mandatoryLevelMap:{}, mandatoryLevelIsFallback:{}, _pipeline:[], miraiHistory:[], trainingHistory:[], _assessmentSubmitted:false };
   el('app-layout').style.display='none';
   el('page-login').style.display='flex';
   el('login-nik').value=''; el('login-password').value='';
@@ -735,10 +740,7 @@ async function loadDashboard() {
 
   // Assessment pending CTA
   if (d.assessment_status === 'pending') {
-    content += `<div class="cta-card cta-card-amber">
-      <div><div style="font-weight:800;">Complete Your Assessment</div></div>
-      <button class="btn btn-primary" onclick="navigateTo('assessment')">Mulai Assessment →</button>
-    </div>`;
+    // Assessment pending — no CTA card shown, dashboard is neutral
   }
 
   // Stat cards
@@ -760,7 +762,7 @@ async function loadDashboard() {
 
   // Pipeline
   if (pipeline.length > 0) {
-    content += `<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title">Competency Saya</div></div><div class="card-body" style="padding:0 22px;">`;
+    content += `<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title">My Competencies</div></div><div class="card-body" style="padding:0 22px;">`;
     pipeline.forEach(p => {
       const icons  = { assigned:'🎯', enrolled:'📚', completed:'✅' };
       const bgs    = { assigned:'var(--amber-soft)', enrolled:'var(--sky-soft)', completed:'var(--emerald-soft)' };
@@ -798,26 +800,27 @@ async function loadDashboard() {
 // ── ASSESSMENT ─────────────────────────────────────────────────
 async function loadAssessment() {
   const u = state.user;
+
+  // LOCK LAYER 1: in-memory flag (same session, no logout)
+  if (state._assessmentSubmitted) {
+    html('assessment-content', buildSubmittedView());
+    return;
+  }
+
+  // LOCK LAYER 2: sessionStorage flag (persists across navigation within same tab, cleared on logout)
+  if (sessionStorage.getItem('mirai_submitted_' + u.nik) === 'true') {
+    state._assessmentSubmitted = true;
+    html('assessment-content', buildSubmittedView());
+    return;
+  }
+
   const statusRes = await api('getAssessmentStatus', { nik: u.nik });
 
-  // Gate: once submitted, form is fully locked — no content shown at all.
-  // Backend returns has_submitted_final=true regardless of period edge cases.
+  // LOCK LAYER 3: backend authoritative check
   if (statusRes.success && statusRes.data.has_submitted_final) {
-    html('assessment-content', `
-      <div class="card" style="max-width:520px;margin:0 auto;">
-        <div class="card-body" style="text-align:center;padding:48px 32px;">
-          <div style="width:72px;height:72px;background:var(--emerald-soft);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 20px;">✅</div>
-          <div style="font-size:20px;font-weight:800;margin-bottom:8px;color:var(--text);">Assessment Submitted</div>
-          <div style="font-size:14px;color:var(--text-2);line-height:1.7;margin-bottom:24px;">
-            Your self-assessment for this cycle has been recorded.<br>
-            Your manager will review and set your development priorities.
-          </div>
-          <div style="background:var(--surface2);border-radius:var(--r);padding:16px 20px;font-size:13px;color:var(--text-muted);border:1px solid var(--border);line-height:1.6;">
-            You will be notified once your manager has completed the review.
-          </div>
-        </div>
-      </div>
-    `);
+    state._assessmentSubmitted = true;
+    sessionStorage.setItem('mirai_submitted_' + u.nik, 'true');
+    html('assessment-content', buildSubmittedView());
     return;
   }
 
@@ -833,21 +836,36 @@ async function loadAssessment() {
       }
     });
   }
-  // Pre-fill checkboxes from saved draft (scores tracked internally, not shown)
-  if (statusRes.success && statusRes.data.scores.length > 0) {
+  if (statusRes.success && statusRes.data.scores && statusRes.data.scores.length > 0) {
     statusRes.data.scores.forEach(s => { state.assessmentScores[s.competency_id] = s.self_score; });
   }
   renderAssessmentForm();
 }
 
+function buildSubmittedView() {
+  return `<div class="card" style="max-width:520px;margin:0 auto;">
+    <div class="card-body" style="text-align:center;padding:48px 32px;">
+      <div style="width:72px;height:72px;background:var(--emerald-soft);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 20px;">✅</div>
+      <div style="font-size:20px;font-weight:800;margin-bottom:8px;color:var(--text);">Assessment Submitted</div>
+      <div style="font-size:14px;color:var(--text-2);line-height:1.7;margin-bottom:24px;">
+        Your self-assessment for this cycle has been recorded.<br>
+        Your manager will review and set your development priorities.
+      </div>
+      <div style="background:var(--surface2);border-radius:var(--r);padding:16px 20px;font-size:13px;color:var(--text-muted);border:1px solid var(--border);line-height:1.6;">
+        You will be notified once your manager has completed the review.
+      </div>
+    </div>
+  </div>`;
+}
+
 function renderGapRecommendation(gaps) {
   const gapItems  = gaps.filter(g => g.achievement_status !== 'achieved');
   const doneItems = gaps.filter(g => g.achievement_status === 'achieved');
-  let content = `<div class="notice notice-emerald"><div class="notice-icon">✅</div><div><strong>Assessment Submitted!</strong> Berikut rekomendasi gap kompetensimu berdasarkan scoring 30:70. Menunggu leader menetapkan prioritas.</div></div>`;
+  let content = `<div class="notice notice-emerald"><div class="notice-icon">✅</div><div><strong>Assessment Submitted!</strong> Below is your competency gap recommendation based on the 30:70 scoring formula. Your manager will set your development priorities.</div></div>`;
 
   // Scoring formula explanation
   content += `<div class="card" style="margin-bottom:14px;">
-    <div class="card-header"><div class="card-title">Formula Scoring 30:70</div></div>
+    <div class="card-header"><div class="card-title">30:70 Scoring Formula</div></div>
     <div class="card-body" style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
       <span class="score-chip score-chip-self">Self Assessment × 30%</span>
       <span style="font-size:18px;color:var(--text-muted);">+</span>
@@ -858,13 +876,13 @@ function renderGapRecommendation(gaps) {
   </div>`;
 
   if (gapItems.length > 0) {
-    content += `<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title">Gap Competency (${gapItems.length})</div></div><div class="table-wrap"><table class="mobile-card"><thead><tr><th>Competency</th><th>Self</th><th>Leader</th><th>Final</th><th>Target</th><th>Gap</th><th>Status</th></tr></thead><tbody>`;
+    content += `<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title">Competency Gap (${gapItems.length})</div></div><div class="table-wrap"><table class="mobile-card"><thead><tr><th>Competency</th><th>Self</th><th>Leader</th><th>Final</th><th>Target</th><th>Gap</th><th>Status</th></tr></thead><tbody>`;
     gapItems.forEach(g => {
       const hasLeader = g.has_leader_score;
       content += `<tr>
         <td data-label="Competency"><strong>${g.competency_name}</strong><br><span style="font-family:var(--mono);font-size:11px;color:var(--text-muted);">${g.competency_id}</span></td>
         <td data-label="Self"><span class="score-chip score-chip-self">L${g.self_score}</span></td>
-        <td data-label="Leader">${hasLeader ? `<span class="score-chip score-chip-leader">L${g.leader_score}</span>` : '<span class="badge badge-gray">Belum</span>'}</td>
+        <td data-label="Leader">${hasLeader ? `<span class="score-chip score-chip-leader">L${g.leader_score}</span>` : '<span class="badge badge-gray">Pending</span>'}</td>
         <td data-label="Final"><span class="score-chip score-chip-final">${g.final_score}</span></td>
         <td data-label="Target"><strong>L${g.target_level}</strong></td>
         <td data-label="Gap"><span class="score-chip score-chip-gap">-${g.gap}</span></td>
@@ -875,7 +893,7 @@ function renderGapRecommendation(gaps) {
   }
 
   if (doneItems.length > 0) {
-    content += `<div class="card"><div class="card-header"><div class="card-title">Competency Sudah Tercapai (${doneItems.length})</div></div><div class="card-body" style="padding:0 22px;">`;
+    content += `<div class="card"><div class="card-header"><div class="card-title">Achieved Competencies (${doneItems.length})</div></div><div class="card-body" style="padding:0 22px;">`;
     doneItems.forEach(g => {
       content += `<div class="pipeline-item"><div class="pipeline-icon" style="background:var(--emerald-soft);">✅</div><div class="pipeline-info"><div class="pipeline-name">${g.competency_name}</div><div class="pipeline-meta">${g.competency_id} · Level ${g.achievement_level} (of ${g.achievement_source==='training_history'?'training history':g.achievement_source==='leader'?'leader approval':'self assessment'})</div></div><span class="badge badge-emerald">Achieved</span></div>`;
     });
@@ -998,7 +1016,7 @@ function buildAssessmentScores() {
 
 async function saveDraft() {
   const res = await api('submitAssessment', { nik:state.user.nik, scores:buildAssessmentScores(), is_final:false });
-  if (res.success) toast('Draft disimpan', 'success'); else toast(res.message, 'error');
+  if (res.success) toast('Draft saved.', 'success'); else toast(res.message, 'error');
 }
 
 function confirmFinalSubmit() {
@@ -1013,15 +1031,23 @@ function confirmFinalSubmit() {
 
 async function doFinalSubmit() {
   closeModal();
+  // LOCK LAYER 1: set in-memory flag immediately to prevent double-submit
+  state._assessmentSubmitted = true;
   const res = await api('submitAssessment', { nik:state.user.nik, scores:buildAssessmentScores(), is_final:true });
   if (res.success) {
+    // LOCK LAYER 2: persist to sessionStorage so lock survives in-tab navigation
+    sessionStorage.setItem('mirai_submitted_' + state.user.nik, 'true');
     toast('Assessment submitted successfully.', 'success');
-    // Reset library so next loadAssessment fetches fresh data
     state.compLibrary = null;
     state.assessmentScores = {};
     state.assessmentChecks = {};
-    loadAssessment();
-  } else toast(res.message, 'error');
+    html('assessment-content', buildSubmittedView());
+  } else {
+    // Backend rejected — release both locks
+    state._assessmentSubmitted = false;
+    sessionStorage.removeItem('mirai_submitted_' + state.user.nik);
+    toast(res.message, 'error');
+  }
 }
 
 // ── JADWAL ─────────────────────────────────────────────────────
@@ -1086,7 +1112,7 @@ function renderJadwal() {
         </div>
       </div>`;
     });
-    if (!sessions.length && !unschHTML) { html('jadwal-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">No sessions available</div><div class="empty-desc">Lihat tab All Schedules untuk sesi yang tersedia.</div></div></div></div>`); return; }
+    if (!sessions.length && !unschHTML) { html('jadwal-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">No sessions available</div><div class="empty-desc">Go to the All Schedules tab to see available sessions.</div></div></div></div>`); return; }
     html('jadwal-content', (sessions.length>0?renderJadwalTable(sessions,enrolledIds):'')+unschHTML);
     return;
   }
@@ -1506,7 +1532,7 @@ async function loadTeamSchedule() {
     const sessMap={};allSessions.forEach(s=>{sessMap[s.session_id]=s;});
     const teamEnrs=[];
     team.forEach((m,i)=>{const eD=allEnrRes[i];(eD.success?eD.data:[]).forEach(e=>{const s=sessMap[e.session_id];if(s)teamEnrs.push({member:m,session:s});});});
-    if(!teamEnrs.length){html('team-monitor-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">Belum ada enrollment tim</div><div class="empty-desc">No team members have enrolled in a training session yet.</div></div></div></div>`);return;}
+    if(!teamEnrs.length){html('team-monitor-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">No team enrollments yet</div><div class="empty-desc">No team members have enrolled in a training session yet.</div></div></div></div>`);return;}
     teamEnrs.sort((a,b)=>(a.session.date||'').localeCompare(b.session.date||''));
     let c=`<div class="card"><div class="table-wrap"><table class="mobile-card"><thead><tr><th>Anggota</th><th>Tanggal</th><th>Competency</th><th>Trainer</th><th>Lokasi</th><th>Tipe</th></tr></thead><tbody>`;
     teamEnrs.forEach(({member:m,session:s})=>{
@@ -1845,7 +1871,7 @@ async function loadAdmin() {
   const deptStats=d.department_stats||{},compDemand=d.competency_demand||{};
   let content=`<div class="stats-grid" style="margin-bottom:20px;">
     <div class="stat-card stat-card-purple"><div class="stat-icon">👤</div><div class="stat-label">Total Karyawan</div><div class="stat-value">${s.total_employees}</div></div>
-    <div class="stat-card stat-card-sky"><div class="stat-icon">📋</div><div class="stat-label">Sudah Assessment</div><div class="stat-value">${s.total_assessed}</div><div class="stat-sub">${pct(s.total_assessed,s.total_employees)}% selesai</div></div>
+    <div class="stat-card stat-card-sky"><div class="stat-icon">📋</div><div class="stat-label">Assessed</div><div class="stat-value">${s.total_assessed}</div><div class="stat-sub">${pct(s.total_assessed,s.total_employees)}% complete</div></div>
     <div class="stat-card stat-card-amber"><div class="stat-icon">👥</div><div class="stat-label">Leader Assigned</div><div class="stat-value">${s.leaders_assigned}<span style="font-size:14px;opacity:0.7;">/${s.total_leaders}</span></div></div>
     <div class="stat-card stat-card-emerald"><div class="stat-icon">✅</div><div class="stat-label">Mandatory Done</div><div class="stat-value">${s.mandatory_completed}<span style="font-size:14px;opacity:0.7;">/${s.mandatory_total}</span></div></div>
   </div>`;
