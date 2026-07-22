@@ -447,8 +447,15 @@ tbody tr:hover{background:var(--purple-soft);}
         <div class="login-logo-pill">MIRAI</div>
         <div style="font-size:12px;color:var(--text-muted);line-height:1.4;">PT. Amerta Indah Otsuka<br>IDP Platform</div>
       </div>
-      <div class="login-heading">Welcome back 👋</div>
-      <div class="login-hint">Sign in with your Employee ID to continue</div>
+      <!-- Language Toggle -->
+      <div id="lang-toggle" style="display:flex;justify-content:center;margin-bottom:20px;">
+        <div style="display:inline-flex;border:1.5px solid var(--border);border-radius:30px;overflow:hidden;background:var(--surface2);">
+          <button id="btn-lang-en" onclick="setLanguage('en')" style="padding:6px 20px;border:none;background:var(--purple);color:#fff;font-size:12px;font-weight:700;cursor:pointer;border-radius:30px 0 0 30px;font-family:var(--font);transition:all 0.2s;">EN</button>
+          <button id="btn-lang-id" onclick="setLanguage('id')" style="padding:6px 20px;border:none;background:transparent;color:var(--text-2);font-size:12px;font-weight:700;cursor:pointer;border-radius:0 30px 30px 0;font-family:var(--font);transition:all 0.2s;">ID</button>
+        </div>
+      </div>
+      <div class="login-heading" data-i18n="login.welcome">Welcome back 👋</div>
+      <div class="login-hint" data-i18n="login.hint">Sign in with your Employee ID to continue</div>
       <div class="form-group">
         <label class="form-label">Employee ID (NIK)</label>
         <input type="text" id="login-nik" class="form-input mono" placeholder="Enter your NIK" autocomplete="off">
@@ -489,7 +496,14 @@ tbody tr:hover{background:var(--purple-soft);}
       <div class="nav-brand-pill">MIRAI</div>
       <div class="nav-brand-sub">IDP Platform</div>
     </div>
-    <div class="nav-user">
+    <div class="nav-user" style="display:flex;align-items:center;gap:12px;">
+      <!-- Floating language toggle (visible when logged in) -->
+      <div id="nav-lang-toggle" style="display:none;">
+        <div style="display:inline-flex;border:1.5px solid rgba(255,255,255,0.2);border-radius:20px;overflow:hidden;background:rgba(255,255,255,0.08);">
+          <button id="nav-btn-en" onclick="setLanguage('en')" style="padding:4px 12px;border:none;background:rgba(255,255,255,0.25);color:#fff;font-size:11px;font-weight:700;cursor:pointer;border-radius:20px 0 0 20px;font-family:var(--font);transition:all 0.2s;">EN</button>
+          <button id="nav-btn-id" onclick="setLanguage('id')" style="padding:4px 12px;border:none;background:transparent;color:rgba(255,255,255,0.6);font-size:11px;font-weight:700;cursor:pointer;border-radius:0 20px 20px 0;font-family:var(--font);transition:all 0.2s;">ID</button>
+        </div>
+      </div>
       <div class="nav-user-info">
         <div class="nav-user-name" id="nav-user-name">—</div>
         <div class="nav-user-role" id="nav-user-role">—</div>
@@ -539,8 +553,280 @@ tbody tr:hover{background:var(--purple-soft);}
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────────────
+
+// ── INTERNATIONALISATION ─────────────────────────────────────────────
+// Language: 'en' (default) or 'id'
+// Behavioral indicators are ALWAYS in Bahasa Indonesia regardless of language setting.
+// All other UI strings switch based on user selection.
+
+const LANG = {
+  en: {
+    // Login
+    'login.welcome':        'Welcome back 👋',
+    'login.hint':           'Sign in with your Employee ID to continue',
+    'login.nik':            'Employee ID (NIK)',
+    'login.password':       'Password',
+    'login.signin':         'Sign In →',
+    'login.forgot':         'Forgot password?',
+    'login.default_pwd':    'Default password: AIO + NIK · Must be changed on first login',
+    // Nav / Sidebar
+    'nav.dashboard':        'Dashboard',
+    'nav.assessment':       'Assessment',
+    'nav.schedule':         'Schedule',
+    'nav.progress':         'Progress',
+    'nav.corporate':        'Corporate',
+    'nav.team':             'Team',
+    'nav.monitor':          'Monitor',
+    'nav.l3eval':           'L3 Eval',
+    'nav.account':          'Account',
+    'nav.signout':          'Sign Out',
+    // Dashboard
+    'dash.overview':        'OVERVIEW',
+    'dash.title':           'Dashboard',
+    'dash.my_comp':         '${t('dash.my_comp')}',
+    'dash.awaiting':        'Awaiting Review',
+    'dash.awaiting_desc':   'Your manager has not yet set your development priorities.',
+    // Assessment
+    'assess.title':         'Self Assessment',
+    'assess.instruction':   'Instruction',
+    'assess.inst_text':     'Check all behavioral indicators that you consistently demonstrate. Be honest — this is for your own development.',
+    'assess.save_draft':    '💾 Save Draft',
+    'assess.submit':        'Submit →',
+    'assess.submitted':     'Assessment Submitted',
+    'assess.submitted_desc':'Your self-assessment for this cycle has been recorded. Your manager will review and set your development priorities.',
+    'assess.notified':      '${t('assess.notified')}',
+    'assess.draft_saved':   'Draft saved.',
+    'assess.no_assess':     '${t('assess.no_assess')}',
+    'assess.no_assess_desc':'${t('assess.no_assess_desc')}',
+    // Scoring
+    'score.formula_title':  '${t('score.formula_title')}',
+    'score.gap_title':      'Competency Gap',
+    'score.achieved_title': 'Achieved Competencies',
+    'score.gap_notice':     '${t('score.gap_notice')}',
+    'score.pending_leader': 'Pending',
+    // Schedule
+    'sched.title':          'Training Schedule',
+    'sched.my_tab':         'My Schedule',
+    'sched.all_tab':        'All Schedules',
+    'sched.no_session':     'No sessions available',
+    'sched.no_session_desc':'${t('sched.no_session_desc')}',
+    'sched.enroll':         'Enroll',
+    'sched.cancel':         'Cancel',
+    'sched.enrolled':       'Enrolled',
+    // Team Assessment
+    'team.title':           'Team Assessment',
+    'team.desc':            'Review team assessment results and set development priorities',
+    'team.download_pdf':    '${t('team.download_pdf')}',
+    'team.no_reports':      'No direct reports',
+    'team.col_name':        'Name',
+    'team.col_grade':       'Grade',
+    'team.col_dept':        'Dept',
+    'team.col_assess':      'Assessment',
+    'team.col_assign':      'Assignment',
+    'team.col_mandatory':   'Mandatory',
+    'team.col_action':      'Action',
+    'team.review_assign':   'Review & Assign',
+    'team.awaiting':        'Awaiting assessment',
+    'team.not_assigned':    '${t('team.not_assigned')}',
+    // Monitor
+    'mon.col_name':         'Name',
+    'mon.col_spv':          'Supervisor',
+    'mon.col_grade':        'Grade',
+    'mon.col_mandatory':    'Mandatory',
+    'mon.col_progress':     'Progress',
+    'mon.col_enrolled':     'Enrolled',
+    'mon.col_status':       'Status',
+    'mon.no_enroll':        '${t('mon.no_enroll')}',
+    'mon.col_member':       'Member',
+    'mon.col_date':         'Date',
+    'mon.col_trainer':      'Trainer',
+    'mon.col_location':     'Location',
+    'mon.col_type':         'Type',
+    // Progress
+    'prog.title':           'IDP Progress',
+    'prog.desc':            'Track your individual development program progress',
+    // Corporate
+    'corp.title':           'Corporate Training',
+    // Account
+    'acc.title':            'Account Settings',
+    // Admin
+    'admin.col_name':       'Name',
+    'admin.col_grade':      'Grade',
+    'admin.col_div':        'Division',
+    'admin.col_role':       'Role',
+    'admin.col_reset':      'Reset Pwd',
+    'admin.col_action':     'Action',
+    // Misc
+    'misc.password_mismatch': 'Passwords do not match',
+    'misc.no_reports':      'No direct reports found',
+    'misc.enroll_success':  'Successfully enrolled in training session',
+    'misc.cancel_success':  'Enrollment cancelled',
+  },
+
+  id: {
+    // Login
+    'login.welcome':        'Selamat datang 👋',
+    'login.hint':           'Masuk dengan Employee ID kamu untuk melanjutkan',
+    'login.nik':            'Employee ID (NIK)',
+    'login.password':       'Kata Sandi',
+    'login.signin':         'Masuk →',
+    'login.forgot':         'Lupa kata sandi?',
+    'login.default_pwd':    'Password default: AIO + NIK · Wajib diganti saat login pertama',
+    // Nav / Sidebar
+    'nav.dashboard':        'Beranda',
+    'nav.assessment':       'Asesmen',
+    'nav.schedule':         'Jadwal',
+    'nav.progress':         'Progres',
+    'nav.corporate':        'Korporat',
+    'nav.team':             'Tim',
+    'nav.monitor':          'Monitor',
+    'nav.l3eval':           'Evaluasi L3',
+    'nav.account':          'Akun',
+    'nav.signout':          'Keluar',
+    // Dashboard
+    'dash.overview':        'IKHTISAR',
+    'dash.title':           'Beranda',
+    'dash.my_comp':         'Kompetensi Saya',
+    'dash.awaiting':        'Menunggu Tinjauan',
+    'dash.awaiting_desc':   'Atasan kamu belum menetapkan prioritas pengembangan.',
+    // Assessment
+    'assess.title':         'Asesmen Mandiri',
+    'assess.instruction':   'Petunjuk',
+    'assess.inst_text':     'Centang semua indikator perilaku yang kamu tunjukkan secara konsisten. Jujurlah — ini untuk pengembanganmu sendiri.',
+    'assess.save_draft':    '💾 Simpan Draf',
+    'assess.submit':        'Submit →',
+    'assess.submitted':     'Asesmen Terkirim',
+    'assess.submitted_desc':'Asesmen mandirimu untuk siklus ini telah tercatat. Atasanmu akan meninjau dan menetapkan prioritas pengembanganmu.',
+    'assess.notified':      'Kamu akan mendapat notifikasi setelah atasanmu selesai meninjau.',
+    'assess.draft_saved':   'Draf tersimpan.',
+    'assess.no_assess':     'Tidak ada asesmen yang diperlukan siklus ini',
+    'assess.no_assess_desc':'Hubungi HCD atau atasanmu untuk informasi lebih lanjut.',
+    // Scoring
+    'score.formula_title':  'Formula Penilaian 30:70',
+    'score.gap_title':      'Kesenjangan Kompetensi',
+    'score.achieved_title': 'Kompetensi Tercapai',
+    'score.gap_notice':     'Berikut rekomendasi kesenjangan kompetensimu berdasarkan formula penilaian 30:70. Atasanmu akan menetapkan prioritas pengembanganmu.',
+    'score.pending_leader': 'Menunggu',
+    // Schedule
+    'sched.title':          'Jadwal Pelatihan',
+    'sched.my_tab':         'Jadwal Saya',
+    'sched.all_tab':        'Semua Jadwal',
+    'sched.no_session':     'Tidak ada sesi tersedia',
+    'sched.no_session_desc':'Buka tab Semua Jadwal untuk melihat sesi yang tersedia.',
+    'sched.enroll':         'Daftar',
+    'sched.cancel':         'Batalkan',
+    'sched.enrolled':       'Terdaftar',
+    // Team Assessment
+    'team.title':           'Asesmen Tim',
+    'team.desc':            'Tinjau hasil asesmen tim dan tetapkan prioritas pengembangan',
+    'team.download_pdf':    '⬇ Unduh PDF Penugasan',
+    'team.no_reports':      '${t('team.no_reports')}',
+    'team.col_name':        'Nama',
+    'team.col_grade':       'Grade',
+    'team.col_dept':        'Dept',
+    'team.col_assess':      'Asesmen',
+    'team.col_assign':      'Penugasan',
+    'team.col_mandatory':   'Wajib',
+    'team.col_action':      'Aksi',
+    'team.review_assign':   'Tinjau & Tetapkan',
+    'team.awaiting':        'Menunggu asesmen',
+    'team.not_assigned':    'anggota belum ditetapkan',
+    // Monitor
+    'mon.col_name':         'Nama',
+    'mon.col_spv':          'Supervisor',
+    'mon.col_grade':        'Grade',
+    'mon.col_mandatory':    'Wajib',
+    'mon.col_progress':     'Progres',
+    'mon.col_enrolled':     'Terdaftar',
+    'mon.col_status':       'Status',
+    'mon.no_enroll':        'Belum ada anggota tim yang mendaftar pelatihan',
+    'mon.col_member':       'Anggota',
+    'mon.col_date':         'Tanggal',
+    'mon.col_trainer':      'Pelatih',
+    'mon.col_location':     'Lokasi',
+    'mon.col_type':         'Tipe',
+    // Progress
+    'prog.title':           'Progres IDP',
+    'prog.desc':            'Pantau progres program pengembangan individu kamu',
+    // Corporate
+    'corp.title':           'Pelatihan Korporat',
+    // Account
+    'acc.title':            'Pengaturan Akun',
+    // Admin
+    'admin.col_name':       'Nama',
+    'admin.col_grade':      'Grade',
+    'admin.col_div':        'Divisi',
+    'admin.col_role':       'Peran',
+    'admin.col_reset':      'Reset Pwd',
+    'admin.col_action':     'Aksi',
+    // Misc
+    'misc.password_mismatch': 'Password tidak cocok',
+    'misc.no_reports':      '${t('team.no_reports')}',
+    'misc.enroll_success':  'Berhasil mendaftar sesi pelatihan',
+    'misc.cancel_success':  'Pendaftaran dibatalkan',
+  }
+};
+
+// Current language state — default English
+let currentLang = localStorage.getItem('mirai_lang') || 'en';
+
+// Translation function
+function t(key) {
+  return (LANG[currentLang] && LANG[currentLang][key]) || (LANG['en'][key]) || key;
+}
+
+function setLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('mirai_lang', lang);
+  applyLanguage();
+}
+
+function applyLanguage() {
+  // Update toggle button styles
+  const btnEn = document.getElementById('btn-lang-en');
+  const btnId = document.getElementById('btn-lang-id');
+  if (btnEn && btnId) {
+    if (currentLang === 'en') {
+      btnEn.style.background = 'var(--purple)'; btnEn.style.color = '#fff';
+      btnId.style.background = 'transparent'; btnId.style.color = 'var(--text-2)';
+    } else {
+      btnId.style.background = 'var(--purple)'; btnId.style.color = '#fff';
+      btnEn.style.background = 'transparent'; btnEn.style.color = 'var(--text-2)';
+    }
+  }
+  // Apply data-i18n attributes to static elements
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (key) el.textContent = t(key);
+  });
+  // Update nav toggle button styles
+  const navEn = document.getElementById('nav-btn-en');
+  const navId = document.getElementById('nav-btn-id');
+  if (navEn && navId) {
+    if (currentLang === 'en') {
+      navEn.style.background = 'rgba(255,255,255,0.25)'; navEn.style.color = '#fff';
+      navId.style.background = 'transparent'; navId.style.color = 'rgba(255,255,255,0.6)';
+    } else {
+      navId.style.background = 'rgba(255,255,255,0.25)'; navId.style.color = '#fff';
+      navEn.style.background = 'transparent'; navEn.style.color = 'rgba(255,255,255,0.6)';
+    }
+  }
+  // If logged in, re-render current view to apply language
+  if (state && state.user) {
+    const view = state.currentView;
+    const loaderFns = {
+      'dashboard': loadDashboard, 'assessment': loadAssessment,
+      'jadwal': loadJadwal, 'progress': loadProgress, 'corporate': loadCorporate,
+      'team-assessment': loadTeamAssessment, 'team-monitor': loadTeamMonitor,
+      'l3-eval': loadL3Eval, 'admin': loadAdmin, 'admin-users': loadAdminUsers,
+      'account': loadAccount
+    };
+    if (loaderFns[view]) loaderFns[view]();
+  }
+}
+
 // UPDATE SETELAH NEW DEPLOYMENT
-const API_URL = 'https://script.google.com/macros/s/AKfycbyavs8zzYmccqwY7DeN86tH9aFdq9xNxrbAJakwaVXVMaigOHZblA3TOv6hFR9dR9Zv/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwckSeieKS27d0fuzz2eVUW3AFGMnDZlngFL9htqrRFNtOuUyE5FU2ym_3RFLqIbonA/exec';
 
 // ── STATE ──────────────────────────────────────────────────────
 let state = {
@@ -638,7 +924,7 @@ async function doChangePassword() {
   const np = el('new-password').value.trim();
   const cp = el('confirm-password').value.trim();
   if (!np || np.length < 6) { toast('Password minimal 6 karakter', 'error'); return; }
-  if (np !== cp) { toast('Password tidak cocok', 'error'); return; }
+  if (np !== cp) { toast(t('misc.password_mismatch'), 'error'); return; }
   const res = await api('changePassword', { nik: state.user.nik, new_password: np });
   if (!res.success) { toast(res.message, 'error'); return; }
   toast('Password updated successfully!', 'success');
@@ -656,6 +942,7 @@ function doLogout() {
   state = { user:null, currentView:'dashboard', jadwalTab:'my', monitorTab:'progress', compLibrary:null, achievedComps:[], assessmentScores:{}, assessmentChecks:{}, teamData:null, enrollments:[], jadwal:[], mandatoryCompIds:[], mandatoryLevelMap:{}, mandatoryLevelIsFallback:{}, _pipeline:[], miraiHistory:[], trainingHistory:[], _assessmentSubmitted:false };
   el('app-layout').style.display='none';
   el('page-login').style.display='flex';
+  const _nlt = document.getElementById('nav-lang-toggle'); if (_nlt) _nlt.style.display = 'none';
   el('login-nik').value=''; el('login-password').value='';
 }
 
@@ -683,6 +970,7 @@ function initApp() {
   el('app-layout').style.display='block';
   const u = state.user;
   el('nav-user-name').textContent = u.name;
+  const navLT = document.getElementById('nav-lang-toggle'); if (navLT) navLT.style.display = '';
   el('nav-user-role').textContent = roleLabel(u.role);
   el('nav-avatar').textContent    = initials(u.name);
   buildNav();
@@ -762,7 +1050,7 @@ async function loadDashboard() {
 
   // Pipeline
   if (pipeline.length > 0) {
-    content += `<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title">My Competencies</div></div><div class="card-body" style="padding:0 22px;">`;
+    content += `<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title">${t('dash.my_comp')}</div></div><div class="card-body" style="padding:0 22px;">`;
     pipeline.forEach(p => {
       const icons  = { assigned:'🎯', enrolled:'📚', completed:'✅' };
       const bgs    = { assigned:'var(--amber-soft)', enrolled:'var(--sky-soft)', completed:'var(--emerald-soft)' };
@@ -779,7 +1067,7 @@ async function loadDashboard() {
     });
     content += `</div></div>`;
   } else if (d.assessment_status === 'submitted') {
-    content += `<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">Awaiting Review</div><div class="empty-desc">Your manager has not yet set your development priorities.</div></div></div></div>`;
+    content += `<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">${t('dash.awaiting')}</div><div class="empty-desc">${t('dash.awaiting_desc')}</div></div></div></div>`;
   }
 
   // Leader tools CTA
@@ -846,13 +1134,12 @@ function buildSubmittedView() {
   return `<div class="card" style="max-width:520px;margin:0 auto;">
     <div class="card-body" style="text-align:center;padding:48px 32px;">
       <div style="width:72px;height:72px;background:var(--emerald-soft);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 20px;">✅</div>
-      <div style="font-size:20px;font-weight:800;margin-bottom:8px;color:var(--text);">Assessment Submitted</div>
+      <div style="font-size:20px;font-weight:800;margin-bottom:8px;color:var(--text);">${t('assess.submitted')}</div>
       <div style="font-size:14px;color:var(--text-2);line-height:1.7;margin-bottom:24px;">
-        Your self-assessment for this cycle has been recorded.<br>
-        Your manager will review and set your development priorities.
+        ${t('assess.submitted_desc')}
       </div>
       <div style="background:var(--surface2);border-radius:var(--r);padding:16px 20px;font-size:13px;color:var(--text-muted);border:1px solid var(--border);line-height:1.6;">
-        You will be notified once your manager has completed the review.
+        ${t('assess.notified')}
       </div>
     </div>
   </div>`;
@@ -861,11 +1148,11 @@ function buildSubmittedView() {
 function renderGapRecommendation(gaps) {
   const gapItems  = gaps.filter(g => g.achievement_status !== 'achieved');
   const doneItems = gaps.filter(g => g.achievement_status === 'achieved');
-  let content = `<div class="notice notice-emerald"><div class="notice-icon">✅</div><div><strong>Assessment Submitted!</strong> Below is your competency gap recommendation based on the 30:70 scoring formula. Your manager will set your development priorities.</div></div>`;
+  let content = `<div class="notice notice-emerald"><div class="notice-icon">✅</div><div><strong>Assessment Submitted!</strong> ${t('score.gap_notice')}</div></div>`;
 
   // Scoring formula explanation
   content += `<div class="card" style="margin-bottom:14px;">
-    <div class="card-header"><div class="card-title">30:70 Scoring Formula</div></div>
+    <div class="card-header"><div class="card-title">${t('score.formula_title')}</div></div>
     <div class="card-body" style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
       <span class="score-chip score-chip-self">Self Assessment × 30%</span>
       <span style="font-size:18px;color:var(--text-muted);">+</span>
@@ -876,13 +1163,13 @@ function renderGapRecommendation(gaps) {
   </div>`;
 
   if (gapItems.length > 0) {
-    content += `<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title">Competency Gap (${gapItems.length})</div></div><div class="table-wrap"><table class="mobile-card"><thead><tr><th>Competency</th><th>Self</th><th>Leader</th><th>Final</th><th>Target</th><th>Gap</th><th>Status</th></tr></thead><tbody>`;
+    content += `<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title">${t('score.gap_title')} (${gapItems.length})</div></div><div class="table-wrap"><table class="mobile-card"><thead><tr><th>Competency</th><th>Self</th><th>Leader</th><th>Final</th><th>Target</th><th>Gap</th><th>Status</th></tr></thead><tbody>`;
     gapItems.forEach(g => {
       const hasLeader = g.has_leader_score;
       content += `<tr>
         <td data-label="Competency"><strong>${g.competency_name}</strong><br><span style="font-family:var(--mono);font-size:11px;color:var(--text-muted);">${g.competency_id}</span></td>
         <td data-label="Self"><span class="score-chip score-chip-self">L${g.self_score}</span></td>
-        <td data-label="Leader">${hasLeader ? `<span class="score-chip score-chip-leader">L${g.leader_score}</span>` : '<span class="badge badge-gray">Pending</span>'}</td>
+        <td data-label="Leader">${hasLeader ? `<span class="score-chip score-chip-leader">L${g.leader_score}</span>` : `<span class="badge badge-gray">${t('score.pending_leader')}</span>`}</td>
         <td data-label="Final"><span class="score-chip score-chip-final">${g.final_score}</span></td>
         <td data-label="Target"><strong>L${g.target_level}</strong></td>
         <td data-label="Gap"><span class="score-chip score-chip-gap">-${g.gap}</span></td>
@@ -893,7 +1180,7 @@ function renderGapRecommendation(gaps) {
   }
 
   if (doneItems.length > 0) {
-    content += `<div class="card"><div class="card-header"><div class="card-title">Achieved Competencies (${doneItems.length})</div></div><div class="card-body" style="padding:0 22px;">`;
+    content += `<div class="card"><div class="card-header"><div class="card-title">${t('score.achieved_title')} (${doneItems.length})</div></div><div class="card-body" style="padding:0 22px;">`;
     doneItems.forEach(g => {
       content += `<div class="pipeline-item"><div class="pipeline-icon" style="background:var(--emerald-soft);">✅</div><div class="pipeline-info"><div class="pipeline-name">${g.competency_name}</div><div class="pipeline-meta">${g.competency_id} · Level ${g.achievement_level} (of ${g.achievement_source==='training_history'?'training history':g.achievement_source==='leader'?'leader approval':'self assessment'})</div></div><span class="badge badge-emerald">Achieved</span></div>`;
     });
@@ -907,10 +1194,10 @@ function renderAssessmentForm() {
   const achieved = state.achievedComps || [];
   if ((!lib || !lib.length) && !achieved.length) {
     // Revisi 3: Pesan netral — tidak menyebut "achieved" ke employees
-    html('assessment-content', `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No assessment required this cycle</div><div class="empty-desc">Please contact HCD or your manager for further information.</div></div>`);
+    html('assessment-content', `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">${t('assess.no_assess')}</div><div class="empty-desc">${t('assess.no_assess_desc')}</div></div>`);
     return;
   }
-  let content = `<div class="notice notice-amber"><div class="notice-icon">💡</div><div><strong>Instruction:</strong> Check all behavioral indicators that you <strong>consistently</strong> demonstrate. Be honest — this is for your own development.</div></div>`;
+  let content = `<div class="notice notice-amber"><div class="notice-icon">💡</div><div><strong>${t('assess.instruction')}:</strong> ${t('assess.inst_text')}</div></div>`;
 
   // Revisi 3: Achieved competency TIDAK ditampilkan ke employees.
   // Info achieved/gap hanya untuk HCD dan leader (via Team Assessment).
@@ -928,8 +1215,8 @@ function renderAssessmentForm() {
       content += `</div>`;
     });
     content += `<div style="display:flex;gap:10px;margin-top:24px;padding-top:18px;border-top:1px solid var(--border);">
-      <button class="btn btn-ghost" onclick="saveDraft()">💾 Save Draft</button>
-      <button class="btn btn-primary btn-lg" onclick="confirmFinalSubmit()">Submit →</button>
+      <button class="btn btn-ghost" onclick="saveDraft()">${t('assess.save_draft')}</button>
+      <button class="btn btn-primary btn-lg" onclick="confirmFinalSubmit()">${t('assess.submit')}</button>
     </div>`;
   }
   html('assessment-content', content);
@@ -1016,7 +1303,7 @@ function buildAssessmentScores() {
 
 async function saveDraft() {
   const res = await api('submitAssessment', { nik:state.user.nik, scores:buildAssessmentScores(), is_final:false });
-  if (res.success) toast('Draft saved.', 'success'); else toast(res.message, 'error');
+  if (res.success) toast(t('assess.draft_saved'), 'success'); else toast(res.message, 'error');
 }
 
 function confirmFinalSubmit() {
@@ -1112,16 +1399,16 @@ function renderJadwal() {
         </div>
       </div>`;
     });
-    if (!sessions.length && !unschHTML) { html('jadwal-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">No sessions available</div><div class="empty-desc">Go to the All Schedules tab to see available sessions.</div></div></div></div>`); return; }
+    if (!sessions.length && !unschHTML) { html('jadwal-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">${t('sched.no_session')}</div><div class="empty-desc">${t('sched.no_session_desc')}</div></div></div></div>`); return; }
     html('jadwal-content', (sessions.length>0?renderJadwalTable(sessions,enrolledIds):'')+unschHTML);
     return;
   }
-  if (!sessions.length) { html('jadwal-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">No schedule available</div><div class="empty-desc">No sessions available training untuk grade kamu.</div></div></div></div>`); return; }
+  if (!sessions.length) { html('jadwal-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">${t('sched.no_session')}</div><div class="empty-desc">No sessions available for your grade.</div></div></div></div>`); return; }
   html('jadwal-content', renderJadwalTable(sessions, enrolledIds));
 }
 
 function renderJadwalTable(sessions, enrolledIds) {
-  let c = `<div class="card"><div class="table-wrap"><table class="mobile-card"><thead><tr><th>Tanggal</th><th>Waktu</th><th>Competency</th><th>Trainer</th><th>Lokasi</th><th>Tipe</th><th>Assigned</th><th>Status</th><th>Aksi</th></tr></thead><tbody>`;
+  let c = `<div class="card"><div class="table-wrap"><table class="mobile-card"><thead><tr><th>${t('mon.col_date')}</th><th>Time</th><th>Competency</th><th>${t('mon.col_trainer')}</th><th>${t('mon.col_location')}</th><th>${t('mon.col_type')}</th><th>Assigned</th><th>Status</th><th>${t('team.col_action')}</th></tr></thead><tbody>`;
   sessions.forEach(s => {
     const isEnrolled = enrolledIds.includes(s.session_id);
     const tt = (s.training_type||'').toLowerCase();
@@ -1138,11 +1425,11 @@ function renderJadwalTable(sessions, enrolledIds) {
       else if (sessLvl>0&&sessLvl===al) { assignCell += `<div class="level-ok">✓ Level matches</div>`; }
     }
     c += `<tr class="${rowClass}">
-      <td data-label="Tanggal" style="white-space:nowrap;font-weight:600;">${dateDisplay}</td>
+      <td data-label="${t('mon.col_date')}" style="white-space:nowrap;font-weight:600;">${dateDisplay}</td>
       <td data-label="Waktu" style="color:var(--text-2);">${s.time||'—'}</td>
       <td data-label="Competency"><div style="font-weight:700;">${s.competency_name||s.competency_id}</div><div style="font-size:11px;font-family:var(--mono);color:var(--text-muted);">${s.competency_id}${sessLvl>0?' · L'+sessLvl:''}</div></td>
-      <td data-label="Trainer">${s.trainer||'—'}</td>
-      <td data-label="Lokasi">${s.location||s.area||'—'}</td>
+      <td data-label="${t('mon.col_trainer')}">${s.trainer||'—'}</td>
+      <td data-label="${t('mon.col_location')}">${s.location||s.area||'—'}</td>
       <td data-label="Tipe">${typeBadge}</td>
       <td data-label="Assigned">${assignCell}</td>
       <td data-label="Status">${isEnrolled?'<span class="badge badge-emerald">Enrolled</span>':'<span class="badge badge-gray">Not enrolled</span>'}</td>
@@ -1307,23 +1594,23 @@ async function loadTeamAssessment() {
 
 function renderTeamList() {
   const team = state.teamData;
-  if (!team||!team.length) { html('team-assessment-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">Tidak ada direct reports</div></div></div></div>`); return; }
+  if (!team||!team.length) { html('team-assessment-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">${t('team.no_reports')}</div></div></div></div>`); return; }
   const allAssigned = team.filter(m=>m.has_submitted).every(m=>m.already_assigned);
   const pendingCount = team.filter(m=>m.has_submitted&&!m.already_assigned).length;
   let content = `<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
-    <button class="btn btn-sky" onclick="downloadAssignmentPDF()" ${!allAssigned?'disabled':''}>⬇ Download Assignment PDF</button>
-    ${!allAssigned?`<span style="font-size:12px;color:var(--text-muted);">${pendingCount} member(s) not yet assigned</span>`:''}
+    <button class="btn btn-sky" onclick="downloadAssignmentPDF()" ${!allAssigned?'disabled':''}>${t('team.download_pdf')}</button>
+    ${!allAssigned?`<span style="font-size:12px;color:var(--text-muted);">${pendingCount} ${t('team.not_assigned')}</span>`:''}
   </div>`;
-  content += `<div class="card"><div class="table-wrap"><table class="mobile-card"><thead><tr><th>Nama</th><th>Grade</th><th>Dept</th><th>Assessment</th><th>Assignment</th><th>Mandatory</th><th>Aksi</th></tr></thead><tbody>`;
+  content += `<div class="card"><div class="table-wrap"><table class="mobile-card"><thead><tr><th>${t('team.col_name')}</th><th>${t('team.col_grade')}</th><th>${t('team.col_dept')}</th><th>${t('team.col_assess')}</th><th>${t('team.col_assign')}</th><th>${t('team.col_mandatory')}</th><th>${t('team.col_action')}</th></tr></thead><tbody>`;
   team.forEach(m => {
     content += `<tr>
-      <td data-label="Nama"><strong>${m.name}</strong><br><span style="font-size:11px;font-family:var(--mono);color:var(--text-muted);">${m.nik}</span></td>
+      <td data-label="${t('team.col_name')}"><strong>${m.name}</strong><br><span style="font-size:11px;font-family:var(--mono);color:var(--text-muted);">${m.nik}</span></td>
       <td data-label="Grade"><span class="badge ${gradeColor(m.grade)}">${m.grade}</span></td>
       <td data-label="Dept" style="font-size:12px;">${m.department}</td>
-      <td data-label="Assessment">${m.has_submitted?'<span class="badge badge-emerald">Completed</span>':'<span class="badge badge-gray">Pending</span>'}</td>
+      <td data-label="Assessment">${m.has_submitted?'<span class="badge badge-emerald">Completed</span>':`<span class="badge badge-gray">${t('score.pending_leader')}</span>`}</td>
       <td data-label="Assignment">${m.already_assigned?'<span class="badge badge-sky">Done</span>':'<span class="badge badge-amber">Pending</span>'}</td>
       <td data-label="Mandatory"><span style="font-weight:800;color:var(--coral);">${m.mandatory_count}</span>/2</td>
-      <td>${m.has_submitted?`<button class="btn btn-primary btn-sm" onclick="openAssignModal('${m.nik}')">Review & Assign</button>`:'<span class="text-muted text-sm">Awaiting assessment</span>'}</td>
+      <td>${m.has_submitted?`<button class="btn btn-primary btn-sm" onclick="openAssignModal('${m.nik}')">${t('team.review_assign')}</button>`:`<span class="text-muted text-sm">${t('team.awaiting')}</span>`}</td>
     </tr>`;
   });
   content += `</tbody></table></div></div>`;
@@ -1487,14 +1774,14 @@ async function loadTeamMonitor() {
     <div class="stat-card stat-card-amber"><div class="stat-icon">🎯</div><div class="stat-label">Mandatory Done</div><div class="stat-value">${doneM}<span style="font-size:14px;opacity:0.7;">/${totalM}</span></div></div>
     <div class="stat-card stat-card-sky"><div class="stat-icon">📅</div><div class="stat-label">Active Enrollments</div><div class="stat-value">${team.reduce((s,m)=>s+m.enrolled_session_ids.length,0)}</div></div>
   </div>`;
-  content += `<div class="card"><div class="table-wrap"><table id="team-mon-tbl" class="mobile-card"><thead><tr><th>Nama</th><th>Supervisor</th><th>Grade</th><th>Mandatory</th><th>Progress</th><th>Enrolled</th><th>Status</th></tr></thead><tbody>`;
+  content += `<div class="card"><div class="table-wrap"><table id="team-mon-tbl" class="mobile-card"><thead><tr><th>${t('mon.col_name')}</th><th>${t('mon.col_spv')}</th><th>${t('mon.col_grade')}</th><th>${t('mon.col_mandatory')}</th><th>${t('mon.col_progress')}</th><th>${t('mon.col_enrolled')}</th><th>${t('mon.col_status')}</th></tr></thead><tbody>`;
   const dColors=['var(--purple)','var(--sky)','var(--emerald)','var(--amber)','var(--coral)'];
   team.forEach(m => {
     const p=pct(m.mandatory_completed,m.mandatory_total);
     const color=p>=100?'emerald':p>=50?'amber':'purple';
     const depth=m.depth||1, indent=depth-1, dc=dColors[Math.min(indent,4)];
     content += `<tr data-depth="${depth}">
-      <td data-label="Nama"><div style="display:flex;align-items:center;gap:5px;">
+      <td data-label="${t('mon.col_name')}"><div style="display:flex;align-items:center;gap:5px;">
         ${indent>0?`<div style="width:${indent*12}px;flex-shrink:0;"></div><div style="width:2px;height:28px;background:${dc};opacity:0.4;flex-shrink:0;border-radius:2px;"></div>`:''}
         <div><div style="font-weight:700;">${m.name}</div><div style="font-size:11px;color:var(--text-muted);">${m.department}</div></div>
       </div></td>
@@ -1532,17 +1819,17 @@ async function loadTeamSchedule() {
     const sessMap={};allSessions.forEach(s=>{sessMap[s.session_id]=s;});
     const teamEnrs=[];
     team.forEach((m,i)=>{const eD=allEnrRes[i];(eD.success?eD.data:[]).forEach(e=>{const s=sessMap[e.session_id];if(s)teamEnrs.push({member:m,session:s});});});
-    if(!teamEnrs.length){html('team-monitor-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">No team enrollments yet</div><div class="empty-desc">No team members have enrolled in a training session yet.</div></div></div></div>`);return;}
+    if(!teamEnrs.length){html('team-monitor-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">${t('mon.no_enroll')}</div><div class="empty-desc">No team members have enrolled in a training session yet.</div></div></div></div>`);return;}
     teamEnrs.sort((a,b)=>(a.session.date||'').localeCompare(b.session.date||''));
-    let c=`<div class="card"><div class="table-wrap"><table class="mobile-card"><thead><tr><th>Anggota</th><th>Tanggal</th><th>Competency</th><th>Trainer</th><th>Lokasi</th><th>Tipe</th></tr></thead><tbody>`;
+    let c=`<div class="card"><div class="table-wrap"><table class="mobile-card"><thead><tr><th>${t('mon.col_member')}</th><th>${t('mon.col_date')}</th><th>Competency</th><th>${t('mon.col_trainer')}</th><th>${t('mon.col_location')}</th><th>${t('mon.col_type')}</th></tr></thead><tbody>`;
     teamEnrs.forEach(({member:m,session:s})=>{
       const tt=(s.training_type||'').toLowerCase(),isSL=tt.includes('self'),isOnline=tt.includes('online');
       const dD=isSL&&s.date_end?`${s.date} – ${s.date_end}`:`${s.date}${s.time?' · '+s.time:''}`;
       const tb=isSL?'<span class="badge badge-purple">Self Learning</span>':isOnline?'<span class="badge badge-sky">Online</span>':'<span class="badge badge-amber">Offline</span>';
       c+=`<tr><td data-label="Anggota"><div style="font-weight:700;">${m.name}</div><div style="font-size:11px;color:var(--text-muted);">${m.grade} · ${m.department}</div></td>
-        <td data-label="Tanggal" style="white-space:nowrap;font-weight:600;">${dD}</td>
+        <td data-label="${t('mon.col_date')}" style="white-space:nowrap;font-weight:600;">${dD}</td>
         <td data-label="Competency"><div style="font-weight:700;">${s.competency_name||s.competency_id}</div><div style="font-size:11px;font-family:var(--mono);color:var(--text-muted);">${s.competency_id}</div></td>
-        <td data-label="Trainer">${s.trainer||'—'}</td><td data-label="Lokasi">${s.location||s.area||'—'}</td><td data-label="Tipe">${tb}</td></tr>`;
+        <td data-label="${t('mon.col_trainer')}">${s.trainer||'—'}</td><td data-label="${t('mon.col_location')}">${s.location||s.area||'—'}</td><td data-label="Tipe">${tb}</td></tr>`;
     });
     c+=`</tbody></table></div></div>`;
     html('team-monitor-content',c);
@@ -1640,7 +1927,7 @@ async function openL3Form(evaluateeNik) {
     </div>
     <div class="modal-footer" style="flex-wrap:wrap;gap:8px;">
       <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-ghost" onclick="saveL3Draft()">💾 Save Draft</button>
+      <button class="btn btn-ghost" onclick="saveL3Draft()">${t('assess.save_draft')}</button>
       <button class="btn btn-amber" onclick="downloadL3PDF()">⬇ Download PDF</button>
       <button class="btn btn-sky" onclick="sendL3Email()">📧 Send to Otsuka Academy</button>
       <button class="btn btn-emerald" onclick="confirmL3Submit()">✅ Submit Final</button>
@@ -1905,11 +2192,11 @@ async function loadAdminUsers() {
     <input type="text" id="user-search" class="form-input" placeholder="Search name or NIK..." style="max-width:260px;" oninput="filterUsers(this.value)">
     <span style="font-size:13px;color:var(--text-muted);font-weight:600;">${users.length} employees</span>
   </div>
-  <div class="card"><div class="table-wrap"><table class="mobile-card"><thead><tr><th>NIK</th><th>Nama</th><th>Grade</th><th>Divisi</th><th>Role</th><th>Reset Pwd</th><th>Aksi</th></tr></thead><tbody id="users-tbody">`;
+  <div class="card"><div class="table-wrap"><table class="mobile-card"><thead><tr><th>NIK</th><th>${t('admin.col_name')}</th><th>${t('admin.col_grade')}</th><th>${t('admin.col_div')}</th><th>${t('admin.col_role')}</th><th>${t('admin.col_reset')}</th><th>${t('admin.col_action')}</th></tr></thead><tbody id="users-tbody">`;
   users.forEach(u=>{
     content+=`<tr data-search="${u.nik} ${(u.name||'').toLowerCase()}">
       <td data-label="NIK" style="font-family:var(--mono);font-size:12px;">${u.nik}</td>
-      <td data-label="Nama"><strong>${u.name}</strong><br><span style="font-size:11px;color:var(--text-muted);">${u.position||''}</span></td>
+      <td data-label="${t('team.col_name')}"><strong>${u.name}</strong><br><span style="font-size:11px;color:var(--text-muted);">${u.position||''}</span></td>
       <td data-label="Grade"><span class="badge ${gradeColor(u.grade)}">${u.grade}</span></td>
       <td data-label="Divisi" style="font-size:12px;">${u.division}</td>
       <td data-label="Role">${u.role&&u.role.includes('leader')?'<span class="badge badge-purple">Leader</span>':'<span class="badge badge-gray">Employee</span>'}</td>
@@ -1987,7 +2274,7 @@ async function doAccChangePwd() {
   const old=el('acc-old').value.trim(),np=el('acc-new').value.trim(),cp=el('acc-confirm').value.trim();
   if(!old||!np){toast('Semua field harus diisi','error');return;}
   if(np.length<6){toast('Password minimal 6 karakter','error');return;}
-  if(np!==cp){toast('Password tidak cocok','error');return;}
+  if(np!==cp){toast(t('misc.password_mismatch'), 'error');return;}
   const res=await api('changePassword',{nik:state.user.nik,old_password:old,new_password:np});
   if(res.success){toast('Password updated successfully!','success');el('acc-old').value='';el('acc-new').value='';el('acc-confirm').value='';}
   else toast(res.message,'error');
@@ -2047,6 +2334,10 @@ document.addEventListener('keydown', e => {
 // ── INIT ───────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   el('page-login').style.display='flex';
+});
+// Apply language on page load
+document.addEventListener('DOMContentLoaded', function() {
+  applyLanguage();
 });
 </script>
 </body>
