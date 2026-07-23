@@ -555,7 +555,7 @@ function applyLanguage() {
 }
 
 // ── API CONFIG — UPDATE AFTER EACH NEW DEPLOYMENT ──────────
-const API_URL = 'https://script.google.com/macros/s/AKfycbxHgpONAqLWkfSYZFumUnycc93QJues4cg4NbwveucoKJwIeRXm-WaWlwsIB7SZgp-7/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzf9exmsKGZHSbWlwvTbAJnwCq_16F4bF7na_R165twYa31s_6nBD0KOEK7KXo4SiWl/exec';
 
 // ── STATE ──────────────────────────────────────────────────
 let state = {
@@ -592,10 +592,32 @@ function getHistoryStatus(nik, compId, currentPeriod) {
 }
 
 // ── API HELPERS ────────────────────────────────────────────
+// Actions yang dikirim via POST (write operations)
+const POST_ACTIONS = new Set([
+  'submitAssessment','saveApproval','enrollSession','cancelEnrollment',
+  'saveL3Evaluation','sendL3Email','changePassword','updateUser',
+  'miraiChat','queueNotification','sendDigest','forgotPassword'
+]);
+
 async function apiWithRetry(action, payload={}, maxRetries=2) {
   for (let attempt=0; attempt<=maxRetries; attempt++) {
     try {
-      const res = await fetch(API_URL, {method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify({action,...payload})});
+      let res;
+      if (POST_ACTIONS.has(action)) {
+        // Write operations → POST
+        res = await fetch(API_URL, {
+          method:'POST',
+          headers:{'Content-Type':'text/plain'},
+          body:JSON.stringify({action,...payload})
+        });
+      } else {
+        // Read operations → GET dengan URL params
+        const params = new URLSearchParams({action});
+        Object.entries(payload).forEach(([k,v]) => {
+          params.append(k, typeof v === 'object' ? JSON.stringify(v) : v);
+        });
+        res = await fetch(`${API_URL}?${params.toString()}`);
+      }
       const json = await res.json();
       const isTransient = !json.success && /busy|simultaneous|timeout/i.test(json.message||'');
       if (isTransient && attempt<maxRetries) { await sleep(800*(attempt+1)); continue; }
@@ -720,9 +742,28 @@ function navigateTo(viewId){
 // ── DASHBOARD ──────────────────────────────────────────────
 async function loadDashboard(){
   const u=state.user; el('dash-greeting').textContent=`${u.name} · ${u.position||u.grade} · ${u.department}`;
-  const res=await api('getDashboard',{nik:u.nik}); if(!res.success){html('dash-content',`<p class="text-muted">${res.message}</p>`);return;}
-  const d=res.data,pipeline=d.pipeline||[],isLeader=u.role&&u.role.includes('leader');
-  const totalM=d.mandatory_total,doneM=d.mandatory_completed,enrolledCount=pipeline.filter(p=>p.status==='enrolled').length;
+  // Code.gs v3.4 tidak punya getDashboard - rakit dari getAssessmentStatus + getApprovalData
+  const [assessRes, approvalRes] = await Promise.all([
+    api('getAssessmentStatus', {nik:u.nik}),
+    api('getApprovalData', {nik:u.nik})
+  ]);
+  // Build dashboard data from available endpoints
+  const assessmentSubmitted = assessRes.success && assessRes.competencies &&
+    assessRes.competencies.every(c => c.statusCode === 'submitted' || c.statusCode === 'achieved_historical' || c.statusCode === 'in_training_current');
+  const assessmentStatus = assessmentSubmitted ? 'submitted' : 'pending';
+  const approvals = approvalRes.success ? (approvalRes.approvals || []) : [];
+  const mandatoryApprovals = approvals.filter(a => String(a.priority||'').toLowerCase() === 'mandatory');
+  const pipeline = approvals.map(a => ({
+    competency_id: a.competency,
+    competency_name: a.competency,
+    decision: String(a.priority||'').toLowerCase(),
+    target_level: 3,
+    gap: 0,
+    status: 'assigned'
+  }));
+  const isLeader=u.role&&u.role.includes('leader');
+  const totalM=mandatoryApprovals.length, doneM=0, enrolledCount=0;
+  const d = { assessment_status: assessmentStatus, mandatory_total: totalM, mandatory_completed: doneM, pipeline };
   let content='';
   const assessIcon=d.assessment_status==='submitted'?'✅':'📋';
   content+=`<div class="stats-grid"><div class="stat-card stat-card-purple"><div class="stat-icon">${assessIcon}</div><div class="stat-label">Assessment</div><div style="margin-top:4px;">${statusBadge(d.assessment_status)}</div></div><div class="stat-card stat-card-emerald"><div class="stat-icon">🎯</div><div class="stat-label">Mandatory</div><div class="stat-value">${doneM}<span style="font-size:16px;opacity:0.7;">/${totalM}</span></div><div class="stat-sub">Completed</div></div><div class="stat-card stat-card-sky"><div class="stat-icon">📚</div><div class="stat-label">Enrolled</div><div class="stat-value">${enrolledCount}</div><div class="stat-sub">Active sessions</div></div><div class="stat-card stat-card-amber"><div class="stat-icon">🏷️</div><div class="stat-label">Grade</div><div style="margin-top:8px;"><span class="badge" style="font-size:14px;padding:5px 16px;background:rgba(255,255,255,0.2);color:#fff;">${u.grade}</span></div></div></div>`;
@@ -783,8 +824,8 @@ async function doFinalSubmit(){closeModal();state._assessmentSubmitted=true;cons
 // ── JADWAL ─────────────────────────────────────────────────
 async function loadJadwal(){
   const u=state.user;
-  const [enrRes,dashRes,schedRes]=await Promise.all([api('getMyEnrollments',{nik:u.nik}),api('getDashboard',{nik:u.nik}),api('getSchedule',{grade:u.grade})]);
-  state.enrollments=enrRes.success?enrRes.data:[];const pipeline=dashRes.success?(dashRes.data.pipeline||[]):[];
+  const [enrRes,approvalRes,schedRes]=await Promise.all([api('getMyEnrollments',{nik:u.nik}),api('getApprovalData',{nik:u.nik}),api('getSchedule',{grade:u.grade})]);
+  state.enrollments=enrRes.success?enrRes.data:[];const pipeline=(approvalRes.success?(approvalRes.approvals||[]):[]).map(a=>({competency_id:a.competency,competency_name:a.competency,decision:String(a.priority||'').toLowerCase(),target_level:a.leaderLevel||3,gap:0,status:'assigned',leader_level:a.leaderLevel}));
   state.mandatoryCompIds=pipeline.filter(p=>p.decision==='mandatory').map(p=>p.competency_id);state._pipeline=pipeline;state.mandatoryLevelMap={};state.mandatoryLevelIsFallback={};
   pipeline.forEach(p=>{if(p.decision!=='mandatory')return;const hasLL=Number(p.leader_level)>0;state.mandatoryLevelMap[p.competency_id]=hasLL?Number(p.leader_level):Number(p.target_level);state.mandatoryLevelIsFallback[p.competency_id]=!hasLL;});
   state.jadwal=schedRes.success?schedRes.data:[];renderJadwal();
@@ -814,7 +855,10 @@ function buildCalendarUrl(s){const title=encodeURIComponent(`[IDP] ${s.competenc
 function showCalendarModal(session){const calUrl=buildCalendarUrl(session);const isSL=(session.training_type||'').toLowerCase().includes('self');const dateDisplay=isSL&&session.date_end?`${session.date} – ${session.date_end}`:`${session.date}${session.time?' · '+session.time:''}`;openModal(`<div class="modal" onclick="event.stopPropagation()" style="max-width:420px;"><div class="modal-header"><div class="modal-title">Enrollment Confirmed!</div><button class="modal-close" onclick="closeModal()">×</button></div><div class="modal-body"><div class="notice notice-emerald" style="margin-bottom:16px;"><div class="notice-icon">✅</div><div>You have successfully enrolled in this session.</div></div><div style="background:var(--surface2);border-radius:var(--r);padding:14px;margin-bottom:16px;"><div style="font-weight:800;margin-bottom:6px;">${session.competency_name||session.competency_id}</div><div style="font-size:12px;color:var(--text-2);display:flex;flex-direction:column;gap:4px;"><span>📅 ${dateDisplay}</span><span>📍 ${session.location||session.area||'—'}</span><span>👤 ${session.trainer||'—'}</span></div></div><a href="${calUrl}" target="_blank" rel="noopener" class="btn btn-primary btn-full" style="text-decoration:none;justify-content:center;">📅 Add to Google Calendar</a></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">Close</button></div></div>`);}
 
 // ── PROGRESS ───────────────────────────────────────────────
-async function loadProgress(){const res=await api('getDashboard',{nik:state.user.nik});if(!res.success){html('progress-content',`<p class="text-muted">${res.message}</p>`);return;}const pipeline=res.data.pipeline||[];if(!pipeline.length){html('progress-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📈</div><div class="empty-title">No progress data yet</div><div class="empty-desc">Complete your self-assessment and wait for your manager's assignment.</div></div></div></div>`);return;}const mandatory=pipeline.filter(p=>p.decision==='mandatory'),additional=pipeline.filter(p=>p.decision==='additional');const rSec=(title,items,color)=>{if(!items.length)return '';let s=`<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title">${title}</div></div><div class="card-body" style="padding:0 22px;">`;items.forEach(p=>{const pBar=p.status==='completed'?100:p.status==='enrolled'?50:10;s+=`<div class="pipeline-item"><div class="pipeline-icon" style="background:${p.status==='completed'?'var(--emerald-soft)':p.status==='enrolled'?'var(--sky-soft)':'var(--amber-soft)'};">${p.status==='completed'?'✅':p.status==='enrolled'?'📚':'🎯'}</div><div class="pipeline-info"><div class="pipeline-name">${p.competency_name||p.competency_id}</div><div style="margin:5px 0;">${progBar(pBar,100,color,7)}</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:3px;"><div class="pipeline-meta">Target: L${p.target_level}</div></div></div><div style="flex-shrink:0;">${statusBadge(p.status)}</div></div>`;});return s+`</div></div>`;};html('progress-content',rSec('Mandatory Competencies',mandatory,'emerald')+rSec('Additional Competencies',additional,'purple'));}
+async function loadProgress(){
+  const approvalRes=await api('getApprovalData',{nik:state.user.nik});
+  if(!approvalRes.success){html('progress-content',`<p class="text-muted">${approvalRes.message}</p>`);return;}
+  const pipeline=(approvalRes.approvals||[]).map(a=>({competency_id:a.competency,competency_name:a.competency,decision:String(a.priority||'').toLowerCase(),target_level:a.leaderLevel||3,gap:0,status:'assigned'}));if(!pipeline.length){html('progress-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📈</div><div class="empty-title">No progress data yet</div><div class="empty-desc">Complete your self-assessment and wait for your manager's assignment.</div></div></div></div>`);return;}const mandatory=pipeline.filter(p=>p.decision==='mandatory'),additional=pipeline.filter(p=>p.decision==='additional');const rSec=(title,items,color)=>{if(!items.length)return '';let s=`<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title">${title}</div></div><div class="card-body" style="padding:0 22px;">`;items.forEach(p=>{const pBar=p.status==='completed'?100:p.status==='enrolled'?50:10;s+=`<div class="pipeline-item"><div class="pipeline-icon" style="background:${p.status==='completed'?'var(--emerald-soft)':p.status==='enrolled'?'var(--sky-soft)':'var(--amber-soft)'};">${p.status==='completed'?'✅':p.status==='enrolled'?'📚':'🎯'}</div><div class="pipeline-info"><div class="pipeline-name">${p.competency_name||p.competency_id}</div><div style="margin:5px 0;">${progBar(pBar,100,color,7)}</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:3px;"><div class="pipeline-meta">Target: L${p.target_level}</div></div></div><div style="flex-shrink:0;">${statusBadge(p.status)}</div></div>`;});return s+`</div></div>`;};html('progress-content',rSec('Mandatory Competencies',mandatory,'emerald')+rSec('Additional Competencies',additional,'purple'));}
 
 // ── CORPORATE ──────────────────────────────────────────────
 async function loadCorporate(){const u=state.user;const res=await api('getCorporateMandatory',{nik:u.nik,grade:u.grade});if(!res.success){html('corporate-content',`<p class="text-muted">${res.message}</p>`);return;}const d=res.data,sessions=d.sessions||[];if(!sessions.length){html('corporate-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">🏢</div><div class="empty-title">No mandatory training found</div><div class="empty-desc">No mandatory training assigned to your grade yet.</div></div></div></div>`);return;}const colorClass=d.completion_pct>=100?'stat-card-emerald':d.completion_pct>=50?'stat-card-amber':'stat-card-coral';let content=`<div class="stats-grid" style="margin-bottom:18px;"><div class="stat-card stat-card-purple"><div class="stat-icon">📚</div><div class="stat-label">Total Training</div><div class="stat-value">${d.total}</div></div><div class="stat-card stat-card-emerald"><div class="stat-icon">✅</div><div class="stat-label">Completed</div><div class="stat-value">${d.completed}</div></div><div class="stat-card ${colorClass}" style="grid-column:span 2;"><div class="stat-icon">📊</div><div class="stat-label">Completion Rate</div><div class="stat-value">${d.completion_pct}%</div><div style="margin-top:8px;">${progBar(d.completed,d.total,'emerald',8)}</div></div></div>`;const rCorpSec=(items,label,icon,iconBg,borderColor)=>{if(!items.length)return '';let o=`<div style="font-size:11px;font-weight:800;color:var(--text-muted);letter-spacing:0.6px;text-transform:uppercase;margin:18px 0 8px;">${label}</div>`;items.forEach(s=>{const bm={completed:'badge-emerald',overdue:'badge-coral',pending:'badge-gray'};const lm={completed:'Completed',overdue:'Overdue',pending:'Pending'};o+=`<div class="corp-card" style="border-left:3px solid ${borderColor};"><div class="corp-icon" style="background:${iconBg};">${icon}</div><div style="flex:1;min-width:0;"><div style="font-weight:700;margin-bottom:2px;">${s.training_name}</div><div style="font-size:12px;color:var(--text-muted);">${s.deadline?`Deadline: ${s.deadline} · `:''}${s.location||''}${s.training_type?' · '+s.training_type:''}</div>${s.notes?`<div style="font-size:11px;color:var(--text-muted);margin-top:3px;">${s.notes}</div>`:''}</div><span class="badge ${bm[s.status]}">${lm[s.status]}</span></div>`;});return o;};const overdue=sessions.filter(s=>s.status==='overdue'),pending=sessions.filter(s=>s.status==='pending'),completed=sessions.filter(s=>s.status==='completed');content+=`<div class="card"><div class="card-body">${rCorpSec(overdue,'Overdue','⚠️','var(--coral-soft)','var(--coral)')}${rCorpSec(pending,'Upcoming','📋','var(--purple-soft)','var(--purple)')}${rCorpSec(completed,'Completed','✅','var(--emerald-soft)','var(--emerald)')}</div></div>`;html('corporate-content',content);}
