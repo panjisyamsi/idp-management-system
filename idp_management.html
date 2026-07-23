@@ -648,12 +648,22 @@ function achievedBadge(status) {
 async function doLogin() {
   const nik=el('login-nik').value.trim(), pwd=el('login-password').value.trim();
   if(!nik||!pwd){toast('NIK dan password harus diisi','error');return;}
-  const res=await api('login',{nik,password:pwd});
-  if(!res.success){toast(res.message,'error');return;}
-  state.user=res.data;
-  if(res.data.must_change_password){el('page-login').style.display='none';el('page-change-password').style.display='flex';return;}
-  await loadTrainingHistory(res.data.nik);
-  initApp();
+  showLoading(true);
+  try {
+    const res = await fetch(`${API_URL}?action=login&nik=${encodeURIComponent(nik)}&password=${encodeURIComponent(pwd)}`);
+    const data = await res.json();
+    if(!data.success){toast(data.message,'error');return;}
+    // Support both response shapes: data.employee (v3.4) and data.data (legacy)
+    const emp = data.employee || data.data;
+    state.user = emp;
+    if(emp.must_change_password){el('page-login').style.display='none';el('page-change-password').style.display='flex';return;}
+    await loadTrainingHistory(emp.nik);
+    initApp();
+  } catch(err) {
+    toast('Koneksi gagal. Coba lagi.','error');
+  } finally {
+    showLoading(false);
+  }
 }
 async function doChangePassword() {
   const np=el('new-password').value.trim(), cp=el('confirm-password').value.trim();
