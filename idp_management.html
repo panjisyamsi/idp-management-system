@@ -826,7 +826,7 @@ function applyLanguage() {
 }
 
 // UPDATE SETELAH NEW DEPLOYMENT
-const API_URL = 'https://script.google.com/macros/s/AKfycbyf0jJx7GobKVe4nbBa96X_kyUiE2ibnOKfxOLQvsN6B739OqTeEjY8AC1bEm5DEEef/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwI1OXTl-ZQ9iHwnN-FoBAOSMHWJEruKLJYPKYJX_JW2R1Wtu_Fi3rwIm6On5pwVXoV/exec';
 
 // ── STATE ──────────────────────────────────────────────────────
 let state = {
@@ -1607,13 +1607,37 @@ function renderTeamList() {
 function openAssignModal(memberNik) {
   const member = state.teamData.find(m=>m.nik===memberNik);
   if (!member) return;
-  const decisions = {}, leaderLevels = {};
-  member.competencies.forEach(c => { decisions[c.competency_id]=c.decision||''; leaderLevels[c.competency_id]=c.leader_level||''; });
+  // Initialize state
+  const leaderLevels = {};
+  const decisions    = {};
+  member.competencies.forEach(c => {
+    leaderLevels[c.competency_id] = c.leader_level || '';
+    decisions[c.competency_id]    = c.decision     || '';
+  });
+  window._curDecisions  = decisions;
+  window._curLeaderLvls = leaderLevels;
+  window._curMemberNik  = memberNik;
+  // Open Step 1
+  renderStep1(memberNik);
+}
+
+// ── STEP 1: Leader sets observed level + reviews indicators ────────────
+function renderStep1(memberNik) {
+  const member    = state.teamData.find(m=>m.nik===memberNik);
+  if (!member) return;
   const typeLabel = {core:'Core',role:'Role',jf:'Job Family'};
   const typeColor = {core:'badge-purple',role:'badge-sky',jf:'badge-amber'};
   const grouped   = {};
-  member.competencies.forEach(c => { const t=c.competency_type; if(!grouped[t]) grouped[t]=[]; grouped[t].push(c); });
-  Object.keys(grouped).forEach(t => { grouped[t].sort((a,b)=>(a.achievement_status==='achieved'?1:0)-(b.achievement_status==='achieved'?1:0)); });
+  member.competencies.forEach(c => {
+    const t = c.competency_type;
+    if (!grouped[t]) grouped[t] = [];
+    grouped[t].push(c);
+  });
+  // Sort: gaps first, achieved last
+  Object.keys(grouped).forEach(t => {
+    grouped[t].sort((a,b) => (a.achievement_status==='achieved'?1:0) - (b.achievement_status==='achieved'?1:0));
+  });
+
   let compRows = '';
   Object.keys(grouped).forEach(type => {
     compRows += `<div style="font-size:10px;font-weight:800;color:var(--text-muted);letter-spacing:0.8px;text-transform:uppercase;margin:14px 0 8px;">${typeLabel[type]||type}</div>`;
@@ -1621,139 +1645,248 @@ function openAssignModal(memberNik) {
       const isAchieved  = c.achievement_status === 'achieved';
       const selfScore   = c.self_score || 0;
       const targetLevel = c.target_level || 3;
+      const curLL       = window._curLeaderLvls[c.competency_id] || '';
+      const borderColor = isAchieved ? 'var(--emerald)' : selfScore === 0 ? 'var(--border)' : 'var(--amber)';
 
-      // Gap status badge
+      // Self-assessment gap badge
       const gapBadge = isAchieved
-        ? `<span class="badge badge-emerald">✓ Achieved (L${c.last_known_level})</span>`
+        ? `<span class="badge badge-emerald">✓ Achieved — L${c.last_known_level}</span>`
         : selfScore === 0
           ? `<span class="badge badge-gray">Not Yet Assessed</span>`
           : `<span class="badge badge-amber">Gap — Self: L${selfScore} → Target: L${targetLevel}</span>`;
 
-      // Border color reflects gap urgency
-      const borderColor = isAchieved ? 'var(--emerald)' : selfScore === 0 ? 'var(--border)' : 'var(--amber)';
-
-      // Build full indicator view — ALL levels shown with check/uncheck status
-      // Leader can see exactly what employee checked and what they didn't,
-      // enabling objective scoring that can raise or lower the self-assessment.
+      // Full indicator view
       let indHTML = '';
       if (c.levels && Object.keys(c.levels).length > 0) {
-        // Build a set of checked indicator texts from self-assessment data
         const checkedInds = c.checked_indicators || [];
         const checkedSet  = new Set(checkedInds.map(i => i.indicator));
-
-        indHTML = `<div style="margin-top:10px;padding:10px 12px;background:var(--surface);border-radius:var(--r-sm);border:1px solid var(--border);">
-          <div style="font-size:10px;font-weight:800;color:var(--text-muted);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;">Behavioral Indicators — Employee Self-Assessment Result</div>`;
-
-        // Show all levels that exist in the library
+        indHTML = `<details style="margin-top:8px;">
+          <summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--purple);padding:4px 0;list-style:none;display:flex;align-items:center;gap:5px;">
+            <span>▶ View behavioral indicators</span>
+          </summary>
+          <div style="margin-top:8px;padding:10px 12px;background:var(--surface);border-radius:var(--r-sm);border:1px solid var(--border);">`;
         const allLevels = Object.keys(c.levels).map(Number).sort((a,b)=>a-b);
         allLevels.forEach(lvl => {
           const inds = c.levels[lvl] || [];
           if (!inds.length) return;
-
-          // Level label color: green if fully checked, amber if partial, gray if none
-          const checkedCount  = inds.filter(ind => checkedSet.has(ind.behavioral_indicator)).length;
+          const checkedCount = inds.filter(ind => checkedSet.has(ind.behavioral_indicator)).length;
           const lvlColor = checkedCount === inds.length ? 'var(--emerald)' : checkedCount > 0 ? 'var(--amber)' : 'var(--text-muted)';
           const lvlNote  = checkedCount === inds.length
-            ? ` — <span style="color:var(--emerald);font-weight:700;">All checked ✓</span>`
+            ? ` — <span style="color:var(--emerald);">All checked ✓</span>`
             : checkedCount > 0
               ? ` — <span style="color:var(--amber);">${checkedCount}/${inds.length} checked</span>`
               : ` — <span style="color:var(--text-muted);">None checked</span>`;
-
-          indHTML += `<div style="font-size:10px;font-weight:800;color:${lvlColor};margin:10px 0 5px;padding-bottom:3px;border-bottom:2px solid ${lvlColor}20;">
-            Level ${lvl}${lvlNote}${lvl === targetLevel ? ' &nbsp;<span style="background:var(--amber);color:#fff;font-size:9px;padding:1px 6px;border-radius:4px;font-weight:700;">TARGET</span>' : ''}
+          indHTML += `<div style="font-size:10px;font-weight:800;color:${lvlColor};margin:8px 0 4px;padding-bottom:3px;border-bottom:1px solid var(--border);">
+            Level ${lvl}${lvlNote}${lvl===targetLevel?' &nbsp;<span style="background:var(--amber);color:#fff;font-size:9px;padding:1px 6px;border-radius:4px;">TARGET</span>':''}
           </div>`;
-
           inds.forEach(ind => {
             const isChecked = checkedSet.has(ind.behavioral_indicator);
-            const checkColor = isChecked ? 'var(--emerald)' : 'var(--coral)';
-            const checkMark  = isChecked ? '✓' : '✗';
-            const textColor  = isChecked ? 'var(--text)' : 'var(--text-2)';
-            const rowBg      = isChecked ? 'rgba(16,185,129,0.04)' : 'rgba(248,113,113,0.04)';
-            indHTML += `<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 4px;border-bottom:1px solid var(--border);background:${rowBg};border-radius:3px;margin-bottom:2px;">
-              <span style="color:${checkColor};font-weight:800;font-size:13px;flex-shrink:0;margin-top:1px;width:14px;text-align:center;">${checkMark}</span>
-              <span style="font-size:12px;line-height:1.55;color:${textColor};">${ind.behavioral_indicator}</span>
+            const rowBg = isChecked ? 'rgba(16,185,129,0.05)' : 'rgba(248,113,113,0.04)';
+            indHTML += `<div style="display:flex;align-items:flex-start;gap:8px;padding:5px 4px;border-bottom:1px solid var(--border);background:${rowBg};margin-bottom:2px;border-radius:3px;">
+              <span style="color:${isChecked?'var(--emerald)':'var(--coral)'};font-weight:800;font-size:13px;flex-shrink:0;margin-top:1px;width:14px;text-align:center;">${isChecked?'✓':'✗'}</span>
+              <span style="font-size:12px;line-height:1.5;color:${isChecked?'var(--text)':'var(--text-2)'};">${ind.behavioral_indicator}</span>
             </div>`;
           });
         });
-
-        indHTML += `</div>`;
+        indHTML += `</div></details>`;
       }
 
-      compRows += `<div id="comp-assign-${memberNik}-${c.competency_id}" style="border:1.5px solid ${borderColor};border-radius:var(--r);margin-bottom:12px;overflow:hidden;${isAchieved?'opacity:0.75;':''}">
-        <!-- Header: name + decision buttons -->
-        <div style="padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;background:var(--surface);">
-          <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
+      compRows += `<div style="border:1.5px solid ${borderColor};border-radius:var(--r);margin-bottom:10px;overflow:hidden;${isAchieved?'opacity:0.75;':''}">
+        <div style="padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;background:var(--surface);">
+          <div style="display:flex;align-items:center;gap:7px;">
             <span class="badge ${typeColor[c.competency_type]||'badge-gray'}">${c.competency_id}</span>
             <span style="font-weight:700;font-size:13px;">${c.competency_name}</span>
           </div>
-          <div style="display:flex;gap:5px;flex-wrap:wrap;" id="dec-btns-${memberNik}-${c.competency_id}">
-            <button class="btn btn-sm ${c.decision==='mandatory'?'btn-coral':'btn-ghost'}" onclick="setDecision('${memberNik}','${c.competency_id}','mandatory')">Mandatory</button>
-            <button class="btn btn-sm ${c.decision==='additional'?'btn-primary':'btn-ghost'}" onclick="setDecision('${memberNik}','${c.competency_id}','additional')">Additional</button>
-            <button class="btn btn-sm btn-ghost" onclick="setDecision('${memberNik}','${c.competency_id}','')">—</button>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            ${gapBadge}
           </div>
         </div>
-        <!-- Gap status -->
-        <div style="padding:7px 14px;background:var(--surface2);border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          ${gapBadge}
-          <span style="font-size:11px;color:var(--text-muted);">Target: L${targetLevel}</span>
-        </div>
-        <!-- Indicators from self-assessment -->
-        ${indHTML ? `<div style="padding:4px 14px 12px;">${indHTML}</div>` : ''}
-        <!-- Leader observed level -->
-        <div style="padding:9px 14px;background:var(--purple-soft);border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-          <label style="font-size:11px;font-weight:700;color:var(--purple-dark);white-space:nowrap;">Your observed level:</label>
-          <select id="ll-${memberNik}-${c.competency_id}" onchange="setLeaderLevel('${memberNik}','${c.competency_id}',this.value)"
-            style="padding:5px 10px;border:1.5px solid var(--purple);border-radius:var(--r-sm);font-size:12px;font-family:var(--font);font-weight:600;background:#fff;cursor:pointer;outline:none;">
-            <option value="">— Select observed level —</option>
-            ${[1,2,3,4,5].map(l=>`<option value="${l}" ${c.leader_level==l?'selected':''}>Level ${l}</option>`).join('')}
-          </select>
+        <div style="padding:8px 14px 10px;background:var(--purple-soft);border-top:1px solid var(--border);">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:${indHTML?'4':'0'}px;">
+            <label style="font-size:11px;font-weight:700;color:var(--purple-dark);white-space:nowrap;">Your observed level:</label>
+            <select id="ll1-${memberNik}-${c.competency_id}" onchange="setLeaderLevel('${memberNik}','${c.competency_id}',this.value)"
+              style="padding:5px 10px;border:1.5px solid var(--purple);border-radius:var(--r-sm);font-size:12px;font-family:var(--font);font-weight:600;background:#fff;cursor:pointer;outline:none;">
+              <option value="">— Select —</option>
+              ${[1,2,3,4,5].map(l=>`<option value="${l}" ${curLL==l?'selected':''}>Level ${l}</option>`).join('')}
+            </select>
+            <span style="font-size:11px;color:var(--text-muted);">Self: L${selfScore} · Target: L${targetLevel}</span>
+          </div>
+          ${indHTML}
         </div>
       </div>`;
     });
   });
-  const initCount = Object.values(decisions).filter(d=>d==='mandatory').length;
-  openModal(`<div class="modal" style="max-width:700px;" onclick="event.stopPropagation()">
+
+  openModal(`<div class="modal" style="max-width:720px;" onclick="event.stopPropagation()">
     <div class="modal-header">
-      <div><div class="modal-title">${member.name}</div><div style="font-size:12px;color:var(--text-muted);margin-top:1px;">${member.grade} · ${member.department}</div></div>
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Step 1 of 2 — Review & Score</div>
+        <div class="modal-title">${member.name}</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:1px;">${member.grade} · ${member.department}</div>
+      </div>
       <button class="modal-close" onclick="closeModal()">×</button>
     </div>
     <div class="modal-body">
-      <div class="notice notice-amber"><div class="notice-icon">⚠️</div>
-        <div><strong>Max. 2 Mandatory</strong> per member. Review the indicators each employee checked to identify gaps, then assign priority.
-        <div id="mand-counter" style="margin-top:3px;font-weight:700;">Mandatory selected: ${initCount}/2</div></div>
+      <div class="notice notice-purple" style="margin-bottom:14px;"><div class="notice-icon">📋</div>
+        <div>Set your <strong>observed level</strong> for each competency. Use ▶ to expand and see which behavioral indicators the employee checked. Your input will recalculate the gap summary.</div>
       </div>
       ${compRows}
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-emerald" onclick="doSaveApproval('${memberNik}')">💾 Save Assignment</button>
+      <button class="btn btn-primary btn-lg" onclick="renderStep2('${memberNik}')">See Gap Summary →</button>
     </div>
   </div>`);
-  window._curDecisions   = decisions;
-  window._curLeaderLvls  = leaderLevels;
-  window._curMemberNik   = memberNik;
+}
+
+// ── STEP 2: Gap summary → assign priority ──────────────────────────────
+function renderStep2(memberNik) {
+  const member = state.teamData.find(m=>m.nik===memberNik);
+  if (!member) return;
+
+  // Compute 30:70 weighted gap for each competency using current leader levels
+  const comps = member.competencies.map(c => {
+    const selfScore   = c.self_score    || 0;
+    const targetLevel = c.target_level  || 3;
+    const leaderLevel = Number(window._curLeaderLvls[c.competency_id]) || 0;
+    let finalScore, gap, isGap;
+    if (leaderLevel > 0) {
+      const weighted = (selfScore * 0.3) + (leaderLevel * 0.7);
+      finalScore = Math.round(weighted * 10) / 10;
+      gap        = Math.max(0, targetLevel - Math.round(weighted));
+      isGap      = Math.round(weighted) < targetLevel;
+    } else {
+      finalScore = selfScore;
+      gap        = Math.max(0, targetLevel - selfScore);
+      isGap      = selfScore < targetLevel;
+    }
+    return { ...c, leaderLevel, finalScore, gap, isGap };
+  });
+
+  // Separate: gaps vs achieved
+  const gapComps      = comps.filter(c => c.isGap && c.achievement_status !== 'achieved');
+  const achievedComps = comps.filter(c => !c.isGap || c.achievement_status === 'achieved');
+  const initCount     = Object.values(window._curDecisions).filter(d=>d==='mandatory').length;
+
+  // Build gap summary table rows
+  let gapRows = '';
+  gapComps.forEach(c => {
+    const dec = window._curDecisions[c.competency_id] || '';
+    gapRows += `<tr id="assign-row-${memberNik}-${c.competency_id}">
+      <td><span class="badge badge-${c.competency_type==='core'?'purple':c.competency_type==='role'?'sky':'amber'}" style="font-size:10px;">${c.competency_id}</span>
+          <span style="font-weight:600;margin-left:5px;font-size:13px;">${c.competency_name}</span></td>
+      <td style="text-align:center;font-weight:700;">${c.self_score||'—'}</td>
+      <td style="text-align:center;font-weight:700;color:var(--purple);">${c.leaderLevel||'—'}</td>
+      <td style="text-align:center;font-weight:800;font-size:14px;">${c.finalScore}</td>
+      <td style="text-align:center;"><span style="font-weight:800;color:var(--coral);">-${c.gap}</span></td>
+      <td style="text-align:center;">L${c.target_level}</td>
+      <td>
+        <div style="display:flex;gap:4px;" id="dec-btns2-${memberNik}-${c.competency_id}">
+          <button class="btn btn-sm ${dec==='mandatory'?'btn-coral':'btn-ghost'}" onclick="setDecision('${memberNik}','${c.competency_id}','mandatory')">Mandatory</button>
+          <button class="btn btn-sm ${dec==='additional'?'btn-primary':'btn-ghost'}" onclick="setDecision('${memberNik}','${c.competency_id}','additional')">Additional</button>
+          <button class="btn btn-sm btn-ghost" onclick="setDecision('${memberNik}','${c.competency_id}','')">—</button>
+        </div>
+      </td>
+    </tr>`;
+  });
+
+  // Achieved section
+  let achievedRows = '';
+  achievedComps.forEach(c => {
+    achievedRows += `<tr style="opacity:0.6;">
+      <td><span class="badge badge-emerald" style="font-size:10px;">${c.competency_id}</span>
+          <span style="font-size:13px;margin-left:5px;">${c.competency_name}</span></td>
+      <td colspan="5" style="text-align:center;"><span class="badge badge-emerald">✓ Achieved — L${c.last_known_level||c.leaderLevel||c.self_score}</span></td>
+      <td><span style="font-size:11px;color:var(--text-muted);">No action needed</span></td>
+    </tr>`;
+  });
+
+  openModal(`<div class="modal" style="max-width:820px;" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Step 2 of 2 — Gap Summary & Priority Assignment</div>
+        <div class="modal-title">${member.name}</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:1px;">${member.grade} · ${member.department}</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="notice notice-amber"><div class="notice-icon">⚠️</div>
+        <div><strong>Max. 2 Mandatory</strong> — assign training priorities based on the gap analysis below.
+        <span id="mand-counter" style="margin-left:8px;font-weight:800;color:var(--coral);">Mandatory selected: ${initCount}/2</span></div>
+      </div>
+
+      ${gapComps.length > 0 ? `
+      <div style="margin-bottom:16px;">
+        <div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:8px;">
+          Competencies with gap after 30:70 scoring
+          <span style="font-size:11px;font-weight:400;color:var(--text-muted);margin-left:6px;">(Self × 30% + Leader × 70% = Final Score)</span>
+        </div>
+        <div class="table-wrap">
+          <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <thead><tr style="background:var(--surface2);">
+              <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:800;color:var(--text-muted);text-transform:uppercase;border-bottom:1px solid var(--border);">Competency</th>
+              <th style="padding:8px 10px;text-align:center;font-size:10px;font-weight:800;color:var(--sky-dark);text-transform:uppercase;border-bottom:1px solid var(--border);">Self</th>
+              <th style="padding:8px 10px;text-align:center;font-size:10px;font-weight:800;color:var(--purple-dark);text-transform:uppercase;border-bottom:1px solid var(--border);">Leader</th>
+              <th style="padding:8px 10px;text-align:center;font-size:10px;font-weight:800;color:var(--emerald-dark);text-transform:uppercase;border-bottom:1px solid var(--border);">Final</th>
+              <th style="padding:8px 10px;text-align:center;font-size:10px;font-weight:800;color:var(--coral-dark);text-transform:uppercase;border-bottom:1px solid var(--border);">Gap</th>
+              <th style="padding:8px 10px;text-align:center;font-size:10px;font-weight:800;color:var(--text-muted);text-transform:uppercase;border-bottom:1px solid var(--border);">Target</th>
+              <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:800;color:var(--text-muted);text-transform:uppercase;border-bottom:1px solid var(--border);">Priority</th>
+            </tr></thead>
+            <tbody>${gapRows}</tbody>
+          </table>
+        </div>
+      </div>` : `<div class="notice notice-emerald"><div class="notice-icon">🎉</div><div>All competencies are achieved based on your scoring. No mandatory assignment needed.</div></div>`}
+
+      ${achievedComps.length > 0 ? `
+      <div style="margin-top:14px;">
+        <div style="font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Achieved competencies</div>
+        <div class="table-wrap">
+          <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <tbody>${achievedRows}</tbody>
+          </table>
+        </div>
+      </div>` : ''}
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="renderStep1('${memberNik}')">← Back to Review</button>
+      <button class="btn btn-emerald btn-lg" onclick="doSaveApproval('${memberNik}')">💾 Save Assignment</button>
+    </div>
+  </div>`);
 }
 
 function setLeaderLevel(mNik, compId, level) { if (window._curLeaderLvls) window._curLeaderLvls[compId]=level; }
+
 function setDecision(mNik, compId, decision) {
   if (!window._curDecisions) return;
   if (decision==='mandatory') {
     const cnt = Object.entries(window._curDecisions).filter(([cid,d])=>d==='mandatory'&&cid!==compId).length;
-    if (cnt>=2) { toast('Maks. 2 Mandatory per anggota','warning'); return; }
+    if (cnt>=2) { toast('Max. 2 Mandatory per member','warning'); return; }
   }
-  window._curDecisions[compId]=decision;
-  const btns = el(`dec-btns-${mNik}-${compId}`)?.querySelectorAll('button');
-  if (btns) { btns[0].className=`btn btn-sm ${decision==='mandatory'?'btn-coral':'btn-ghost'}`; btns[1].className=`btn btn-sm ${decision==='additional'?'btn-primary':'btn-ghost'}`; btns[2].className='btn btn-sm btn-ghost'; }
+  window._curDecisions[compId] = decision;
+  // Update buttons in step 2 table
+  const btns2 = el(`dec-btns2-${mNik}-${compId}`)?.querySelectorAll('button');
+  if (btns2) {
+    btns2[0].className = `btn btn-sm ${decision==='mandatory'?'btn-coral':'btn-ghost'}`;
+    btns2[1].className = `btn btn-sm ${decision==='additional'?'btn-primary':'btn-ghost'}`;
+    btns2[2].className = 'btn btn-sm btn-ghost';
+  }
   const ctr = el('mand-counter');
-  if (ctr) ctr.textContent=`Mandatory selected: ${Object.values(window._curDecisions).filter(d=>d==='mandatory').length}/2`;
+  if (ctr) ctr.textContent = `Mandatory selected: ${Object.values(window._curDecisions).filter(d=>d==='mandatory').length}/2`;
 }
 
 async function doSaveApproval(memberNik) {
-  const decisions = Object.entries(window._curDecisions).map(([cid,dec]) => ({ competency_id:cid, decision:dec, suggestion:'', leader_level:window._curLeaderLvls?.[cid]||'' }));
+  const decisions = Object.entries(window._curDecisions).map(([cid,dec]) => ({
+    competency_id: cid,
+    decision:      dec,
+    suggestion:    '',
+    leader_level:  window._curLeaderLvls?.[cid] || '',
+  }));
   const res = await api('saveApproval', { leader_nik:state.user.nik, member_nik:memberNik, decisions });
   if (res.success) { toast('Assignment saved successfully!','success'); closeModal(); loadTeamAssessment(); }
   else toast(res.message,'error');
 }
+
 
 async function downloadAssignmentPDF() {
   const team = state.teamData;
