@@ -950,7 +950,7 @@ function renderStep1(memberNik){
       const gapBadge=isAchieved
         ? `<span class="badge badge-emerald">✓ Achieved — L${c.last_known_level}</span>`
         : selfScore===0
-          ? `<span style="font-size:11px;color:var(--text-muted);font-style:italic;">Belum self-assessment · Target: L${targetLevel}</span>`
+          ? `<span style="font-size:11px;color:var(--text-muted);">Target: L${targetLevel}</span>`
           : `<span class="badge badge-amber">Gap — Self: L${selfScore} → Target: L${targetLevel}</span>`;
       let indHTML='';
       if(c.levels&&Object.keys(c.levels).length>0){
