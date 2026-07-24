@@ -783,25 +783,33 @@ async function loadAssessment(){
   if(state._assessmentSubmitted){html('assessment-content',buildSubmittedView());return;}
   if(sessionStorage.getItem('mirai_submitted_'+u.nik)==='true'){state._assessmentSubmitted=true;html('assessment-content',buildSubmittedView());return;}
   const statusRes=await api('getAssessmentStatus',{nik:u.nik});
-  if(statusRes.success&&statusRes.data.has_submitted_final){state._assessmentSubmitted=true;sessionStorage.setItem('mirai_submitted_'+u.nik,'true');html('assessment-content',buildSubmittedView());return;}
+  if(statusRes.success&&statusRes.has_submitted_final){state._assessmentSubmitted=true;sessionStorage.setItem('mirai_submitted_'+u.nik,'true');html('assessment-content',buildSubmittedView());return;}
   if(!state.compLibrary){
-    const libRes=await api('getCompetencyLibrary',{nik:u.nik,department:u.department,division:u.division,grade:u.grade,has_subordinates:u.has_subordinates});
+    const libRes=await api('getCompetencyLibrary',{nik:u.nik,grade:u.grade});
     if(!libRes.success){html('assessment-content',`<p class="text-muted">${libRes.message}</p>`);return;}
-    state.compLibrary=libRes.data.competencies||[]; state.achievedComps=libRes.data.achieved_competencies||[];
+    state.compLibrary=libRes.data.competencies||[];
     state.compLibrary.forEach(comp=>{if(!state.assessmentChecks[comp.competency_id]){state.assessmentChecks[comp.competency_id]={};for(let l=1;l<=5;l++)state.assessmentChecks[comp.competency_id][l]=(comp.levels[l]||[]).map(()=>false);}});
   }
-  if(statusRes.success&&statusRes.data.scores&&statusRes.data.scores.length>0)statusRes.data.scores.forEach(s=>{state.assessmentScores[s.competency_id]=s.self_score;});
+  if(statusRes.success&&statusRes.scores&&statusRes.scores.length>0)statusRes.scores.forEach(s=>{state.assessmentScores[s.competency_id]=s.self_score;});
   renderAssessmentForm();
 }
 function buildSubmittedView(){return `<div class="card" style="max-width:520px;margin:0 auto;"><div class="card-body" style="text-align:center;padding:48px 32px;"><div style="width:72px;height:72px;background:var(--emerald-soft);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 20px;">✅</div><div style="font-size:20px;font-weight:800;margin-bottom:8px;color:var(--text);">${t('assess.submitted')}</div><div style="font-size:14px;color:var(--text-2);line-height:1.7;margin-bottom:24px;">${t('assess.submitted_desc')}</div><div style="background:var(--surface2);border-radius:var(--r);padding:16px 20px;font-size:13px;color:var(--text-muted);border:1px solid var(--border);line-height:1.6;">${t('assess.notified')}</div></div></div>`;}
 function renderAssessmentForm(){
-  const lib=state.compLibrary,achieved=state.achievedComps||[];
-  if((!lib||!lib.length)&&!achieved.length){html('assessment-content',`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">${t('assess.no_assess')}</div><div class="empty-desc">${t('assess.no_assess_desc')}</div></div>`);return;}
+  const lib=state.compLibrary||[];
+  if(!lib.length){html('assessment-content',`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">${t('assess.no_assess')}</div><div class="empty-desc">${t('assess.no_assess_desc')}</div></div>`);return;}
+  // Filter: only show competencies that need self-assessment
+  // achieved_historical and in_training_current are locked
   let content=`<div class="notice notice-amber"><div class="notice-icon">💡</div><div><strong>${t('assess.instruction')}:</strong> ${t('assess.inst_text')}</div></div>`;
   if(lib&&lib.length>0){
     const typeOrder={core:0,role:1,jf:2},typeLabel={core:'Core Competency',role:'Role Competency',jf:'Job Family Competency'},typeColor={core:'badge-purple',role:'badge-sky',jf:'badge-amber'};
     const grouped={};lib.forEach(comp=>{const tp=comp.competency_type;if(!grouped[tp])grouped[tp]=[];grouped[tp].push(comp);});
-    Object.keys(grouped).sort((a,b)=>(typeOrder[a]||0)-(typeOrder[b]||0)).forEach(type=>{content+=`<div style="margin-bottom:8px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="badge ${typeColor[type]||'badge-gray'}">${typeLabel[type]||type}</span><div style="flex:1;height:1px;background:var(--border);"></div></div>`;grouped[type].forEach(comp=>{content+=renderCompBlock(comp);});content+=`</div>`;});
+    Object.keys(grouped).sort((a,b)=>(typeOrder[a]||0)-(typeOrder[b]||0)).forEach(type=>{
+      // Only render if there are non-locked competencies in this type
+      const activeComps = grouped[type].filter(c => c.status_code!=='achieved_historical' && c.status_code!=='in_training_current');
+      if(!activeComps.length) return;
+      content+=`<div style="margin-bottom:8px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="badge ${typeColor[type]||'badge-gray'}">${typeLabel[type]||type}</span><div style="flex:1;height:1px;background:var(--border);"></div></div>`;
+      activeComps.forEach(comp=>{content+=renderCompBlock(comp);});
+      content+=`</div>`;});
     content+=`<div style="display:flex;gap:10px;margin-top:24px;padding-top:18px;border-top:1px solid var(--border);"><button class="btn btn-ghost" onclick="saveDraft()">${t('assess.save_draft')}</button><button class="btn btn-primary btn-lg" onclick="confirmFinalSubmit()">${t('assess.submit')}</button></div>`;
   }
   html('assessment-content',content);
