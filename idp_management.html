@@ -570,7 +570,7 @@ function applyLanguage() {
 }
 
 // ── API CONFIG — UPDATE AFTER EACH NEW DEPLOYMENT ──────────
-const API_URL = 'https://script.google.com/macros/s/AKfycbzcvRQPgnG7U5iNbKrjzsHb-OrkbUW2JVcMPPj_CGT1i5oH1SPx6Dee6Lv2dmBz44gS/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbx7-882P2sUmQp4TelhRe8jh4yWiR5qgbuO777YYNF_z2mrGsnvyEvskOZbrCEb1T8o/exec';
 
 // ── STATE ──────────────────────────────────────────────────
 let state = {
@@ -925,10 +925,17 @@ function renderStep1(memberNik){
     grouped[type].forEach(c=>{
       const isAchieved=c.achievement_status==='achieved',selfScore=c.self_score||0,targetLevel=c.target_level||3,curLL=window._curLeaderLvls[c.competency_id]||'';
       const borderColor=isAchieved?'var(--emerald)':selfScore===0?'var(--border)':'var(--amber)';
-      const gapBadge=isAchieved?`<span class="badge badge-emerald">✓ Achieved — L${c.last_known_level}</span>`:selfScore===0?`<span class="badge badge-gray">Not Yet Assessed</span>`:`<span class="badge badge-amber">Gap — Self: L${selfScore} → Target: L${targetLevel}</span>`;
+      const gapBadge=isAchieved
+        ? `<span class="badge badge-emerald">✓ Achieved — L${c.last_known_level}</span>`
+        : selfScore===0
+          ? `<span style="font-size:11px;color:var(--text-muted);font-style:italic;">Belum self-assessment · Target: L${targetLevel}</span>`
+          : `<span class="badge badge-amber">Gap — Self: L${selfScore} → Target: L${targetLevel}</span>`;
       let indHTML='';
       if(c.levels&&Object.keys(c.levels).length>0){
-        const checkedInds=c.checked_indicators||[],checkedSet=new Set(checkedInds.map(i=>i.indicator));
+        // Build checked set from levels data returned by backend
+        const checkedSet=new Set();
+        Object.values(c.levels||{}).flat().forEach(function(ind){ if(ind.is_checked) checkedSet.add(ind.behavioral_indicator); });
+        const checkedInds=[];
         indHTML=`<details style="margin-top:8px;"><summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--purple);padding:4px 0;list-style:none;display:flex;align-items:center;gap:5px;"><span>▶ View behavioral indicators</span></summary><div style="margin-top:8px;padding:10px 12px;background:var(--surface);border-radius:var(--r-sm);border:1px solid var(--border);">`;
         const allLevels=Object.keys(c.levels).map(Number).sort((a,b)=>a-b);
         allLevels.forEach(lvl=>{const inds=c.levels[lvl]||[];if(!inds.length)return;const checkedCount=inds.filter(ind=>checkedSet.has(ind.behavioral_indicator)).length;const lvlColor=checkedCount===inds.length?'var(--emerald)':checkedCount>0?'var(--amber)':'var(--text-muted)';const lvlNote=checkedCount===inds.length?` — <span style="color:var(--emerald);">All checked ✓</span>`:checkedCount>0?` — <span style="color:var(--amber);">${checkedCount}/${inds.length} checked</span>`:` — <span style="color:var(--text-muted);">None checked</span>`;indHTML+=`<div style="font-size:10px;font-weight:800;color:${lvlColor};margin:8px 0 4px;padding-bottom:3px;border-bottom:1px solid var(--border);">Level ${lvl}${lvlNote}${lvl===targetLevel?' &nbsp;<span style="background:var(--amber);color:#fff;font-size:9px;padding:1px 6px;border-radius:4px;">TARGET</span>':''}</div>`;inds.forEach(ind=>{const isChecked=checkedSet.has(ind.behavioral_indicator);const rowBg=isChecked?'rgba(16,185,129,0.05)':'rgba(248,113,113,0.04)';indHTML+=`<div style="display:flex;align-items:flex-start;gap:8px;padding:5px 4px;border-bottom:1px solid var(--border);background:${rowBg};margin-bottom:2px;border-radius:3px;"><span style="color:${isChecked?'var(--emerald)':'var(--coral)'};font-weight:800;font-size:13px;flex-shrink:0;margin-top:1px;width:14px;text-align:center;">${isChecked?'✓':'✗'}</span><span style="font-size:12px;line-height:1.5;color:${isChecked?'var(--text)':'var(--text-2)'};">${ind.behavioral_indicator}</span></div>`;});});
