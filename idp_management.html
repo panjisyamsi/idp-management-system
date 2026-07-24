@@ -570,7 +570,7 @@ function applyLanguage() {
 }
 
 // ── API CONFIG — UPDATE AFTER EACH NEW DEPLOYMENT ──────────
-const API_URL = 'https://script.google.com/macros/s/AKfycbx7-882P2sUmQp4TelhRe8jh4yWiR5qgbuO777YYNF_z2mrGsnvyEvskOZbrCEb1T8o/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyDtXAaS0iSyc5K3Q1fRh088G29FHZPDyjyHW7veAoDrObCGxdVh9dKP6bCvs3N0eMy/exec';
 
 // ── STATE ──────────────────────────────────────────────────
 let state = {
@@ -839,7 +839,29 @@ function toggleComp(cid){const b=el(`comp-body-${cid}`),a=el(`arrow-${cid}`);if(
 function toggleInd(cid,level,idx){if(!state.assessmentChecks[cid]?.[level])return;state.assessmentChecks[cid][level][idx]=!state.assessmentChecks[cid][level][idx];recalcScore(cid);refreshCompBlock(cid);}
 function recalcScore(cid){const comp=state.compLibrary.find(c=>c.competency_id===cid);if(!comp)return;let achieved=0;for(let l=1;l<=5;l++){const inds=comp.levels[l]||[];if(!inds.length)continue;const checks=state.assessmentChecks[cid][l]||[];if(inds.every((_,i)=>checks[i]===true))achieved=l;else break;}state.assessmentScores[cid]=achieved;}
 function refreshCompBlock(cid){const comp=state.compLibrary.find(c=>c.competency_id===cid);if(!comp)return;for(let l=1;l<=5;l++){const inds=comp.levels[l]||[];inds.forEach((_,idx)=>{const item=document.querySelector(`[onclick="toggleInd('${cid}',${l},${idx})"]`);if(!item)return;const checked=state.assessmentChecks[cid]?.[l]?.[idx]||false;item.classList.toggle('checked',checked);item.querySelector('.ind-check').textContent=checked?'✓':'';});}}
-function buildAssessmentScores(){return (state.compLibrary||[]).map(comp=>({competency_id:comp.competency_id,competency_type:comp.competency_type,self_score:state.assessmentScores[comp.competency_id]||0,notes:''}));}
+function buildAssessmentScores(){
+  return (state.compLibrary||[]).map(comp=>{
+    const cid = comp.competency_id;
+    const checks = state.assessmentChecks[cid] || {};
+    // Build flat array of checked indicator_nos per level
+    const checkedIndicators = [];
+    Object.entries(checks).forEach(([level, bools]) => {
+      const inds = comp.levels[level] || [];
+      bools.forEach((checked, idx) => {
+        if (checked && inds[idx]) {
+          checkedIndicators.push({ indicator_no: inds[idx].indicator_no, level: parseInt(level) });
+        }
+      });
+    });
+    return {
+      competency_id:      cid,
+      competency_type:    comp.competency_type,
+      self_score:         state.assessmentScores[cid] || 0,
+      notes:              '',
+      checked_indicators: checkedIndicators
+    };
+  });
+}
 async function saveDraft(){const res=await api('submitAssessment',{nik:state.user.nik,scores:buildAssessmentScores(),is_final:false});if(res.success)toast(t('assess.draft_saved'),'success');else toast(res.message,'error');}
 function confirmFinalSubmit(){openModal(`<div class="modal" onclick="event.stopPropagation()"><div class="modal-header"><div class="modal-title">Confirm Final Submission</div><button class="modal-close" onclick="closeModal()">×</button></div><div class="modal-body"><div class="notice notice-amber"><div class="notice-icon">⚠️</div><div>Once submitted, your assessment <strong>cannot be changed</strong>. Please ensure all indicators are filled in honestly.</div></div></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doFinalSubmit()">Yes, Submit</button></div></div>`);}
 async function doFinalSubmit(){closeModal();state._assessmentSubmitted=true;const res=await api('submitAssessment',{nik:state.user.nik,scores:buildAssessmentScores(),is_final:true});if(res.success){sessionStorage.setItem('mirai_submitted_'+state.user.nik,'true');toast('Assessment submitted successfully.','success');state.compLibrary=null;state.assessmentScores={};state.assessmentChecks={};html('assessment-content',buildSubmittedView());}else{state._assessmentSubmitted=false;sessionStorage.removeItem('mirai_submitted_'+state.user.nik);toast(res.message,'error');}}
