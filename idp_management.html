@@ -624,7 +624,7 @@ function renderStep1(memberNik){
           const inds=c.levels[lvl]||[];if(!inds.length)return;
           const checkedCount=inds.filter(ind=>ind.is_checked).length;
           const lvlColor=checkedCount===inds.length?'var(--emerald)':checkedCount>0?'var(--amber)':'var(--text-muted)';
-          const lvlNote=checkedCount===inds.length?` — <span style="color:var(--emerald);">All checked ✓</span>`:checkedCount>0?` — <span style="color:var(--amber);">${checkedCount}/${inds.length} checked</span>`:` — <span style="color:var(--text-muted);">Not assessed</span>`;
+          const lvlNote=checkedCount===inds.length?` — <span style="color:var(--emerald);">All checked ✓</span>`:checkedCount>0?` — <span style="color:var(--amber);">${checkedCount}/${inds.length} checked</span>`:'';
           indHTML+=`<div style="font-size:10px;font-weight:800;color:${lvlColor};margin:8px 0 4px;padding-bottom:3px;border-bottom:1px solid var(--border);">Level ${lvl}${lvlNote}${lvl===targetLevel?' &nbsp;<span style="background:var(--amber);color:#fff;font-size:9px;padding:1px 6px;border-radius:4px;">TARGET</span>':''}</div>`;
           inds.forEach(ind=>{
             if(ind.is_checked){indHTML+=`<div class="ind-ro ind-checked"><div class="ind-ro-icon-c">✓</div><span style="font-size:12px;line-height:1.5;color:var(--text);font-weight:500;">${ind.behavioral_indicator}</span></div>`;}
