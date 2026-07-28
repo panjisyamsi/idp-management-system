@@ -251,6 +251,12 @@ tbody tr:hover{background:var(--purple-soft);}
 .level-mismatch-row td{background:var(--coral-soft)!important;}
 .level-warn{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;color:var(--coral-dark);background:var(--coral-soft);padding:2px 8px;border-radius:var(--r-full);border:1px solid rgba(244,63,94,0.3);margin-top:3px;}
 .level-ok{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;color:var(--emerald-dark);}
+.filter-row th{padding:6px 10px;background:var(--surface);border-bottom:1px solid var(--border);}
+.col-filter{width:100%;min-width:88px;padding:5px 9px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:var(--font);font-size:11.5px;color:var(--text);background:var(--surface2);outline:none;transition:border-color var(--t-fast) var(--ease);font-weight:500;}
+.col-filter:focus{border-color:var(--purple);background:var(--surface);}
+.col-filter::placeholder{color:var(--text-muted);font-weight:400;}
+.div-row:hover .bar-name{text-decoration:underline;}
+@media(max-width:767px){.filter-row{display:none;}}
 .admin-tab-row{display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid var(--border);overflow-x:auto;}
 .admin-tab-btn{padding:9px 20px;border:none;background:none;font-family:var(--font);font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all var(--t-fast) var(--ease);white-space:nowrap;}
 .admin-tab-btn:hover{color:var(--text);background:var(--surface2);}
@@ -438,7 +444,7 @@ tbody tr:hover{background:var(--purple-soft);}
 // lalu unggah ulang file ini ke GitHub. Melewatkan langkah ini adalah
 // sumber bug paling sering di proyek ini.
 // ============================================================
-const API_URL='https://script.google.com/macros/s/AKfycbxnSRR0EuH4qbwYI9fdsUk1Y2xoFAl4ARNv0PiA6YCp_SyPKWsB5e9bHMPkLoaSRIk1/exec';
+const API_URL='https://script.google.com/macros/s/AKfycbxkwUDlRdYUrZCPgnxMXJ8wWGbHfnCyUyROGTT0f5OIG1xnk4w8urHwiYGAdNSZoGDN/exec';
 
 // ── BAHASA ─────────────────────────────────────────────────
 const LANG={
@@ -453,6 +459,41 @@ function applyLanguage(){
   document.querySelectorAll('[data-i18n]').forEach(e=>{const k=e.getAttribute('data-i18n');if(k)e.textContent=t(k);});
   const ne=el('nav-btn-en'),ni=el('nav-btn-id');
   if(ne&&ni){const on=currentLang==='en';ne.style.background=on?'rgba(255,255,255,0.25)':'transparent';ne.style.color=on?'#fff':'rgba(255,255,255,0.6)';ni.style.background=on?'transparent':'rgba(255,255,255,0.25)';ni.style.color=on?'rgba(255,255,255,0.6)':'#fff';}
+}
+
+// ── SESI ───────────────────────────────────────────────────
+// Disimpan di sessionStorage, bukan localStorage. Bedanya penting di
+// lingkungan dengan terminal bersama: sessionStorage ikut mati begitu tab
+// ditutup, sementara localStorage bertahan sampai satu jam penuh dan bisa
+// diambil alih orang berikutnya yang duduk di komputer yang sama.
+// Platform ini belum punya token sesi di lapisan API, jadi tidak ada
+// pertahanan kedua kalau sesi bocor.
+//
+// Refresh dan F5 tidak lagi memaksa login ulang. Batas satu jam dihitung
+// dari waktu login, tidak diperpanjang oleh aktivitas.
+const SESSION_KEY='mirai_session';
+const SESSION_MAX_AGE=60*60*1000;   // 1 jam
+
+function saveSession(user){
+  try{sessionStorage.setItem(SESSION_KEY,JSON.stringify({user,at:Date.now()}));}catch(e){}
+}
+function loadSession(){
+  try{
+    const raw=sessionStorage.getItem(SESSION_KEY);
+    if(!raw)return null;
+    const s=JSON.parse(raw);
+    if(!s||!s.user||!s.at)return null;
+    if(Date.now()-s.at>SESSION_MAX_AGE){clearSession();return null;}
+    return s.user;
+  }catch(e){return null;}
+}
+function clearSession(){try{sessionStorage.removeItem(SESSION_KEY);}catch(e){}}
+function sessionMinutesLeft(){
+  try{
+    const s=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
+    if(!s||!s.at)return 0;
+    return Math.max(0,Math.ceil((SESSION_MAX_AGE-(Date.now()-s.at))/60000));
+  }catch(e){return 0;}
 }
 
 // ── STATE ──────────────────────────────────────────────────
@@ -520,6 +561,7 @@ async function doLogin(){
   const emp=data.employee||data.data;
   state.user=emp;
   if(emp.must_change_password){el('page-login').style.display='none';el('page-change-password').style.display='flex';return;}
+  saveSession(emp);
   initApp();
 }
 async function doChangePassword(){
@@ -530,11 +572,13 @@ async function doChangePassword(){
   if(!res.success){toast(res.message,'error');return;}
   toast('Password berhasil diubah','success');
   state.user.must_change_password=false;
+  saveSession(state.user);
   el('page-change-password').style.display='none';
   initApp();
 }
 function doLogout(){
   closeModal();
+  clearSession();
   state=freshState();
   el('app-layout').style.display='none';
   el('page-login').style.display='flex';
@@ -557,7 +601,12 @@ function initApp(){
 }
 function sItem(i){return `<button class="sidebar-item" id="snav-${i.id}" onclick="navigateTo('${i.id}')"><span class="sidebar-icon">${i.icon}</span>${i.label}</button>`;}
 function buildNav(){
-  const u=state.user,isLeader=u.role&&u.role.includes('leader'),isAdmin=u.role==='admin';
+  // Status atasan diambil dari Has_Subordinates, bukan dari kolom Role.
+  // Seluruh backend (SPV_NIK, getTeamAssessments, _isSupervisorOf) memakai
+  // sumber itu; kalau navigasi bersandar pada teks Role, atasan yang kolom
+  // Role-nya masih 'employee' tidak pernah melihat menunya sama sekali.
+  const u=state.user,isAdmin=u.role==='admin';
+  const isLeader=u.has_subordinates===true||u.isLeader===true||(u.role||'').includes('leader')||isAdmin;
   const emp=[{id:'dashboard',icon:'&#127968;',label:'Dashboard'},{id:'assessment',icon:'&#128203;',label:'Assessment'},{id:'jadwal',icon:'&#128197;',label:'Schedule'},{id:'progress',icon:'&#128200;',label:'Progress'},{id:'corporate',icon:'&#127970;',label:'Corporate'}];
   const lead=[{id:'team-assessment',icon:'&#128101;',label:'Team'},{id:'team-monitor',icon:'&#128202;',label:'Monitor'},{id:'l3-eval',icon:'&#127919;',label:'Evaluasi L3'}];
   const adm=[{id:'admin',icon:'&#128737;',label:'Admin'},{id:'admin-users',icon:'&#128100;',label:'Pengguna'}];
@@ -596,7 +645,7 @@ async function loadDashboard(){
   const enrolled=enrRes.success?(enrRes.data||[]).length:0;
   const submitted=assessRes.success&&assessRes.has_submitted_final;
   const hasDraft=assessRes.success&&assessRes.has_draft&&!submitted;
-  const isLeader=u.role&&u.role.includes('leader');
+  const isLeader=u.has_subordinates===true||u.isLeader===true||(u.role||'').includes('leader')||u.role==='admin';
 
   let c=`<div class="stats-grid">
     <div class="stat-card stat-card-purple"><div class="stat-icon">${submitted?'&#9989;':hasDraft?'&#128190;':'&#128203;'}</div><div class="stat-label">Assessment</div><div style="margin-top:4px;">${submitted?statusBadge('submitted'):hasDraft?'<span class="badge badge-sky">Draf</span>':statusBadge('pending')}</div>${assessRes.expected_count?`<div class="stat-sub" style="margin-top:6px;">${assessRes.filled_count}/${assessRes.expected_count} kompetensi</div>`:''}</div>
@@ -648,7 +697,35 @@ async function loadAssessment(){
     state.assessmentChecks[c.competency_id]={};
     for(let l=1;l<=5;l++)state.assessmentChecks[c.competency_id][l]=(c.levels[l]||[]).map(()=>false);
   });
-  if(statusRes.success&&(statusRes.scores||[]).length)statusRes.scores.forEach(s=>{state.assessmentScores[s.competency_id]=s.self_score;});
+
+  // Centang draf dipulihkan dari server, bukan hanya skornya. Tanpa ini,
+  // karyawan yang kembali setelah menyimpan draf melihat formulir kosong
+  // padahal skornya sudah terisi — lalu mengirim skor tanpa satu pun
+  // centang yang mendukungnya, dan atasannya melihat data yang janggal.
+  if(statusRes.success&&(statusRes.scores||[]).length){
+    statusRes.scores.forEach(sc=>{
+      const cid=sc.competency_id;
+      const comp=state.compLibrary.find(c=>c.competency_id===cid);
+      if(!comp)return;
+      (sc.checked_indicators||[]).forEach(ci=>{
+        const no=ci&&ci.indicator_no!==undefined?ci.indicator_no:ci;
+        const lvl=ci&&ci.level!==undefined&&ci.level!==null?ci.level:null;
+        // Baris berformat lama tidak menyimpan level. Memulihkannya ke semua
+        // level akan mengulang persis bug kebocoran centang, jadi baris
+        // seperti itu sengaja tidak dipulihkan.
+        if(lvl===null)return;
+        const inds=comp.levels[lvl]||[];
+        const i=inds.findIndex(x=>Number(x.indicator_no)===Number(no));
+        if(i>=0&&state.assessmentChecks[cid]&&state.assessmentChecks[cid][lvl])
+          state.assessmentChecks[cid][lvl][i]=true;
+      });
+      // Skor dihitung ulang dari centang yang benar-benar pulih, bukan
+      // diambil mentah dari server, supaya keduanya selalu konsisten.
+      recalcScore(cid);
+      if(!(state.assessmentChecks[cid]&&Object.values(state.assessmentChecks[cid]).some(a=>(a||[]).some(Boolean))))
+        state.assessmentScores[cid]=sc.self_score;
+    });
+  }
   renderAssessmentForm();
 }
 function buildSubmittedView(){
@@ -768,7 +845,13 @@ function confirmFinalSubmit(){
 async function doFinalSubmit(){
   closeModal();
   const r=await api('submitAssessment',{nik:state.user.nik,scores:buildAssessmentScores(),is_final:true});
-  if(!r.success){toast(r.message,'error');return;}
+  if(!r.success){
+    toast(r.message,'error');
+    // Server menolak karena asesmen sudah final di tempat lain (tab kedua
+    // atau perangkat lain). Layar disamakan dengan keadaan sebenarnya.
+    if(r.locked){state._assessmentSubmitted=true;html('assessment-content',buildSubmittedView());}
+    return;
+  }
   if((r.rejected_competencies||[]).length)toast(r.rejected_competencies.length+' kompetensi dilewati karena sedang berjalan','warning');
   state._assessmentSubmitted=true;
   toast('Asesmen terkirim','success');
@@ -948,8 +1031,11 @@ function renderTeamList(){
   team.forEach(m=>{
     // Kolom asesmen menampilkan porsi yang memang perlu dinilai.
     // Kompetensi yang di-skip tidak lagi memblokir tombol review.
+    // Rincian "n dilewati" dihapus dari tabel: angkanya membingungkan tanpa
+    // konteks. Informasi lengkapnya tetap ada di dalam modal Langkah 1,
+    // berikut nama kompetensi dan alasan masing-masing.
     const detail=m.assessable_count>0?`${m.submitted_count}/${m.assessable_count}`:'—';
-    const skipInfo=m.skipped_count>0?`<div style="font-size:10px;color:var(--text-muted);margin-top:2px;">${m.skipped_count} dilewati</div>`:'';
+    const skipInfo='';
     c+=`<tr><td data-label="Nama"><strong>${esc(m.name)}</strong><br><span style="font-size:11px;font-family:var(--mono);color:var(--text-muted);">${esc(m.nik)}</span></td><td data-label="Grade"><span class="badge ${gradeColor(m.grade)}">${esc(m.grade)}</span></td><td data-label="Departemen" style="font-size:12px;">${esc(m.department)}</td><td data-label="Asesmen">${m.has_submitted?'<span class="badge badge-emerald">Lengkap</span>':'<span class="badge badge-gray">Belum</span>'}<div style="font-size:10px;color:var(--text-muted);margin-top:2px;">${detail}</div>${skipInfo}</td><td data-label="Assignment">${m.already_assigned?'<span class="badge badge-sky">Selesai</span>':'<span class="badge badge-amber">Belum</span>'}</td><td data-label="Mandatory"><span style="font-weight:800;color:var(--coral);">${m.mandatory_count}</span>/2</td><td>${m.has_submitted?`<button class="btn btn-primary btn-sm" onclick="openAssignModal('${m.nik}')">Tinjau &amp; Assign</button>`:'<span class="text-muted text-sm">Menunggu asesmen</span>'}</td></tr>`;
   });
   html('team-assessment-content',c+`</tbody></table></div></div>`);
@@ -957,7 +1043,15 @@ function renderTeamList(){
 function openAssignModal(nik){
   const m=(state.teamData||[]).find(x=>x.nik===nik);if(!m)return;
   window._curDecisions={};window._curLeaderLvls={};window._curMemberNik=nik;
-  m.competencies.forEach(c=>{window._curLeaderLvls[c.competency_id]=c.leader_level||'';window._curDecisions[c.competency_id]=c.decision||'';});
+  // Hanya kompetensi yang benar-benar dinilai siklus ini yang masuk ke
+  // keputusan. Kompetensi yang sedang berjalan di IDP 2026 bisa masih
+  // memegang Decision 'mandatory' dari periode yang sama; kalau ikut
+  // dihitung, penghitung sudah menunjukkan 1/2 sebelum atasan memilih
+  // apa pun, dan pilihan keduanya ditolak server.
+  m.competencies.filter(c=>!c.is_skipped).forEach(c=>{
+    window._curLeaderLvls[c.competency_id]=c.leader_level||'';
+    window._curDecisions[c.competency_id]=c.decision||'';
+  });
   renderStep1(nik);
 }
 
@@ -1072,11 +1166,80 @@ function setDecision(cid,dec){
   const ctr=el('mand-counter');
   if(ctr)ctr.textContent=`Terpilih: ${Object.values(window._curDecisions).filter(d=>d==='mandatory').length}/2`;
 }
-async function doSaveApproval(nik){
+async function doSaveApproval(nik,confirmed){
   const decisions=Object.entries(window._curDecisions).map(([cid,dec])=>({competency_id:cid,decision:dec,suggestion:'',leader_level:(window._curLeaderLvls||{})[cid]||''}));
+  // Level yang tidak diisi tersimpan sebagai 0. Skor akhir lalu jatuh ke
+  // nilai self, dan kompetensi itu tidak akan pernah tercatat tercapai —
+  // tanpa ada yang memberi tahu atasannya. Karena itu dikonfirmasi dulu.
+  const kosong=decisions.filter(d=>!Number(d.leader_level));
+  if(kosong.length&&!confirmed){
+    const m=(state.teamData||[]).find(x=>x.nik===nik)||{};
+    const nama=kosong.map(d=>{
+      const c=(m.competencies||[]).find(x=>x.competency_id===d.competency_id);
+      return esc(c?(c.competency_name||c.competency_id):d.competency_id);
+    }).join(', ');
+    openModal(`<div class="modal" style="max-width:460px;" onclick="event.stopPropagation()"><div class="modal-header"><div class="modal-title">Level Belum Ditetapkan</div><button class="modal-close" onclick="renderStep2('${nik}')">&times;</button></div><div class="modal-body"><div class="notice notice-amber"><div class="notice-icon">&#9888;</div><div><strong>${kosong.length} kompetensi</strong> belum kamu tetapkan levelnya: ${nama}.</div></div><p style="font-size:13px;color:var(--text-2);line-height:1.7;">Tanpa level dari kamu, skor akhir memakai nilai self karyawan saja dan kompetensi ini tidak akan pernah tercatat tercapai. Kamu bisa kembali dan mengisinya, atau tetap menyimpan dan melengkapinya nanti.</p></div><div class="modal-footer"><button class="btn btn-ghost" onclick="renderStep1('${nik}')">&larr; Isi Sekarang</button><button class="btn btn-emerald" onclick="doSaveApproval('${nik}',true)">Tetap Simpan</button></div></div>`);
+    return;
+  }
   const r=await api('saveApproval',{leader_nik:state.user.nik,member_nik:nik,decisions});
   if(r.success){toast('Assignment tersimpan','success');closeModal();loadTeamAssessment();}
   else toast(r.message,'error');
+}
+
+// SheetJS dimuat saat dibutuhkan saja, sama seperti jsPDF, supaya halaman
+// utama tidak menanggung bobotnya. Menghasilkan .xlsx sungguhan, bukan CSV
+// yang gampang salah baca karena pemisah desimal Indonesia.
+async function loadSheetJS(){
+  if(window.XLSX)return;
+  await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
+}
+function saveSheet(rows,sheetName,fileName){
+  const ws=window.XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols']=(rows[0]||[]).map((_,i)=>({wch:i===0?34:i===4?26:i===5?26:16}));
+  const wb=window.XLSX.utils.book_new();
+  window.XLSX.utils.book_append_sheet(wb,ws,sheetName);
+  window.XLSX.writeFile(wb,fileName);
+}
+const stamp=()=>new Date().toISOString().split('T')[0];
+
+// Kolom A-F sesuai permintaan. Satu baris per karyawan yang di-assign;
+// kolom C berisi jumlah untuk kombinasi kompetensi + level yang sama,
+// diulang di tiap baris supaya siap langsung di-pivot.
+async function downloadDemandExcel(){
+  showLoading(true);
+  try{
+    const r=await apiFast('getDemandExport');
+    if(!r.success){toast(r.message||'Gagal mengambil data','error');return;}
+    const data=r.data||[];
+    if(!data.length){toast('Belum ada data assignment','warning');return;}
+    await loadSheetJS();
+    const rows=[['Nama Kompetensi','Level Target','Jumlah Di-assign','NIK','Nama Karyawan','Divisi','Departemen','Grade','Prioritas']];
+    data.forEach(x=>rows.push([x.competency_name||x.competency_id,x.target_level||'',x.assigned_count||0,x.nik,x.name,x.division||'',x.department||'',x.grade||'',x.decision]));
+    saveSheet(rows,'Demand Pelatihan',`MIRAI_Demand_Pelatihan_${stamp()}.xlsx`);
+    toast(`${data.length} baris terunduh`,'success');
+  }catch(e){toast('Gagal membuat Excel: '+e.message,'error');}
+  finally{showLoading(false);}
+}
+
+// Format sama dengan Demand, ditambah kolom waktu sesi yang dipilih peserta.
+async function downloadEnrollmentExcel(){
+  const sessions=window._enrollData||[];
+  if(!sessions.length){toast('Belum ada pendaftaran','warning');return;}
+  showLoading(true);
+  try{
+    await loadSheetJS();
+    const counts={};
+    sessions.forEach(s=>{const k=(s.competency_id||'')+'|'+(s.level||0);counts[k]=(counts[k]||0)+s.participants.length;});
+    const rows=[['Nama Kompetensi','Level Target','Jumlah Di-assign','NIK','Nama Karyawan','Divisi','Waktu Training','Departemen','Trainer','Lokasi','Tipe']];
+    sessions.forEach(s=>{
+      const jumlah=counts[(s.competency_id||'')+'|'+(s.level||0)]||s.participants.length;
+      const waktu=`${s.date||''}${s.time?' '+s.time:''}`.trim();
+      s.participants.forEach(p=>rows.push([s.competency_name||s.competency_id,s.level||'',jumlah,p.nik,p.name,p.division||'',waktu,p.department||'',s.trainer||'',s.location||'',s.training_type||'']));
+    });
+    saveSheet(rows,'Pendaftaran',`MIRAI_Pendaftaran_${stamp()}.xlsx`);
+    toast(`${rows.length-1} baris terunduh`,'success');
+  }catch(e){toast('Gagal membuat Excel: '+e.message,'error');}
+  finally{showLoading(false);}
 }
 
 async function loadJsPDF(){
@@ -1141,17 +1304,15 @@ async function loadTeamMonitor(){
   html('team-monitor-content',c+`</tbody></table></div></div>`);
 }
 async function loadTeamSchedule(){
-  const r=await api('getTeamProgress',{leader_nik:state.user.nik});
-  if(!r.success||!(r.data||[]).length){html('team-monitor-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">&#128197;</div><div class="empty-title">Belum ada data tim</div></div></div></div>`);return;}
-  const team=r.data;
   showLoading(true);
   try{
-    const[schedRes,...enrs]=await Promise.all([apiFast('getSchedule',{grade:''}),...team.map(m=>apiFast('getMyEnrollments',{nik:m.nik}))]);
-    const sessMap={};(schedRes.success?schedRes.data:[]).forEach(s=>{sessMap[s.session_id]=s;});
-    const list=[];
-    team.forEach((m,i)=>{(enrs[i]&&enrs[i].success?enrs[i].data:[]).forEach(e=>{const s=sessMap[e.session_id];if(s)list.push({m,s});});});
+    // Satu permintaan untuk seluruh tim. Pola lama menembakkan satu
+    // permintaan per anggota secara paralel; untuk tim besar sebagian
+    // gagal karena batas eksekusi simultan Apps Script, dan anggotanya
+    // hilang dari tabel tanpa pesan error apa pun.
+    const res=await apiFast('getTeamEnrollments',{leader_nik:state.user.nik});
+    const list=(res.success?(res.data||[]):[]).map(x=>({m:{name:x.name,grade:x.grade,department:x.department},s:x.session}));
     if(!list.length){html('team-monitor-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">&#128197;</div><div class="empty-title">Belum ada pendaftaran tim</div></div></div></div>`);return;}
-    list.sort((a,b)=>String(a.s.date||'').localeCompare(String(b.s.date||'')));
     let c=`<div class="card"><div class="table-wrap"><table class="mobile-card"><thead><tr><th>Anggota</th><th>Tanggal</th><th>Kompetensi</th><th>Trainer</th><th>Lokasi</th><th>Tipe</th></tr></thead><tbody>`;
     list.forEach(({m,s})=>{
       const tt=(s.training_type||'').toLowerCase(),isSL=tt.includes('self'),isOn=tt.includes('online');
@@ -1463,20 +1624,90 @@ function renderAdminOverview(d){
   return c;
 }
 function renderAdminAssessment(d){
-  const det=d.assessment_detail||[],ds=d.department_stats||{};
-  const notYet=det.filter(u=>!u.has_assessed);
-  let c=`<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title">Asesmen per Departemen</div></div><div class="card-body"><div class="bar-chart">`;
-  Object.entries(ds).sort((a,b)=>b[1].total-a[1].total).slice(0,15).forEach(([dep,v])=>{
-    c+=`<div class="bar-row"><div class="bar-name truncate" title="${esc(dep)}">${esc(dep)}</div><div class="bar-track"><div class="bar-fill" style="width:${pct(v.assessed,v.total)}%"></div></div><div class="bar-val">${v.assessed}/${v.total}</div></div>`;
+  const ds=d.division_stats||{};
+  window._adminNotYet=(d.assessment_detail||[]).filter(u=>!u.has_assessed);
+  window._divStats=ds;
+  state.assessFilters=state.assessFilters||{nik:'',name:'',grade:'',dept:'',div:''};
+  state.assessPage=1;
+
+  // Divisi jauh lebih sedikit daripada departemen, jadi grafiknya muat satu
+  // layar. Klik satu batang untuk membuka rincian departemen di dalamnya.
+  const divs=Object.entries(ds).sort((a,b)=>b[1].total-a[1].total);
+  let c=`<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title">Asesmen per Divisi</div><span class="badge badge-gray">${divs.length} divisi</span></div><div class="card-body"><div style="font-size:11px;color:var(--text-muted);margin-bottom:12px;">Klik nama divisi untuk melihat rincian per departemen.</div><div class="bar-chart">`;
+  divs.forEach(([dv,v],i)=>{
+    c+=`<div>
+      <div class="bar-row div-row" onclick="toggleDivision(${i})" style="cursor:pointer;">
+        <div class="bar-name truncate" title="${esc(dv)}" style="color:var(--purple);font-weight:700;"><span id="div-caret-${i}" style="display:inline-block;width:10px;transition:transform 0.2s;">&#9656;</span> ${esc(dv)}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct(v.assessed,v.total)}%"></div></div>
+        <div class="bar-val">${v.assessed}/${v.total}</div>
+      </div>
+      <div id="div-body-${i}" style="display:none;margin:4px 0 10px 22px;padding-left:12px;border-left:2px solid var(--border);">`;
+    Object.entries(v.departments||{}).sort((a,b)=>b[1].total-a[1].total).forEach(([dp,dv2])=>{
+      c+=`<div class="bar-row" style="margin:5px 0;"><div class="bar-name truncate" title="${esc(dp)}" style="font-size:11px;">${esc(dp)}</div><div class="bar-track" style="height:6px;"><div class="bar-fill" style="width:${pct(dv2.assessed,dv2.total)}%;background:linear-gradient(90deg,var(--sky-dark),var(--sky));"></div></div><div class="bar-val" style="font-size:10px;">${dv2.assessed}/${dv2.total}</div></div>`;
+    });
+    c+=`<div style="margin-top:6px;"><button class="btn btn-ghost btn-sm" onclick="filterByDivision('${esc(dv).replace(/'/g,"\\'")}')">Lihat yang belum asesmen di divisi ini &rarr;</button></div></div></div>`;
   });
   c+=`</div></div></div>`;
-  c+=`<div class="card"><div class="card-header"><div class="card-title">Belum Menyelesaikan Asesmen</div><div style="display:flex;gap:8px;align-items:center;"><span class="badge badge-coral">${notYet.length}</span><button class="btn btn-ghost btn-sm" onclick="copyList('nik')">Salin NIK</button></div></div><div class="table-wrap"><table class="mobile-card"><thead><tr><th>NIK</th><th>Nama</th><th>Grade</th><th>Departemen</th><th>Progres</th></tr></thead><tbody>`;
-  notYet.slice(0,300).forEach(u=>{
-    c+=`<tr><td data-label="NIK" style="font-family:var(--mono);font-size:12px;">${esc(u.nik)}</td><td data-label="Nama">${esc(u.name)}</td><td data-label="Grade"><span class="badge ${gradeColor(u.grade)}">${esc(u.grade)}</span></td><td data-label="Dept" style="font-size:12px;">${esc(u.department)}</td><td data-label="Progres">${u.expected_count?`${u.filled_count}/${u.expected_count}`:'<span class="text-muted">tidak ada target</span>'}</td></tr>`;
-  });
-  window._adminNotYet=notYet;
-  return c+`</tbody></table>${notYet.length>300?`<div style="padding:12px;text-align:center;font-size:12px;color:var(--text-muted);">Menampilkan 300 dari ${notYet.length}</div>`:''}</div></div>`;
+
+  // Tabel dengan filter per kolom dan paginasi 50 baris.
+  c+=`<div class="card"><div class="card-header"><div class="card-title">Belum Menyelesaikan Asesmen</div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><span class="badge badge-coral" id="notyet-count">${window._adminNotYet.length}</span><button class="btn btn-ghost btn-sm" onclick="clearAssessFilters()">Reset Filter</button><button class="btn btn-ghost btn-sm" onclick="copyList()">Salin NIK</button></div></div>
+  <div class="table-wrap"><table class="mobile-card"><thead>
+    <tr><th>NIK</th><th>Nama</th><th>Grade</th><th>Divisi</th><th>Departemen</th><th>Progres</th></tr>
+    <tr class="filter-row">
+      <th><input class="col-filter" id="af-nik" placeholder="Cari NIK" oninput="onAssessFilter()"></th>
+      <th><input class="col-filter" id="af-name" placeholder="Cari nama" oninput="onAssessFilter()"></th>
+      <th><input class="col-filter" id="af-grade" placeholder="Grade" oninput="onAssessFilter()"></th>
+      <th><input class="col-filter" id="af-div" placeholder="Divisi" oninput="onAssessFilter()"></th>
+      <th><input class="col-filter" id="af-dept" placeholder="Departemen" oninput="onAssessFilter()"></th>
+      <th></th>
+    </tr>
+  </thead><tbody id="notyet-tbody"></tbody></table></div>
+  <div id="notyet-pager" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-top:1px solid var(--border);flex-wrap:wrap;"></div></div>`;
+  setTimeout(renderNotYetPage,0);
+  return c;
 }
+function toggleDivision(i){
+  const b=el('div-body-'+i),cr=el('div-caret-'+i);if(!b)return;
+  const open=b.style.display!=='none';
+  b.style.display=open?'none':'block';
+  if(cr)cr.style.transform=open?'rotate(0deg)':'rotate(90deg)';
+}
+function filterByDivision(dv){
+  const f=el('af-div');if(f)f.value=dv;
+  onAssessFilter();
+  const t=el('notyet-tbody');if(t)t.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function clearAssessFilters(){
+  ['af-nik','af-name','af-grade','af-div','af-dept'].forEach(id=>{const e=el(id);if(e)e.value='';});
+  onAssessFilter();
+}
+function onAssessFilter(){state.assessPage=1;renderNotYetPage();}
+function filteredNotYet(){
+  const g=id=>((el(id)||{}).value||'').toLowerCase().trim();
+  const q={nik:g('af-nik'),name:g('af-name'),grade:g('af-grade'),div:g('af-div'),dept:g('af-dept')};
+  return (window._adminNotYet||[]).filter(u=>
+    (!q.nik||String(u.nik).toLowerCase().includes(q.nik))&&
+    (!q.name||String(u.name||'').toLowerCase().includes(q.name))&&
+    (!q.grade||String(u.grade||'').toLowerCase().includes(q.grade))&&
+    (!q.div||String(u.division||'').toLowerCase().includes(q.div))&&
+    (!q.dept||String(u.department||'').toLowerCase().includes(q.dept)));
+}
+const NOTYET_PER_PAGE=50;
+function renderNotYetPage(){
+  const list=filteredNotYet();
+  const pages=Math.max(1,Math.ceil(list.length/NOTYET_PER_PAGE));
+  if(state.assessPage>pages)state.assessPage=pages;
+  const p=state.assessPage;
+  const slice=list.slice((p-1)*NOTYET_PER_PAGE,p*NOTYET_PER_PAGE);
+  const tb=el('notyet-tbody');
+  if(tb)tb.innerHTML=slice.length?slice.map(u=>`<tr><td data-label="NIK" style="font-family:var(--mono);font-size:12px;">${esc(u.nik)}</td><td data-label="Nama">${esc(u.name)}</td><td data-label="Grade"><span class="badge ${gradeColor(u.grade)}">${esc(u.grade)}</span></td><td data-label="Divisi" style="font-size:12px;">${esc(u.division||'—')}</td><td data-label="Departemen" style="font-size:12px;">${esc(u.department)}</td><td data-label="Progres">${u.expected_count?`${u.filled_count}/${u.expected_count}`:'<span class="text-muted">tidak ada target</span>'}</td></tr>`).join(''):`<tr><td colspan="6" style="text-align:center;padding:28px;color:var(--text-muted);">Tidak ada data yang cocok dengan filter</td></tr>`;
+  const cnt=el('notyet-count');if(cnt)cnt.textContent=list.length;
+  const from=list.length?((p-1)*NOTYET_PER_PAGE+1):0, to=Math.min(p*NOTYET_PER_PAGE,list.length);
+  const pg=el('notyet-pager');
+  if(pg)pg.innerHTML=`<div style="font-size:12px;color:var(--text-muted);">Menampilkan <strong>${from}–${to}</strong> dari <strong>${list.length}</strong></div><div style="display:flex;gap:8px;align-items:center;"><button class="btn btn-ghost btn-sm" ${p<=1?'disabled':''} onclick="notYetPage(${p-1})">&larr; Sebelumnya</button><span style="font-size:12px;font-weight:700;">Hal ${p}/${pages}</span><button class="btn btn-ghost btn-sm" ${p>=pages?'disabled':''} onclick="notYetPage(${p+1})">Berikutnya &rarr;</button></div>`;
+}
+function notYetPage(n){state.assessPage=n;renderNotYetPage();window.scrollTo({top:el('notyet-tbody').getBoundingClientRect().top+window.scrollY-160,behavior:'smooth'});}
+
 function renderAdminAssignment(d){
   const det=(d.assignment_detail||[]).slice().sort((a,b)=>Number(a.has_assigned)-Number(b.has_assigned));
   let c=`<div class="card"><div class="card-header"><div class="card-title">Status Assignment per Atasan</div><span class="badge badge-gray">${det.length} atasan</span></div><div class="table-wrap"><table class="mobile-card"><thead><tr><th>NIK</th><th>Nama</th><th>Departemen</th><th>Bawahan</th><th>Sudah Assign</th><th>Status</th></tr></thead><tbody>`;
@@ -1496,10 +1727,16 @@ function renderAdminCompletion(d){
     <div class="stat-card stat-card-amber"><div class="stat-icon">&#127919;</div><div class="stat-label">Kompetensi Tercapai</div><div class="stat-value">${s.l3_achieved}<span style="font-size:14px;opacity:0.7;">/${s.l3_total}</span></div></div>
     <div class="stat-card stat-card-sky"><div class="stat-icon">&#128200;</div><div class="stat-label">Rasio</div><div class="stat-value">${pct(s.l3_achieved,s.l3_total)}%</div></div>
   </div>`;
-  c+=`<div class="card"><div class="card-header"><div class="card-title">Detail Evaluasi Perilaku</div></div><div class="table-wrap"><table class="mobile-card"><thead><tr><th>NIK</th><th>Nama</th><th>Departemen</th><th>Kompetensi</th><th>Dievaluasi</th><th>Rerata</th><th>Progres</th></tr></thead><tbody>`;
+  // Judul lama "Detail Evaluasi Perilaku" ambigu: pembaca tidak tahu apakah
+  // nama di baris itu yang menilai atau yang dinilai. Baris ini adalah
+  // karyawan YANG DINILAI, dan penilainya kini ditampilkan terpisah.
+  c+=`<div class="card"><div class="card-header"><div class="card-title">Karyawan yang Dinilai Perilakunya</div><span class="badge badge-gray">${det.length}</span></div><div class="card-body" style="padding-bottom:0;"><div style="font-size:12px;color:var(--text-muted);line-height:1.7;">Setiap baris adalah karyawan yang perilakunya dievaluasi oleh atasannya setelah program pengembangan. Kolom <strong>Dinilai oleh</strong> menunjukkan atasan yang bertanggung jawab.</div></div><div class="table-wrap"><table class="mobile-card"><thead><tr><th>NIK</th><th>Karyawan Dinilai</th><th>Departemen</th><th>Dinilai oleh</th><th>Kompetensi</th><th>Dievaluasi</th><th>Rerata</th><th>Progres</th></tr></thead><tbody>`;
   det.slice(0,300).forEach(u=>{
     const col=u.completion_pct>=100?'emerald':u.completion_pct>=50?'amber':'purple';
-    c+=`<tr><td data-label="NIK" style="font-family:var(--mono);font-size:12px;">${esc(u.nik)}</td><td data-label="Nama">${esc(u.name)}</td><td data-label="Dept" style="font-size:12px;">${esc(u.department)}</td><td data-label="Kompetensi" style="font-weight:700;">${u.mandatory_completed}/${u.mandatory_total}</td><td data-label="Dievaluasi">${u.evaluated_count}</td><td data-label="Rerata">${u.evaluated_count?u.avg_score_percent+'%':'<span class="text-muted">—</span>'}</td><td data-label="Progres" style="min-width:80px;">${progBar(u.mandatory_completed,u.mandatory_total||1,col,7)}</td></tr>`;
+    // Rerata 0% berdampingan dengan status tercapai berarti Score_Percent
+    // belum terisi — tandanya setupL3Schema() belum dijalankan.
+    const janggal=u.mandatory_completed>0&&u.evaluated_count>0&&u.avg_score_percent===0;
+    c+=`<tr><td data-label="NIK" style="font-family:var(--mono);font-size:12px;">${esc(u.nik)}</td><td data-label="Karyawan">${esc(u.name)}</td><td data-label="Dept" style="font-size:12px;">${esc(u.department)}</td><td data-label="Dinilai oleh" style="font-size:12px;">${esc(u.evaluator_name||'—')}</td><td data-label="Kompetensi" style="font-weight:700;">${u.mandatory_completed}/${u.mandatory_total}</td><td data-label="Dievaluasi">${u.evaluated_count}</td><td data-label="Rerata">${u.evaluated_count?`${u.avg_score_percent}%${janggal?' <span class="thin-warn" title="Skor dan status saling bertentangan. Jalankan setupL3Schema().">&#9888;</span>':''}`:'<span class="text-muted">—</span>'}</td><td data-label="Progres" style="min-width:80px;">${progBar(u.mandatory_completed,u.mandatory_total||1,col,7)}</td></tr>`;
   });
   return c+`</tbody></table>${det.length>300?`<div style="padding:12px;text-align:center;font-size:12px;color:var(--text-muted);">Menampilkan 300 dari ${det.length}</div>`:''}</div></div>`;
 }
@@ -1508,7 +1745,7 @@ function renderAdminDemand(d){
   const rows=Object.entries(cd).map(([cid,v])=>({cid,...v,total:v.mandatory+v.additional})).sort((a,b)=>b.total-a.total);
   if(!rows.length)return `<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">&#128202;</div><div class="empty-title">Belum ada data demand</div><div class="empty-desc">Demand terbentuk setelah para atasan menetapkan prioritas pengembangan.</div></div></div></div>`;
   const max=rows[0].total||1;
-  let c=`<div class="card"><div class="card-header"><div class="card-title">Kebutuhan Pelatihan per Kompetensi</div></div><div class="card-body"><div class="bar-chart">`;
+  let c=`<div class="card"><div class="card-header"><div class="card-title">Kebutuhan Pelatihan per Kompetensi</div><button class="btn btn-emerald btn-sm" onclick="downloadDemandExcel()">&#8681; Unduh Excel</button></div><div class="card-body"><div class="bar-chart">`;
   rows.forEach(r=>{
     c+=`<div class="bar-row"><div class="bar-name truncate" title="${esc(r.name||r.cid)}">${esc(r.cid)}</div><div class="bar-track"><div class="bar-fill" style="width:${pct(r.total,max)}%"></div></div><div class="bar-val">${r.total}</div></div>`;
   });
@@ -1522,7 +1759,8 @@ async function loadAdminEnrollment(){
   const slot=el('admin-enroll-slot');if(!slot)return;
   if(!r.success||!(r.data||[]).length){slot.innerHTML=`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">&#128197;</div><div class="empty-title">Belum ada pendaftaran</div></div></div></div>`;return;}
   window._emailStore=[];
-  let c='';
+  window._enrollData=r.data;
+  let c=`<div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button class="btn btn-emerald btn-sm" onclick="downloadEnrollmentExcel()">&#8681; Unduh Excel</button></div>`;
   r.data.forEach(s=>{
     const emails=s.participants.map(p=>p.email).filter(Boolean).join('; ');
     // Email disimpan di array dan dirujuk lewat indeks. Menyisipkan teks
@@ -1536,6 +1774,96 @@ async function loadAdminEnrollment(){
   });
   slot.innerHTML=c;
 }
+// ── EKSPOR EXCEL ───────────────────────────────────────────
+// SheetJS dimuat dari CDN saat dibutuhkan, pola yang sama dengan jsPDF.
+// Bila CDN tidak terjangkau — jaringan pabrik kadang memblokirnya — berkas
+// tetap terunduh sebagai CSV yang bisa dibuka Excel, bukan gagal total.
+async function loadXLSX(){
+  if(window.XLSX)return true;
+  try{
+    await new Promise((res,rej)=>{
+      const s=document.createElement('script');
+      s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+      s.onload=res;s.onerror=rej;document.head.appendChild(s);
+    });
+    return !!window.XLSX;
+  }catch(e){return false;}
+}
+function downloadCSV(rows,filename){
+  // Pemisah titik koma dan BOM UTF-8: Excel dengan lokal Indonesia membaca
+  // koma sebagai desimal, sehingga CSV berkoma jatuh ke satu kolom.
+  const csv=rows.map(r=>r.map(c=>{
+    const v=String(c==null?'':c);
+    return /[";\r\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;
+  }).join(';')).join('\r\n');
+  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=filename;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+async function exportSheet(header,rows,sheetName,baseName){
+  if(!rows.length){toast('Tidak ada data untuk diunduh','warning');return;}
+  showLoading(true);
+  try{
+    const stamp=new Date().toISOString().split('T')[0];
+    if(await loadXLSX()){
+      const ws=XLSX.utils.aoa_to_sheet([header,...rows]);
+      ws['!cols']=header.map((h,i)=>({wch:Math.min(38,Math.max(String(h).length+2,
+        ...rows.slice(0,400).map(r=>String(r[i]==null?'':r[i]).length+2)))}));
+      const wb=XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb,ws,sheetName);
+      XLSX.writeFile(wb,`${baseName}_${stamp}.xlsx`);
+      toast(`Excel terunduh — ${rows.length} baris`,'success');
+    }else{
+      downloadCSV([header,...rows],`${baseName}_${stamp}.csv`);
+      toast('CDN Excel tidak terjangkau, diunduh sebagai CSV','warning',5000);
+    }
+  }catch(e){toast('Gagal mengunduh: '+e.message,'error');}
+  finally{showLoading(false);}
+}
+
+// Demand — A Kompetensi, B Level Target, C NIK, D Nama, E Divisi
+function downloadDemandExcel(){
+  const det=(window._adminData&&window._adminData.demand_detail)||[];
+  const rows=det.map(r=>[
+    r.competency_name||r.competency_id,
+    r.target_level||'',
+    r.nik,
+    r.name,
+    r.division||''
+  ]);
+  exportSheet(['Kompetensi','Level Target','NIK','Nama Karyawan','Divisi'],
+    rows,'Demand','MIRAI_Demand_Pelatihan');
+}
+
+// Pendaftaran — kolom A sampai E sama seperti Demand, ditambah
+// F Tanggal Training dan G Waktu Training.
+// Catatan: Anda menyebut kolom G untuk waktu tanpa menyebut kolom F.
+// Saya isi F dengan tanggal karena waktu tanpa tanggal tidak bisa dipakai
+// menyusun undangan. Bilang saja kalau F seharusnya sesuatu yang lain.
+function downloadEnrollmentExcel(){
+  const data=window._enrollData||[];
+  const rows=[];
+  data.forEach(s=>{
+    const tgl=s.date_end&&(s.training_type||'').toLowerCase().includes('self')
+      ? `${s.date} - ${s.date_end}` : s.date;
+    (s.participants||[]).forEach(p=>{
+      rows.push([
+        s.competency_name||s.competency_id,
+        s.level||'',
+        p.nik,
+        p.name,
+        p.division||'',
+        tgl||'',
+        s.time||''
+      ]);
+    });
+  });
+  exportSheet(['Kompetensi','Level Target','NIK','Nama Karyawan','Divisi','Tanggal Training','Waktu Training'],
+    rows,'Pendaftaran','MIRAI_Pendaftaran_Training');
+}
+
 function copyText(txt){
   if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(txt).then(()=>toast('Disalin','success')).catch(()=>fallbackCopy(txt));
@@ -1547,7 +1875,7 @@ function fallbackCopy(txt){
   catch(e){toast('Gagal menyalin','error');}
 }
 function copyStored(i){const v=(window._emailStore||[])[i];if(v)copyText(v);}
-function copyList(){const l=window._adminNotYet||[];if(!l.length){toast('Tidak ada data','warning');return;}copyText(l.map(u=>u.nik).join('\n'));}
+function copyList(){const l=(typeof filteredNotYet==='function'?filteredNotYet():(window._adminNotYet||[]));if(!l.length){toast('Tidak ada data','warning');return;}copyText(l.map(u=>u.nik).join('\n'));toast(l.length+' NIK disalin','success');}
 
 // ── ADMIN USERS ────────────────────────────────────────────
 async function loadAdminUsers(){
@@ -1592,7 +1920,7 @@ function loadAccount(){
       <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--coral));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#fff;">${initials(u.name)}</div>
       <div><div style="font-size:17px;font-weight:800;">${esc(u.name)}</div><div style="font-size:12px;color:var(--text-muted);">${roleLabel(u.role)}</div></div>
     </div>
-    ${row('NIK',u.nik)}${row('Grade',u.grade)}${row('Posisi',u.position)}${row('Departemen',u.department)}${row('Divisi',u.division)}${row('Email',u.email)}
+    ${row('NIK',u.nik)}${row('Grade',u.grade)}${row('Posisi',u.position)}${row('Departemen',u.department)}${row('Divisi',u.division)}${row('Email',u.email)}${row('Sesi berakhir dalam',sessionMinutesLeft()+' menit')}
     <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;">
       <button class="btn btn-ghost" onclick="openChangePwdModal()">&#128274; Ubah Password</button>
       <button class="btn btn-coral" onclick="doLogout()">Keluar</button>
@@ -1667,7 +1995,15 @@ document.addEventListener('keydown',e=>{
     if(a&&(a.id==='new-password'||a.id==='confirm-password'))doChangePassword();
   }
 });
-document.addEventListener('DOMContentLoaded',()=>{applyLanguage();});
+// Memulihkan sesi yang masih berlaku sebelum halaman login sempat terlihat.
+function restoreSession(){
+  const u=loadSession();
+  if(!u)return false;
+  state.user=u;
+  initApp();
+  return true;
+}
+document.addEventListener('DOMContentLoaded',()=>{applyLanguage();restoreSession();});
 applyLanguage();
 </script>
 </body>
