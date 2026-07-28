@@ -257,6 +257,20 @@ tbody tr:hover{background:var(--purple-soft);}
 .col-filter::placeholder{color:var(--text-muted);font-weight:400;}
 .div-row:hover .bar-name{text-decoration:underline;}
 @media(max-width:767px){.filter-row{display:none;}}
+.dt-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--border);}
+.dt-search{flex:1;min-width:170px;max-width:300px;padding:7px 12px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:12.5px;font-family:var(--font);color:var(--text);background:var(--surface2);outline:none;transition:border-color var(--t-fast) var(--ease);}
+.dt-search:focus{border-color:var(--purple);background:var(--surface);}
+.dt-sortsel{padding:6px 10px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:12px;font-family:var(--font);font-weight:600;background:var(--surface);color:var(--text-2);outline:none;cursor:pointer;}
+.dt-sortsel:focus{border-color:var(--purple);}
+.dt-th{cursor:pointer;user-select:none;white-space:nowrap;transition:color var(--t-fast) var(--ease);}
+.dt-th:hover{color:var(--purple);}
+.dt-arrow{font-size:9px;margin-left:4px;opacity:0.35;}
+.dt-arrow.on{opacity:1;color:var(--purple);}
+.dt-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-top:1px solid var(--border);flex-wrap:wrap;}
+.dt-count{font-size:12px;color:var(--text-muted);}
+.dt-page{font-size:12px;font-weight:700;white-space:nowrap;}
+.dt-cards{padding:14px 16px;}
+@media(min-width:768px){.dt-mobile-sort{display:none!important;}}
 .admin-tab-row{display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid var(--border);overflow-x:auto;}
 .admin-tab-btn{padding:9px 20px;border:none;background:none;font-family:var(--font);font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all var(--t-fast) var(--ease);white-space:nowrap;}
 .admin-tab-btn:hover{color:var(--text);background:var(--surface2);}
@@ -444,7 +458,7 @@ tbody tr:hover{background:var(--purple-soft);}
 // lalu unggah ulang file ini ke GitHub. Melewatkan langkah ini adalah
 // sumber bug paling sering di proyek ini.
 // ============================================================
-const API_URL='https://script.google.com/macros/s/AKfycbxkwUDlRdYUrZCPgnxMXJ8wWGbHfnCyUyROGTT0f5OIG1xnk4w8urHwiYGAdNSZoGDN/exec';
+const API_URL='https://script.google.com/macros/s/AKfycbxd6p9BsDgU_5jkgch8flGC4aElxXBYGXIO2_N1BHPiUJW8M1rldxmjtRNIQbE0iPmx/exec';
 
 // ── BAHASA ─────────────────────────────────────────────────
 const LANG={
@@ -526,6 +540,175 @@ async function apiWithRetry(action,payload={},maxRetries=2){
 }
 async function api(action,payload={}){showLoading(true);try{return await apiWithRetry(action,payload);}finally{showLoading(false);}}
 async function apiFast(action,payload={}){return await apiWithRetry(action,payload);}
+
+// ── KOMPONEN LISTING BERSAMA ───────────────────────────────
+// Satu implementasi untuk seluruh daftar di aplikasi: filter per kolom,
+// pencarian menyeluruh, urutan A-Z / Z-A, dan paginasi 50 baris.
+//
+// Dibuat terpusat dengan sengaja. Menyalin logika ini ke delapan tabel
+// berarti delapan tempat yang harus diperbaiki setiap kali ada bug, dan
+// pengalaman yang diam-diam berbeda di tiap layar.
+//
+// Yang dirender ulang saat mengetik hanya isi tabel dan kaki halaman,
+// bukan seluruh kartu. Kalau kotak filternya ikut dirender ulang, fokus
+// kursor lepas setiap satu huruf dan filternya tidak bisa dipakai.
+const DT={};
+const DT_PAGE_SIZE=50;
+
+// cols: [{key,label,filter,sort,render(row),plain(row),cls,style,thStyle}]
+function dtInit(id,cfg){
+  DT[id]={
+    cols:cfg.cols,rows:cfg.rows||[],mode:cfg.mode||'table',
+    card:cfg.card||null,rowAttr:cfg.rowAttr||null,
+    pageSize:cfg.pageSize||DT_PAGE_SIZE,
+    empty:cfg.empty||'Tidak ada data yang cocok',
+    label:cfg.label||'baris',
+    searchPlaceholder:cfg.searchPlaceholder||'Cari...',
+    q:'',f:{},sortKey:cfg.sortKey||null,sortDir:cfg.sortDir===-1?-1:1,page:1
+  };
+  return dtShell(id);
+}
+function _dtPlain(col,row){
+  if(col.plain)return String(col.plain(row)==null?'':col.plain(row));
+  const v=row[col.key];
+  return String(v==null?'':v);
+}
+function dtFiltered(id){
+  const T=DT[id];if(!T)return [];
+  const q=(T.q||'').toLowerCase().trim();
+  const searchable=T.cols.filter(c=>c.filter!==false);
+  let out=T.rows.filter(row=>{
+    for(const c of T.cols){
+      const fv=(T.f[c.key]||'').toLowerCase().trim();
+      if(fv&&!_dtPlain(c,row).toLowerCase().includes(fv))return false;
+    }
+    if(q&&!searchable.some(c=>_dtPlain(c,row).toLowerCase().includes(q)))return false;
+    return true;
+  });
+  if(T.sortKey){
+    const col=T.cols.find(c=>c.key===T.sortKey);
+    if(col){
+      out=out.slice().sort((a,b)=>{
+        const x=_dtPlain(col,a),y=_dtPlain(col,b);
+        const nx=parseFloat(x),ny=parseFloat(y);
+        // Angka diurutkan sebagai angka. Kalau tidak, "10" jatuh sebelum "9".
+        const bothNum=!isNaN(nx)&&!isNaN(ny)&&/^-?[\d.,]+$/.test(x.trim())&&/^-?[\d.,]+$/.test(y.trim());
+        const r=bothNum?(nx-ny):x.localeCompare(y,'id',{sensitivity:'base',numeric:true});
+        return r*T.sortDir;
+      });
+    }
+  }
+  return out;
+}
+function dtShell(id){
+  const T=DT[id];
+  const sortable=T.cols.filter(c=>c.sort!==false);
+  const mobileSort=`<select class="dt-sortsel dt-mobile-sort" onchange="dtSortSelect('${id}',this.value)">
+    <option value="">Urutkan...</option>
+    ${sortable.map(c=>`<option value="${esc(c.key)}|1">${esc(c.label)} A-Z</option><option value="${esc(c.key)}|-1">${esc(c.label)} Z-A</option>`).join('')}
+  </select>`;
+  let head='';
+  if(T.mode==='table'){
+    head=`<div class="table-wrap"><table class="mobile-card"><thead>
+      <tr>${T.cols.map(c=>c.sort===false
+        ?`<th ${c.thStyle?`style="${c.thStyle}"`:''}>${esc(c.label)}</th>`
+        :`<th class="dt-th" ${c.thStyle?`style="${c.thStyle}"`:''} onclick="dtSort('${id}','${esc(c.key)}')">${esc(c.label)}<span class="dt-arrow" id="dta-${id}-${esc(c.key)}">&#9662;</span></th>`).join('')}</tr>
+      <tr class="filter-row">${T.cols.map(c=>c.filter===false?'<th></th>'
+        :`<th><input class="col-filter" id="dtf-${id}-${esc(c.key)}" placeholder="${esc(c.label)}" oninput="dtFilter('${id}','${esc(c.key)}',this.value)"></th>`).join('')}</tr>
+    </thead><tbody id="dtb-${id}"></tbody></table></div>`;
+  }else{
+    head=`<div class="dt-cards" id="dtb-${id}"></div>`;
+  }
+  setTimeout(()=>dtRefresh(id),0);
+  return `<div id="dtw-${id}">
+    <div class="dt-toolbar">
+      <input class="dt-search" id="dts-${id}" placeholder="${esc(T.searchPlaceholder)}" oninput="dtSearch('${id}',this.value)">
+      ${mobileSort}
+      <button class="btn btn-ghost btn-sm" onclick="dtReset('${id}')">Reset</button>
+      <span class="dt-count" id="dtc-${id}"></span>
+    </div>
+    ${head}
+    <div class="dt-foot" id="dtp-${id}"></div>
+  </div>`;
+}
+function dtRefresh(id){
+  const T=DT[id];if(!T)return;
+  const list=dtFiltered(id);
+  const pages=Math.max(1,Math.ceil(list.length/T.pageSize));
+  if(T.page>pages)T.page=pages;
+  if(T.page<1)T.page=1;
+  const p=T.page;
+  const slice=list.slice((p-1)*T.pageSize,p*T.pageSize);
+  const body=el('dtb-'+id);
+  if(body){
+    if(!slice.length){
+      body.innerHTML=T.mode==='table'
+        ?`<tr><td colspan="${T.cols.length}" style="text-align:center;padding:30px;color:var(--text-muted);">${esc(T.empty)}</td></tr>`
+        :`<div class="empty-state"><div class="empty-icon">&#128269;</div><div class="empty-title">${esc(T.empty)}</div></div>`;
+    }else if(T.mode==='table'){
+      body.innerHTML=slice.map(row=>{
+        const attr=T.rowAttr?T.rowAttr(row):'';
+        return `<tr ${attr}>${T.cols.map(c=>`<td data-label="${esc(c.label)}" ${c.style?`style="${c.style}"`:''} ${c.cls?`class="${c.cls}"`:''}>${c.render?c.render(row):esc(_dtPlain(c,row))}</td>`).join('')}</tr>`;
+      }).join('');
+    }else{
+      body.innerHTML=slice.map(row=>T.card(row)).join('');
+    }
+  }
+  T.cols.forEach(c=>{
+    const a=el(`dta-${id}-${c.key}`);
+    if(!a)return;
+    const on=T.sortKey===c.key;
+    a.className='dt-arrow'+(on?' on':'');
+    a.innerHTML=on?(T.sortDir===1?'&#9652;':'&#9662;'):'&#9662;';
+  });
+  const cnt=el('dtc-'+id);
+  if(cnt)cnt.textContent=`${list.length} ${T.label}${list.length!==T.rows.length?` (dari ${T.rows.length})`:''}`;
+  const from=list.length?((p-1)*T.pageSize+1):0,to=Math.min(p*T.pageSize,list.length);
+  const foot=el('dtp-'+id);
+  if(foot)foot.innerHTML=`<div class="dt-count">Menampilkan <strong>${from}&ndash;${to}</strong> dari <strong>${list.length}</strong></div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn btn-ghost btn-sm" ${p<=1?'disabled':''} onclick="dtGo('${id}',${p-1})">&larr; Sebelumnya</button>
+      <span class="dt-page">Hal ${p}/${pages}</span>
+      <button class="btn btn-ghost btn-sm" ${p>=pages?'disabled':''} onclick="dtGo('${id}',${p+1})">Berikutnya &rarr;</button>
+    </div>`;
+}
+function dtFilter(id,key,val){const T=DT[id];if(!T)return;T.f[key]=val;T.page=1;dtRefresh(id);}
+function dtSearch(id,val){const T=DT[id];if(!T)return;T.q=val;T.page=1;dtRefresh(id);}
+function dtSort(id,key){
+  const T=DT[id];if(!T)return;
+  // Klik pertama A-Z, klik kedua Z-A, klik ketiga kembali ke urutan asli.
+  if(T.sortKey!==key){T.sortKey=key;T.sortDir=1;}
+  else if(T.sortDir===1){T.sortDir=-1;}
+  else{T.sortKey=null;T.sortDir=1;}
+  dtRefresh(id);
+}
+function dtSortSelect(id,v){
+  const T=DT[id];if(!T)return;
+  if(!v){T.sortKey=null;T.sortDir=1;}
+  else{const[k,d]=v.split('|');T.sortKey=k;T.sortDir=Number(d)===-1?-1:1;}
+  dtRefresh(id);
+}
+function dtGo(id,n){
+  const T=DT[id];if(!T)return;T.page=n;dtRefresh(id);
+  const w=el('dtw-'+id);
+  if(w)window.scrollTo({top:w.getBoundingClientRect().top+window.scrollY-140,behavior:'smooth'});
+}
+function dtReset(id){
+  const T=DT[id];if(!T)return;
+  T.q='';T.f={};T.page=1;T.sortKey=null;T.sortDir=1;
+  const sb=el('dts-'+id);if(sb)sb.value='';
+  T.cols.forEach(c=>{const e=el(`dtf-${id}-${c.key}`);if(e)e.value='';});
+  const ms=el('dtw-'+id);if(ms){const sel=ms.querySelector('.dt-sortsel');if(sel)sel.value='';}
+  dtRefresh(id);
+}
+function dtSetFilter(id,key,val){
+  const T=DT[id];if(!T)return;
+  const e=el(`dtf-${id}-${key}`);if(e)e.value=val;
+  T.f[key]=val;T.page=1;dtRefresh(id);
+  const w=el('dtw-'+id);
+  if(w)window.scrollTo({top:w.getBoundingClientRect().top+window.scrollY-140,behavior:'smooth'});
+}
+function dtVisible(id){return dtFiltered(id);}
 
 // ── UI HELPERS ─────────────────────────────────────────────
 function el(id){return document.getElementById(id);}
@@ -902,22 +1085,47 @@ function renderJadwal(){
   html('jadwal-content',renderJadwalTable(sessions,enrolledIds));
 }
 function renderJadwalTable(sessions,enrolledIds){
-  let c=`<div class="card"><div class="table-wrap"><table class="mobile-card"><thead><tr><th>Tanggal</th><th>Waktu</th><th>Kompetensi</th><th>Trainer</th><th>Lokasi</th><th>Tipe</th><th>Assigned</th><th>Status</th><th>Aksi</th></tr></thead><tbody>`;
-  sessions.forEach(s=>{
-    const isE=enrolledIds.includes(s.session_id);
-    const tt=(s.training_type||'').toLowerCase(),isSL=tt.includes('self'),isOn=tt.includes('online');
-    const dd=isSL&&s.date_end?`${s.date} – ${s.date_end}`:s.date;
-    const tb=isSL?'<span class="badge badge-purple">Self Learning</span>':isOn?'<span class="badge badge-sky">Online</span>':'<span class="badge badge-amber">Offline</span>';
-    const al=state.mandatoryLevelMap[s.competency_id],fb=state.mandatoryLevelIsFallback[s.competency_id],sl=Number(s.level)||0;
-    let cell='<span class="text-muted">—</span>',rc='';
-    if(al){
-      cell=levelBadge(al,fb);
-      if(sl>0&&sl!==al){rc='level-mismatch-row';cell+=`<div class="level-warn">&#9888; Sesi ini L${sl}, bukan L${al}</div>`;}
-      else if(sl>0)cell+=`<div class="level-ok">&#10003; Level sesuai</div>`;
-    }
-    c+=`<tr class="${rc}"><td data-label="Tanggal" style="white-space:nowrap;font-weight:600;">${esc(dd)}</td><td data-label="Waktu" style="color:var(--text-2);">${esc(s.time||'—')}</td><td data-label="Kompetensi"><div style="font-weight:700;">${esc(s.competency_name||s.competency_id)}</div><div style="font-size:11px;font-family:var(--mono);color:var(--text-muted);">${esc(s.competency_id)}${sl>0?' · L'+sl:''}</div></td><td data-label="Trainer">${esc(s.trainer||'—')}</td><td data-label="Lokasi">${esc(s.location||s.area||'—')}</td><td data-label="Tipe">${tb}</td><td data-label="Assigned">${cell}</td><td data-label="Status">${isE?'<span class="badge badge-emerald">Terdaftar</span>':'<span class="badge badge-gray">Belum</span>'}</td><td>${isE?`<button class="btn btn-ghost btn-sm" onclick="doCancelEnroll('${s.session_id}')">Batal</button>`:`<button class="btn btn-primary btn-sm" onclick="doEnroll('${s.competency_id}','${s.session_id}')">Daftar</button>`}</td></tr>`;
-  });
-  return c+`</tbody></table></div></div>`;
+  return `<div class="card">`+dtInit('jadwal',{
+    label:'sesi',searchPlaceholder:'Cari kompetensi, trainer, lokasi...',
+    empty:'Tidak ada sesi yang cocok dengan filter',
+    rows:sessions,sortKey:'date',sortDir:1,
+    rowAttr:s=>{
+      const al=state.mandatoryLevelMap[s.competency_id],sl=Number(s.level)||0;
+      return (al&&sl>0&&sl!==al)?'class="level-mismatch-row"':'';
+    },
+    cols:[
+      {key:'date',label:'Tanggal',style:'white-space:nowrap;font-weight:600;',
+       plain:s=>_dtSortableDate(s.date),
+       render:s=>{const tt=(s.training_type||'').toLowerCase();
+         return esc(tt.includes('self')&&s.date_end?`${s.date} – ${s.date_end}`:s.date);}},
+      {key:'time',label:'Waktu',style:'color:var(--text-2);',render:s=>esc(s.time||'—')},
+      {key:'competency_name',label:'Kompetensi',plain:s=>`${s.competency_id} ${s.competency_name||''}`,
+       render:s=>`<div style="font-weight:700;">${esc(s.competency_name||s.competency_id)}</div><div style="font-size:11px;font-family:var(--mono);color:var(--text-muted);">${esc(s.competency_id)}${Number(s.level)>0?' · L'+s.level:''}</div>`},
+      {key:'trainer',label:'Trainer',render:s=>esc(s.trainer||'—')},
+      {key:'location',label:'Lokasi',plain:s=>s.location||s.area||'',render:s=>esc(s.location||s.area||'—')},
+      {key:'training_type',label:'Tipe',plain:s=>s.training_type||'',render:s=>{
+        const tt=(s.training_type||'').toLowerCase();
+        return tt.includes('self')?'<span class="badge badge-purple">Self Learning</span>':tt.includes('online')?'<span class="badge badge-sky">Online</span>':'<span class="badge badge-amber">Offline</span>';}},
+      {key:'assigned',label:'Assigned',filter:false,sort:false,plain:()=>'',render:s=>{
+        const al=state.mandatoryLevelMap[s.competency_id],fb=state.mandatoryLevelIsFallback[s.competency_id],sl=Number(s.level)||0;
+        if(!al)return '<span class="text-muted">—</span>';
+        let cell=levelBadge(al,fb);
+        if(sl>0&&sl!==al)cell+=`<div class="level-warn">&#9888; Sesi ini L${sl}, bukan L${al}</div>`;
+        else if(sl>0)cell+=`<div class="level-ok">&#10003; Level sesuai</div>`;
+        return cell;}},
+      {key:'status',label:'Status',filter:false,plain:s=>enrolledIds.includes(s.session_id)?'Terdaftar':'Belum',
+       render:s=>enrolledIds.includes(s.session_id)?'<span class="badge badge-emerald">Terdaftar</span>':'<span class="badge badge-gray">Belum</span>'},
+      {key:'aksi',label:'Aksi',filter:false,sort:false,plain:()=>'',render:s=>enrolledIds.includes(s.session_id)
+        ?`<button class="btn btn-ghost btn-sm" onclick="doCancelEnroll('${esc(s.session_id)}')">Batal</button>`
+        :`<button class="btn btn-primary btn-sm" onclick="doEnroll('${esc(s.competency_id)}','${esc(s.session_id)}')">Daftar</button>`}
+    ]
+  })+`</div>`;
+}
+// Tanggal disimpan dd/MM/yyyy. Diurutkan apa adanya, "01/12" jatuh sebelum
+// "02/01" padahal Desember setelah Januari. Dibalik dulu jadi yyyyMMdd.
+function _dtSortableDate(v){
+  const p=String(v||'').split('/');
+  return p.length===3?`${p[2]}${p[1].padStart(2,'0')}${p[0].padStart(2,'0')}`:String(v||'');
 }
 async function doEnroll(cid,sid){
   const s=state.jadwal.find(x=>x.session_id===sid)||{};
@@ -1011,9 +1219,19 @@ async function loadCorporate(){
   const r=await api('getCorporateMandatory',{nik:u.nik,grade:u.grade});
   const s=r.success?(r.data.sessions||[]):[];
   if(!s.length){html('corporate-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">&#127970;</div><div class="empty-title">Belum ada pelatihan wajib perusahaan</div><div class="empty-desc">Belum ada pelatihan korporat yang ditetapkan untuk grade-mu.</div></div></div></div>`);return;}
-  let c=`<div class="card"><div class="table-wrap"><table class="mobile-card"><thead><tr><th>Pelatihan</th><th>Grade</th><th>Deadline</th><th>Lokasi</th><th>Tipe</th></tr></thead><tbody>`;
-  s.forEach(x=>{c+=`<tr><td data-label="Pelatihan"><strong>${esc(x.training_name)}</strong>${x.notes?`<div style="font-size:11px;color:var(--text-muted);">${esc(x.notes)}</div>`:''}</td><td data-label="Grade"><span class="badge badge-gray">${esc(x.target_grade||'ALL')}</span></td><td data-label="Deadline">${esc(x.deadline||'—')}</td><td data-label="Lokasi">${esc(x.location||'—')}</td><td data-label="Tipe"><span class="badge badge-sky">${esc(x.training_type||'—')}</span></td></tr>`;});
-  html('corporate-content',c+`</tbody></table></div></div>`);
+  html('corporate-content',`<div class="card">`+dtInit('corp',{
+    label:'pelatihan',searchPlaceholder:'Cari pelatihan, lokasi...',
+    empty:'Tidak ada pelatihan yang cocok dengan filter',
+    rows:s,
+    cols:[
+      {key:'training_name',label:'Pelatihan',plain:x=>`${x.training_name} ${x.notes||''}`,
+       render:x=>`<strong>${esc(x.training_name)}</strong>${x.notes?`<div style="font-size:11px;color:var(--text-muted);">${esc(x.notes)}</div>`:''}`},
+      {key:'target_grade',label:'Grade',render:x=>`<span class="badge badge-gray">${esc(x.target_grade||'ALL')}</span>`},
+      {key:'deadline',label:'Deadline',plain:x=>_dtSortableDate(x.deadline),render:x=>esc(x.deadline||'—')},
+      {key:'location',label:'Lokasi',render:x=>esc(x.location||'—')},
+      {key:'training_type',label:'Tipe',render:x=>`<span class="badge badge-sky">${esc(x.training_type||'—')}</span>`}
+    ]
+  })+`</div>`);
 }
 
 // ── TEAM ASSESSMENT ────────────────────────────────────────
@@ -1027,18 +1245,28 @@ function renderTeamList(){
   if(!team.length){html('team-assessment-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">&#128101;</div><div class="empty-title">Tidak ada bawahan langsung</div></div></div></div>`);return;}
   const pending=team.filter(m=>m.has_submitted&&!m.already_assigned).length;
   let c=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;"><button class="btn btn-sky" onclick="downloadAssignmentPDF()">&#8681; Unduh PDF Assignment</button>${pending?`<span style="font-size:12px;color:var(--text-muted);">${pending} anggota belum di-assign</span>`:''}</div>`;
-  c+=`<div class="card"><div class="table-wrap"><table class="mobile-card"><thead><tr><th>Nama</th><th>Grade</th><th>Departemen</th><th>Asesmen</th><th>Assignment</th><th>Mandatory</th><th>Aksi</th></tr></thead><tbody>`;
-  team.forEach(m=>{
-    // Kolom asesmen menampilkan porsi yang memang perlu dinilai.
-    // Kompetensi yang di-skip tidak lagi memblokir tombol review.
-    // Rincian "n dilewati" dihapus dari tabel: angkanya membingungkan tanpa
-    // konteks. Informasi lengkapnya tetap ada di dalam modal Langkah 1,
-    // berikut nama kompetensi dan alasan masing-masing.
-    const detail=m.assessable_count>0?`${m.submitted_count}/${m.assessable_count}`:'—';
-    const skipInfo='';
-    c+=`<tr><td data-label="Nama"><strong>${esc(m.name)}</strong><br><span style="font-size:11px;font-family:var(--mono);color:var(--text-muted);">${esc(m.nik)}</span></td><td data-label="Grade"><span class="badge ${gradeColor(m.grade)}">${esc(m.grade)}</span></td><td data-label="Departemen" style="font-size:12px;">${esc(m.department)}</td><td data-label="Asesmen">${m.has_submitted?'<span class="badge badge-emerald">Lengkap</span>':'<span class="badge badge-gray">Belum</span>'}<div style="font-size:10px;color:var(--text-muted);margin-top:2px;">${detail}</div>${skipInfo}</td><td data-label="Assignment">${m.already_assigned?'<span class="badge badge-sky">Selesai</span>':'<span class="badge badge-amber">Belum</span>'}</td><td data-label="Mandatory"><span style="font-weight:800;color:var(--coral);">${m.mandatory_count}</span>/2</td><td>${m.has_submitted?`<button class="btn btn-primary btn-sm" onclick="openAssignModal('${m.nik}')">Tinjau &amp; Assign</button>`:'<span class="text-muted text-sm">Menunggu asesmen</span>'}</td></tr>`;
+  c+=`<div class="card">`;
+  c+=dtInit('team',{
+    label:'anggota',searchPlaceholder:'Cari nama, NIK, departemen...',
+    empty:'Tidak ada anggota yang cocok dengan filter',
+    rows:team,
+    cols:[
+      {key:'name',label:'Nama',render:m=>`<strong>${esc(m.name)}</strong><br><span style="font-size:11px;font-family:var(--mono);color:var(--text-muted);">${esc(m.nik)}</span>`,
+       plain:m=>m.name+' '+m.nik},
+      {key:'grade',label:'Grade',render:m=>`<span class="badge ${gradeColor(m.grade)}">${esc(m.grade)}</span>`},
+      {key:'department',label:'Departemen',style:'font-size:12px;'},
+      {key:'has_submitted',label:'Asesmen',filter:false,plain:m=>m.has_submitted?'Lengkap':'Belum',
+       render:m=>(m.has_submitted?'<span class="badge badge-emerald">Lengkap</span>':'<span class="badge badge-gray">Belum</span>')+
+         `<div style="font-size:10px;color:var(--text-muted);margin-top:2px;">${m.assessable_count>0?`${m.submitted_count}/${m.assessable_count}`:'—'}</div>`},
+      {key:'already_assigned',label:'Assignment',filter:false,plain:m=>m.already_assigned?'Selesai':'Belum',
+       render:m=>m.already_assigned?'<span class="badge badge-sky">Selesai</span>':'<span class="badge badge-amber">Belum</span>'},
+      {key:'mandatory_count',label:'Mandatory',filter:false,
+       render:m=>`<span style="font-weight:800;color:var(--coral);">${m.mandatory_count}</span>/2`},
+      {key:'aksi',label:'Aksi',filter:false,sort:false,plain:()=>'',
+       render:m=>m.has_submitted?`<button class="btn btn-primary btn-sm" onclick="openAssignModal('${esc(m.nik)}')">Tinjau &amp; Assign</button>`:'<span class="text-muted text-sm">Menunggu asesmen</span>'}
+    ]
   });
-  html('team-assessment-content',c+`</tbody></table></div></div>`);
+  html('team-assessment-content',c+`</div>`);
 }
 function openAssignModal(nik){
   const m=(state.teamData||[]).find(x=>x.nik===nik);if(!m)return;
@@ -1295,13 +1523,30 @@ async function loadTeamMonitor(){
     <div class="stat-card stat-card-amber"><div class="stat-icon">&#127919;</div><div class="stat-label">Sudah Dievaluasi</div><div class="stat-value">${evald}<span style="font-size:14px;opacity:0.7;">/${totalM}</span></div></div>
     <div class="stat-card stat-card-sky"><div class="stat-icon">&#128197;</div><div class="stat-label">Pendaftaran</div><div class="stat-value">${team.reduce((s,m)=>s+m.enrolled_session_ids.length,0)}</div></div>
   </div>`;
-  c+=`<div class="card"><div class="table-wrap"><table class="mobile-card"><thead><tr><th>Nama</th><th>Atasan</th><th>Grade</th><th>Kompetensi</th><th>Progres</th><th>Rerata Skor</th><th>Status</th></tr></thead><tbody>`;
-  team.forEach(m=>{
-    const p=pct(m.mandatory_completed,m.mandatory_total);
-    const col=p>=100?'emerald':p>=50?'amber':'purple';
-    c+=`<tr><td data-label="Nama"><div style="font-weight:700;">${esc(m.name)}</div><div style="font-size:11px;color:var(--text-muted);">${esc(m.department)}</div></td><td data-label="Atasan" style="font-size:12px;">${esc(m.spv_name||'—')}</td><td data-label="Grade"><span class="badge ${gradeColor(m.grade)}">${esc(m.grade)}</span></td><td data-label="Kompetensi" style="font-weight:800;">${m.mandatory_completed}/${m.mandatory_total}</td><td data-label="Progres" style="min-width:90px;">${progBar(m.mandatory_completed,m.mandatory_total||1,col,7)}<div style="font-size:10px;color:var(--text-muted);margin-top:2px;">${p}%</div></td><td data-label="Rerata Skor">${m.evaluated_count?`<span style="font-weight:800;">${m.avg_score_percent}%</span>`:'<span class="text-muted">—</span>'}</td><td data-label="Status">${m.mandatory_total===0?'<span class="badge badge-gray">Tidak ada IDP</span>':m.mandatory_completed>=m.mandatory_total?'<span class="badge badge-emerald">Tuntas</span>':'<span class="badge badge-amber">Berjalan</span>'}</td></tr>`;
-  });
-  html('team-monitor-content',c+`</tbody></table></div></div>`);
+  c+=`<div class="card">`+dtInit('monitor',{
+    label:'anggota',searchPlaceholder:'Cari nama, departemen...',
+    empty:'Tidak ada anggota yang cocok dengan filter',
+    rows:team,
+    cols:[
+      {key:'name',label:'Nama',plain:m=>`${m.name} ${m.department||''}`,
+       render:m=>`<div style="font-weight:700;">${esc(m.name)}</div><div style="font-size:11px;color:var(--text-muted);">${esc(m.department)}</div>`},
+      {key:'spv_name',label:'Atasan',style:'font-size:12px;',render:m=>esc(m.spv_name||'—')},
+      {key:'grade',label:'Grade',render:m=>`<span class="badge ${gradeColor(m.grade)}">${esc(m.grade)}</span>`},
+      {key:'mandatory_completed',label:'Kompetensi',style:'font-weight:800;',filter:false,
+       render:m=>`${m.mandatory_completed}/${m.mandatory_total}`},
+      {key:'progres',label:'Progres',filter:false,style:'min-width:90px;',
+       plain:m=>pct(m.mandatory_completed,m.mandatory_total),
+       render:m=>{const p=pct(m.mandatory_completed,m.mandatory_total);
+         return progBar(m.mandatory_completed,m.mandatory_total||1,p>=100?'emerald':p>=50?'amber':'purple',7)+
+           `<div style="font-size:10px;color:var(--text-muted);margin-top:2px;">${p}%</div>`;}},
+      {key:'avg_score_percent',label:'Rerata Skor',filter:false,
+       render:m=>m.evaluated_count?`<span style="font-weight:800;">${m.avg_score_percent}%</span>`:'<span class="text-muted">—</span>'},
+      {key:'status',label:'Status',filter:false,
+       plain:m=>m.mandatory_total===0?'Tidak ada IDP':(m.mandatory_completed>=m.mandatory_total?'Tuntas':'Berjalan'),
+       render:m=>m.mandatory_total===0?'<span class="badge badge-gray">Tidak ada IDP</span>':m.mandatory_completed>=m.mandatory_total?'<span class="badge badge-emerald">Tuntas</span>':'<span class="badge badge-amber">Berjalan</span>'}
+    ]
+  })+`</div>`;
+  html('team-monitor-content',c);
 }
 async function loadTeamSchedule(){
   showLoading(true);
@@ -1313,14 +1558,29 @@ async function loadTeamSchedule(){
     const res=await apiFast('getTeamEnrollments',{leader_nik:state.user.nik});
     const list=(res.success?(res.data||[]):[]).map(x=>({m:{name:x.name,grade:x.grade,department:x.department},s:x.session}));
     if(!list.length){html('team-monitor-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">&#128197;</div><div class="empty-title">Belum ada pendaftaran tim</div></div></div></div>`);return;}
-    let c=`<div class="card"><div class="table-wrap"><table class="mobile-card"><thead><tr><th>Anggota</th><th>Tanggal</th><th>Kompetensi</th><th>Trainer</th><th>Lokasi</th><th>Tipe</th></tr></thead><tbody>`;
-    list.forEach(({m,s})=>{
-      const tt=(s.training_type||'').toLowerCase(),isSL=tt.includes('self'),isOn=tt.includes('online');
-      const dd=isSL&&s.date_end?`${s.date} – ${s.date_end}`:`${s.date}${s.time?' · '+s.time:''}`;
-      const tb=isSL?'<span class="badge badge-purple">Self Learning</span>':isOn?'<span class="badge badge-sky">Online</span>':'<span class="badge badge-amber">Offline</span>';
-      c+=`<tr><td data-label="Anggota"><div style="font-weight:700;">${esc(m.name)}</div><div style="font-size:11px;color:var(--text-muted);">${esc(m.grade)} · ${esc(m.department)}</div></td><td data-label="Tanggal" style="white-space:nowrap;font-weight:600;">${esc(dd)}</td><td data-label="Kompetensi"><div style="font-weight:700;">${esc(s.competency_name||s.competency_id)}</div><div style="font-size:11px;font-family:var(--mono);color:var(--text-muted);">${esc(s.competency_id)}</div></td><td data-label="Trainer">${esc(s.trainer||'—')}</td><td data-label="Lokasi">${esc(s.location||s.area||'—')}</td><td data-label="Tipe">${tb}</td></tr>`;
-    });
-    html('team-monitor-content',c+`</tbody></table></div></div>`);
+    const flat=list.map(({m,s})=>({name:m.name,grade:m.grade,department:m.department,
+      date:s.date,date_end:s.date_end,time:s.time,competency_id:s.competency_id,
+      competency_name:s.competency_name,trainer:s.trainer,location:s.location||s.area,
+      training_type:s.training_type}));
+    html('team-monitor-content',`<div class="card">`+dtInit('tsched',{
+      label:'pendaftaran',searchPlaceholder:'Cari anggota, kompetensi, trainer...',
+      empty:'Tidak ada pendaftaran yang cocok dengan filter',
+      rows:flat,sortKey:'date',sortDir:1,
+      cols:[
+        {key:'name',label:'Anggota',plain:r=>`${r.name} ${r.department||''}`,
+         render:r=>`<div style="font-weight:700;">${esc(r.name)}</div><div style="font-size:11px;color:var(--text-muted);">${esc(r.grade)} · ${esc(r.department)}</div>`},
+        {key:'date',label:'Tanggal',style:'white-space:nowrap;font-weight:600;',
+         plain:r=>_dtSortableDate(r.date),
+         render:r=>{const isSL=(r.training_type||'').toLowerCase().includes('self');
+           return esc(isSL&&r.date_end?`${r.date} – ${r.date_end}`:`${r.date}${r.time?' · '+r.time:''}`);}},
+        {key:'competency_name',label:'Kompetensi',plain:r=>`${r.competency_id} ${r.competency_name||''}`,
+         render:r=>`<div style="font-weight:700;">${esc(r.competency_name||r.competency_id)}</div><div style="font-size:11px;font-family:var(--mono);color:var(--text-muted);">${esc(r.competency_id)}</div>`},
+        {key:'trainer',label:'Trainer',render:r=>esc(r.trainer||'—')},
+        {key:'location',label:'Lokasi',render:r=>esc(r.location||'—')},
+        {key:'training_type',label:'Tipe',render:r=>{const tt=(r.training_type||'').toLowerCase();
+          return tt.includes('self')?'<span class="badge badge-purple">Self Learning</span>':tt.includes('online')?'<span class="badge badge-sky">Online</span>':'<span class="badge badge-amber">Offline</span>';}}
+      ]
+    })+`</div>`);
   }catch(e){html('team-monitor-content',`<div class="notice notice-coral"><div class="notice-icon">!</div><div>Gagal memuat jadwal tim.</div></div>`);}
   finally{showLoading(false);}
 }
@@ -1352,14 +1612,34 @@ async function loadL3Eval(){
     <div class="stat-card stat-card-amber"><div class="stat-icon">&#128221;</div><div class="stat-label">Berjalan</div><div class="stat-value">${prog}</div></div>
     <div class="stat-card stat-card-sky"><div class="stat-icon">&#127919;</div><div class="stat-label">Tercapai 100%</div><div class="stat-value">${compDone}<span style="font-size:14px;opacity:0.7;">/${compTotal}</span></div></div>
   </div>`;
+  window._l3Open=r.l3_open;
+  c+=`<div class="card">`+dtInit('l3list',{
+    mode:'cards',label:'karyawan',
+    searchPlaceholder:'Cari nama, NIK, departemen, kompetensi...',
+    empty:'Tidak ada karyawan yang cocok dengan filter',
+    rows:evs,
+    cols:[
+      {key:'name',label:'Nama'},
+      {key:'nik',label:'NIK'},
+      {key:'grade',label:'Grade'},
+      {key:'department',label:'Departemen'},
+      {key:'kompetensi',label:'Kompetensi',plain:e=>(e.competencies||[]).map(x=>`${x.competency_id} L${x.competency_level}`).join(' ')},
+      {key:'l3_status',label:'Status',plain:e=>({not_started:'Belum Mulai',in_progress:'Berjalan',submitted:'Selesai',none:'—'})[e.l3_status]||'—'},
+      {key:'achieved_count',label:'Tercapai'}
+    ],
+    card:l3Card
+  })+`</div>`;
+  c+=`<div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;"><div style="font-size:13px;color:var(--text-muted);">Unduh seluruh evaluasi tim sebagai PDF</div><button class="btn btn-primary" onclick="downloadAllTeamL3PDF()">&#8681; Unduh PDF Tim</button></div>`;
+  html('l3-eval-content',c);
+}
+function l3Card(e){
   const sl={not_started:'Belum Mulai',in_progress:'Berjalan',submitted:'Selesai',none:'—'};
   const sb={not_started:'badge-gray',in_progress:'badge-amber',submitted:'badge-emerald',none:'badge-gray'};
   const dc={not_started:'l3-dot-gray',in_progress:'l3-dot-amber',submitted:'l3-dot-emerald',none:'l3-dot-gray'};
-  c+=`<div style="display:flex;flex-direction:column;gap:8px;">`;
-  evs.forEach(e=>{
-    const thin=e.competencies.some(x=>x.thin_instrument);
-    const comps=e.competencies.map(x=>`${x.competency_id} L${x.competency_level}`).join(' · ');
-    c+=`<div class="l3-card${r.l3_open?'':' locked'}" ${r.l3_open?`onclick="openL3Form('${e.nik}')"`:''}>
+  const open=window._l3Open;
+  const thin=(e.competencies||[]).some(x=>x.thin_instrument);
+  const comps=(e.competencies||[]).map(x=>`${x.competency_id} L${x.competency_level}`).join(' · ');
+  return `<div class="l3-card${open?'':' locked'}" ${open?`onclick="openL3Form('${esc(e.nik)}')"`:''}>
       <div class="l3-dot ${dc[e.l3_status]||'l3-dot-gray'}"></div>
       <div style="flex:1;min-width:0;">
         <div style="font-weight:700;margin-bottom:1px;">${esc(e.name||e.nik)}</div>
@@ -1370,11 +1650,8 @@ async function loadL3Eval(){
       </div>
       <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
         <span class="badge ${sb[e.l3_status]||'badge-gray'}">${sl[e.l3_status]||'—'}</span>
-        ${r.l3_open?'<span style="color:var(--text-muted);font-size:18px;">&rsaquo;</span>':'<span style="color:var(--text-muted);font-size:14px;">&#128274;</span>'}
+        ${open?'<span style="color:var(--text-muted);font-size:18px;">&rsaquo;</span>':'<span style="color:var(--text-muted);font-size:14px;">&#128274;</span>'}
       </div></div>`;
-  });
-  c+=`</div><div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;"><div style="font-size:13px;color:var(--text-muted);">Unduh seluruh evaluasi tim sebagai PDF</div><button class="btn btn-primary" onclick="downloadAllTeamL3PDF()">&#8681; Unduh PDF Tim</button></div>`;
-  html('l3-eval-content',c);
 }
 
 async function openL3Form(nik){
@@ -1649,21 +1926,25 @@ function renderAdminAssessment(d){
   });
   c+=`</div></div></div>`;
 
-  // Tabel dengan filter per kolom dan paginasi 50 baris.
-  c+=`<div class="card"><div class="card-header"><div class="card-title">Belum Menyelesaikan Asesmen</div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><span class="badge badge-coral" id="notyet-count">${window._adminNotYet.length}</span><button class="btn btn-ghost btn-sm" onclick="clearAssessFilters()">Reset Filter</button><button class="btn btn-ghost btn-sm" onclick="copyList()">Salin NIK</button></div></div>
-  <div class="table-wrap"><table class="mobile-card"><thead>
-    <tr><th>NIK</th><th>Nama</th><th>Grade</th><th>Divisi</th><th>Departemen</th><th>Progres</th></tr>
-    <tr class="filter-row">
-      <th><input class="col-filter" id="af-nik" placeholder="Cari NIK" oninput="onAssessFilter()"></th>
-      <th><input class="col-filter" id="af-name" placeholder="Cari nama" oninput="onAssessFilter()"></th>
-      <th><input class="col-filter" id="af-grade" placeholder="Grade" oninput="onAssessFilter()"></th>
-      <th><input class="col-filter" id="af-div" placeholder="Divisi" oninput="onAssessFilter()"></th>
-      <th><input class="col-filter" id="af-dept" placeholder="Departemen" oninput="onAssessFilter()"></th>
-      <th></th>
-    </tr>
-  </thead><tbody id="notyet-tbody"></tbody></table></div>
-  <div id="notyet-pager" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-top:1px solid var(--border);flex-wrap:wrap;"></div></div>`;
-  setTimeout(renderNotYetPage,0);
+  // Tabel memakai komponen listing bersama: filter per kolom, pencarian
+  // menyeluruh, urutan A-Z / Z-A, paginasi 50 baris.
+  c+=`<div class="card"><div class="card-header"><div class="card-title">Belum Menyelesaikan Asesmen</div><button class="btn btn-ghost btn-sm" onclick="copyList()">Salin NIK</button></div>`;
+  c+=dtInit('notyet',{
+    label:'karyawan',searchPlaceholder:'Cari NIK, nama, divisi...',
+    empty:'Tidak ada karyawan yang cocok dengan filter',
+    rows:window._adminNotYet,
+    cols:[
+      {key:'nik',label:'NIK',style:'font-family:var(--mono);font-size:12px;'},
+      {key:'name',label:'Nama'},
+      {key:'grade',label:'Grade',render:u=>`<span class="badge ${gradeColor(u.grade)}">${esc(u.grade)}</span>`},
+      {key:'division',label:'Divisi',style:'font-size:12px;',plain:u=>u.division||'',render:u=>esc(u.division||'—')},
+      {key:'department',label:'Departemen',style:'font-size:12px;'},
+      {key:'progress',label:'Progres',filter:false,
+       plain:u=>u.expected_count?(u.filled_count/u.expected_count):0,
+       render:u=>u.expected_count?`${u.filled_count}/${u.expected_count}`:'<span class="text-muted">tidak ada target</span>'}
+    ]
+  });
+  c+=`</div>`;
   return c;
 }
 function toggleDivision(i){
@@ -1672,73 +1953,58 @@ function toggleDivision(i){
   b.style.display=open?'none':'block';
   if(cr)cr.style.transform=open?'rotate(0deg)':'rotate(90deg)';
 }
-function filterByDivision(dv){
-  const f=el('af-div');if(f)f.value=dv;
-  onAssessFilter();
-  const t=el('notyet-tbody');if(t)t.scrollIntoView({behavior:'smooth',block:'center'});
-}
-function clearAssessFilters(){
-  ['af-nik','af-name','af-grade','af-div','af-dept'].forEach(id=>{const e=el(id);if(e)e.value='';});
-  onAssessFilter();
-}
-function onAssessFilter(){state.assessPage=1;renderNotYetPage();}
-function filteredNotYet(){
-  const g=id=>((el(id)||{}).value||'').toLowerCase().trim();
-  const q={nik:g('af-nik'),name:g('af-name'),grade:g('af-grade'),div:g('af-div'),dept:g('af-dept')};
-  return (window._adminNotYet||[]).filter(u=>
-    (!q.nik||String(u.nik).toLowerCase().includes(q.nik))&&
-    (!q.name||String(u.name||'').toLowerCase().includes(q.name))&&
-    (!q.grade||String(u.grade||'').toLowerCase().includes(q.grade))&&
-    (!q.div||String(u.division||'').toLowerCase().includes(q.div))&&
-    (!q.dept||String(u.department||'').toLowerCase().includes(q.dept)));
-}
-const NOTYET_PER_PAGE=50;
-function renderNotYetPage(){
-  const list=filteredNotYet();
-  const pages=Math.max(1,Math.ceil(list.length/NOTYET_PER_PAGE));
-  if(state.assessPage>pages)state.assessPage=pages;
-  const p=state.assessPage;
-  const slice=list.slice((p-1)*NOTYET_PER_PAGE,p*NOTYET_PER_PAGE);
-  const tb=el('notyet-tbody');
-  if(tb)tb.innerHTML=slice.length?slice.map(u=>`<tr><td data-label="NIK" style="font-family:var(--mono);font-size:12px;">${esc(u.nik)}</td><td data-label="Nama">${esc(u.name)}</td><td data-label="Grade"><span class="badge ${gradeColor(u.grade)}">${esc(u.grade)}</span></td><td data-label="Divisi" style="font-size:12px;">${esc(u.division||'—')}</td><td data-label="Departemen" style="font-size:12px;">${esc(u.department)}</td><td data-label="Progres">${u.expected_count?`${u.filled_count}/${u.expected_count}`:'<span class="text-muted">tidak ada target</span>'}</td></tr>`).join(''):`<tr><td colspan="6" style="text-align:center;padding:28px;color:var(--text-muted);">Tidak ada data yang cocok dengan filter</td></tr>`;
-  const cnt=el('notyet-count');if(cnt)cnt.textContent=list.length;
-  const from=list.length?((p-1)*NOTYET_PER_PAGE+1):0, to=Math.min(p*NOTYET_PER_PAGE,list.length);
-  const pg=el('notyet-pager');
-  if(pg)pg.innerHTML=`<div style="font-size:12px;color:var(--text-muted);">Menampilkan <strong>${from}–${to}</strong> dari <strong>${list.length}</strong></div><div style="display:flex;gap:8px;align-items:center;"><button class="btn btn-ghost btn-sm" ${p<=1?'disabled':''} onclick="notYetPage(${p-1})">&larr; Sebelumnya</button><span style="font-size:12px;font-weight:700;">Hal ${p}/${pages}</span><button class="btn btn-ghost btn-sm" ${p>=pages?'disabled':''} onclick="notYetPage(${p+1})">Berikutnya &rarr;</button></div>`;
-}
-function notYetPage(n){state.assessPage=n;renderNotYetPage();window.scrollTo({top:el('notyet-tbody').getBoundingClientRect().top+window.scrollY-160,behavior:'smooth'});}
-
+function filterByDivision(dv){dtSetFilter('notyet','division',dv);}
 function renderAdminAssignment(d){
-  const det=(d.assignment_detail||[]).slice().sort((a,b)=>Number(a.has_assigned)-Number(b.has_assigned));
-  let c=`<div class="card"><div class="card-header"><div class="card-title">Status Assignment per Atasan</div><span class="badge badge-gray">${det.length} atasan</span></div><div class="table-wrap"><table class="mobile-card"><thead><tr><th>NIK</th><th>Nama</th><th>Departemen</th><th>Bawahan</th><th>Sudah Assign</th><th>Status</th></tr></thead><tbody>`;
-  det.forEach(l=>{
-    c+=`<tr><td data-label="NIK" style="font-family:var(--mono);font-size:12px;">${esc(l.nik)}</td><td data-label="Nama">${esc(l.name)}</td><td data-label="Dept" style="font-size:12px;">${esc(l.department)}</td><td data-label="Bawahan" style="font-weight:700;">${l.report_count}</td><td data-label="Assign" style="font-weight:700;">${l.assigned_count}</td><td data-label="Status">${l.has_assigned?'<span class="badge badge-emerald">Sudah</span>':'<span class="badge badge-amber">Belum</span>'}</td></tr>`;
+  const det=(d.assignment_detail||[]).slice();
+  let c=`<div class="card"><div class="card-header"><div class="card-title">Status Assignment per Atasan</div></div>`;
+  c+=dtInit('assign',{
+    label:'atasan',searchPlaceholder:'Cari NIK, nama, departemen...',
+    empty:'Tidak ada atasan yang cocok dengan filter',
+    rows:det,sortKey:'has_assigned',sortDir:1,
+    cols:[
+      {key:'nik',label:'NIK',style:'font-family:var(--mono);font-size:12px;'},
+      {key:'name',label:'Nama'},
+      {key:'department',label:'Departemen',style:'font-size:12px;'},
+      {key:'report_count',label:'Bawahan',style:'font-weight:700;',filter:false},
+      {key:'assigned_count',label:'Sudah Assign',style:'font-weight:700;',filter:false},
+      {key:'has_assigned',label:'Status',filter:false,
+       plain:l=>l.has_assigned?'Sudah':'Belum',
+       render:l=>l.has_assigned?'<span class="badge badge-emerald">Sudah</span>':'<span class="badge badge-amber">Belum</span>'}
+    ]
   });
-  return c+`</tbody></table></div></div>`;
+  return c+`</div>`;
 }
 function renderAdminCompletion(d){
-  const det=d.completion_detail||[],s=d.summary;
+  const det=d.completion_detail||[],sm=d.summary;
   const done=det.filter(x=>x.is_fully_completed).length;
   let c='';
-  if(!s.l3_open)c+=`<div class="notice notice-sky"><div class="notice-icon">&#128197;</div><div>Evaluasi belum dibuka (jadwal: <strong>${esc(s.l3_open_date)}</strong>), sehingga angka di bawah masih nol. Ini normal, bukan kesalahan data.</div></div>`;
+  if(!sm.l3_open)c+=`<div class="notice notice-sky"><div class="notice-icon">&#128197;</div><div>Evaluasi belum dibuka (jadwal: <strong>${esc(sm.l3_open_date)}</strong>), sehingga angka di bawah masih nol. Ini normal, bukan kesalahan data.</div></div>`;
   c+=`<div class="stats-grid" style="margin-bottom:16px;">
     <div class="stat-card stat-card-purple"><div class="stat-icon">&#128101;</div><div class="stat-label">Dalam Antrian</div><div class="stat-value">${det.length}</div></div>
     <div class="stat-card stat-card-emerald"><div class="stat-icon">&#9989;</div><div class="stat-label">Tuntas Seluruhnya</div><div class="stat-value">${done}</div></div>
-    <div class="stat-card stat-card-amber"><div class="stat-icon">&#127919;</div><div class="stat-label">Kompetensi Tercapai</div><div class="stat-value">${s.l3_achieved}<span style="font-size:14px;opacity:0.7;">/${s.l3_total}</span></div></div>
-    <div class="stat-card stat-card-sky"><div class="stat-icon">&#128200;</div><div class="stat-label">Rasio</div><div class="stat-value">${pct(s.l3_achieved,s.l3_total)}%</div></div>
+    <div class="stat-card stat-card-amber"><div class="stat-icon">&#127919;</div><div class="stat-label">Kompetensi Tercapai</div><div class="stat-value">${sm.l3_achieved}<span style="font-size:14px;opacity:0.7;">/${sm.l3_total}</span></div></div>
+    <div class="stat-card stat-card-sky"><div class="stat-icon">&#128200;</div><div class="stat-label">Rasio</div><div class="stat-value">${pct(sm.l3_achieved,sm.l3_total)}%</div></div>
   </div>`;
-  // Judul lama "Detail Evaluasi Perilaku" ambigu: pembaca tidak tahu apakah
-  // nama di baris itu yang menilai atau yang dinilai. Baris ini adalah
-  // karyawan YANG DINILAI, dan penilainya kini ditampilkan terpisah.
-  c+=`<div class="card"><div class="card-header"><div class="card-title">Karyawan yang Dinilai Perilakunya</div><span class="badge badge-gray">${det.length}</span></div><div class="card-body" style="padding-bottom:0;"><div style="font-size:12px;color:var(--text-muted);line-height:1.7;">Setiap baris adalah karyawan yang perilakunya dievaluasi oleh atasannya setelah program pengembangan. Kolom <strong>Dinilai oleh</strong> menunjukkan atasan yang bertanggung jawab.</div></div><div class="table-wrap"><table class="mobile-card"><thead><tr><th>NIK</th><th>Karyawan Dinilai</th><th>Departemen</th><th>Dinilai oleh</th><th>Kompetensi</th><th>Dievaluasi</th><th>Rerata</th><th>Progres</th></tr></thead><tbody>`;
-  det.slice(0,300).forEach(u=>{
-    const col=u.completion_pct>=100?'emerald':u.completion_pct>=50?'amber':'purple';
-    // Rerata 0% berdampingan dengan status tercapai berarti Score_Percent
-    // belum terisi — tandanya setupL3Schema() belum dijalankan.
-    const janggal=u.mandatory_completed>0&&u.evaluated_count>0&&u.avg_score_percent===0;
-    c+=`<tr><td data-label="NIK" style="font-family:var(--mono);font-size:12px;">${esc(u.nik)}</td><td data-label="Karyawan">${esc(u.name)}</td><td data-label="Dept" style="font-size:12px;">${esc(u.department)}</td><td data-label="Dinilai oleh" style="font-size:12px;">${esc(u.evaluator_name||'—')}</td><td data-label="Kompetensi" style="font-weight:700;">${u.mandatory_completed}/${u.mandatory_total}</td><td data-label="Dievaluasi">${u.evaluated_count}</td><td data-label="Rerata">${u.evaluated_count?`${u.avg_score_percent}%${janggal?' <span class="thin-warn" title="Skor dan status saling bertentangan. Jalankan setupL3Schema().">&#9888;</span>':''}`:'<span class="text-muted">—</span>'}</td><td data-label="Progres" style="min-width:80px;">${progBar(u.mandatory_completed,u.mandatory_total||1,col,7)}</td></tr>`;
+  c+=`<div class="card"><div class="card-header"><div><div class="card-title">Karyawan yang Dievaluasi (L3 Kirkpatrick)</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Setiap baris adalah karyawan yang <strong>dinilai</strong>. Kolom Atasan Penilai menunjukkan siapa yang menilainya.</div></div></div>`;
+  c+=dtInit('l3det',{
+    label:'karyawan',searchPlaceholder:'Cari NIK, nama, atasan penilai...',
+    empty:'Tidak ada karyawan yang cocok dengan filter',
+    rows:det,
+    cols:[
+      {key:'nik',label:'NIK',style:'font-family:var(--mono);font-size:12px;'},
+      {key:'name',label:'Nama Karyawan'},
+      {key:'evaluator_name',label:'Atasan Penilai',style:'font-size:12px;',plain:u=>u.evaluator_name||'',render:u=>esc(u.evaluator_name||'—')},
+      {key:'department',label:'Departemen',style:'font-size:12px;'},
+      {key:'mandatory_completed',label:'Kompetensi',style:'font-weight:700;',filter:false,
+       plain:u=>u.mandatory_completed,render:u=>`${u.mandatory_completed}/${u.mandatory_total}`},
+      {key:'evaluated_count',label:'Dievaluasi',filter:false},
+      {key:'avg_score_percent',label:'Rerata',filter:false,
+       render:u=>u.evaluated_count?`${u.avg_score_percent}%`:'<span class="text-muted">—</span>'},
+      {key:'completion_pct',label:'Progres',filter:false,style:'min-width:80px;',
+       render:u=>progBar(u.mandatory_completed,u.mandatory_total||1,u.completion_pct>=100?'emerald':u.completion_pct>=50?'amber':'purple',7)}
+    ]
   });
-  return c+`</tbody></table>${det.length>300?`<div style="padding:12px;text-align:center;font-size:12px;color:var(--text-muted);">Menampilkan 300 dari ${det.length}</div>`:''}</div></div>`;
+  return c+`</div>`;
 }
 function renderAdminDemand(d){
   const cd=d.competency_demand||{};
@@ -1750,9 +2016,25 @@ function renderAdminDemand(d){
     c+=`<div class="bar-row"><div class="bar-name truncate" title="${esc(r.name||r.cid)}">${esc(r.cid)}</div><div class="bar-track"><div class="bar-fill" style="width:${pct(r.total,max)}%"></div></div><div class="bar-val">${r.total}</div></div>`;
   });
   c+=`</div></div></div>`;
-  c+=`<div class="card" style="margin-top:14px;"><div class="table-wrap"><table class="mobile-card"><thead><tr><th>Kode</th><th>Kompetensi</th><th>Mandatory</th><th>Additional</th><th>Total</th></tr></thead><tbody>`;
-  rows.forEach(r=>{c+=`<tr><td data-label="Kode"><span class="badge badge-purple">${esc(r.cid)}</span></td><td data-label="Kompetensi">${esc(r.name||r.cid)}</td><td data-label="Mandatory" style="font-weight:700;color:var(--coral);">${r.mandatory}</td><td data-label="Additional" style="font-weight:700;color:var(--purple);">${r.additional}</td><td data-label="Total" style="font-weight:800;">${r.total}</td></tr>`;});
-  return c+`</tbody></table></div></div>`;
+  // Rincian per karyawan, bukan hanya rekap per kompetensi. Isinya sama
+  // persis dengan berkas Excel, jadi admin bisa memeriksanya sebelum unduh.
+  c+=`<div class="card" style="margin-top:14px;"><div class="card-header"><div class="card-title">Rincian per Karyawan</div><button class="btn btn-emerald btn-sm" onclick="downloadDemandExcel()">&#8681; Unduh Excel</button></div>`;
+  c+=dtInit('demand',{
+    label:'penugasan',searchPlaceholder:'Cari kompetensi, NIK, nama, divisi...',
+    empty:'Tidak ada penugasan yang cocok dengan filter',
+    rows:(d.demand_detail||[]),
+    cols:[
+      {key:'competency_name',label:'Kompetensi',plain:r=>(r.competency_id+' '+(r.competency_name||'')),
+       render:r=>`<span class="badge badge-purple" style="font-size:10px;">${esc(r.competency_id)}</span> ${esc(r.competency_name||'')}`},
+      {key:'target_level',label:'Level Target',filter:false,render:r=>r.target_level?('L'+r.target_level):'—'},
+      {key:'nik',label:'NIK',style:'font-family:var(--mono);font-size:12px;'},
+      {key:'name',label:'Nama Karyawan'},
+      {key:'division',label:'Divisi',style:'font-size:12px;',render:r=>esc(r.division||'—')},
+      {key:'decision',label:'Prioritas',filter:false,
+       render:r=>r.decision==='mandatory'?'<span class="badge badge-coral">Mandatory</span>':'<span class="badge badge-purple">Additional</span>'}
+    ]
+  });
+  return c+`</div>`;
 }
 async function loadAdminEnrollment(){
   const r=await apiFast('getSessionEnrollments');
@@ -1760,19 +2042,49 @@ async function loadAdminEnrollment(){
   if(!r.success||!(r.data||[]).length){slot.innerHTML=`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">&#128197;</div><div class="empty-title">Belum ada pendaftaran</div></div></div></div>`;return;}
   window._emailStore=[];
   window._enrollData=r.data;
-  let c=`<div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button class="btn btn-emerald btn-sm" onclick="downloadEnrollmentExcel()">&#8681; Unduh Excel</button></div>`;
-  r.data.forEach(s=>{
-    const emails=s.participants.map(p=>p.email).filter(Boolean).join('; ');
-    // Email disimpan di array dan dirujuk lewat indeks. Menyisipkan teks
-    // langsung ke atribut onclick rusak begitu data mengandung apostrof:
-    // esc() mengubahnya jadi &#39; yang di-decode browser di dalam atribut,
-    // sehingga string JS-nya terputus.
-    const eidx=window._emailStore.push(emails)-1;
-    c+=`<div class="card" style="margin-bottom:12px;"><div class="card-header"><div><div class="card-title">${esc(s.competency_name||s.competency_id)}${s.level?' — L'+s.level:''}</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${esc(s.date)}${s.time?' · '+esc(s.time):''} · ${esc(s.location||'—')} · ${esc(s.trainer||'—')}</div></div><div style="display:flex;gap:8px;align-items:center;"><span class="badge badge-emerald">${s.participants.length} peserta</span>${emails?`<button class="btn btn-ghost btn-sm" onclick="copyStored(${eidx})">Salin Email</button>`:''}</div></div><div class="card-body"><div>`;
-    s.participants.forEach(p=>{c+=`<span class="participant-chip">${esc(p.name)}<span style="opacity:0.6;font-family:var(--mono);font-size:10px;">${esc(p.nik)}</span></span>`;});
-    c+=`</div></div></div>`;
-  });
-  slot.innerHTML=c;
+  window._enrollExpand={};
+  slot.innerHTML=`<div class="card"><div class="card-header"><div class="card-title">Pendaftaran per Sesi</div><button class="btn btn-emerald btn-sm" onclick="downloadEnrollmentExcel()">&#8681; Unduh Excel</button></div>`+
+    dtInit('enroll',{
+      mode:'cards',label:'sesi',
+      searchPlaceholder:'Cari kompetensi, trainer, nama peserta...',
+      empty:'Tidak ada sesi yang cocok dengan filter',
+      rows:r.data,sortKey:'date',sortDir:1,
+      cols:[
+        {key:'competency_name',label:'Kompetensi',plain:x=>`${x.competency_id} ${x.competency_name||''}`},
+        {key:'date',label:'Tanggal',plain:x=>_dtSortableDate(x.date)},
+        {key:'trainer',label:'Trainer'},
+        {key:'location',label:'Lokasi'},
+        {key:'peserta',label:'Nama Peserta',plain:x=>(x.participants||[]).map(p=>`${p.name} ${p.nik}`).join(' ')},
+        {key:'jumlah',label:'Jumlah Peserta',plain:x=>(x.participants||[]).length}
+      ],
+      card:enrollCard
+    })+`</div>`;
+}
+// Satu sesi bisa memuat ratusan peserta. Ditampilkan 50 lebih dulu, sisanya
+// dibuka atas permintaan — kalau seluruhnya dirender, satu sesi besar
+// menghasilkan ribuan elemen dan halaman terasa macet saat digulir.
+const ENROLL_CHIP_LIMIT=50;
+function enrollCard(sx){
+  const parts=sx.participants||[];
+  const key=String(sx.session_id||'');
+  const expanded=!!(window._enrollExpand||{})[key];
+  const shown=expanded?parts:parts.slice(0,ENROLL_CHIP_LIMIT);
+  const emails=parts.map(p=>p.email).filter(Boolean).join('; ');
+  // Email disimpan di array dan dirujuk lewat indeks. Menyisipkan teks
+  // langsung ke atribut onclick rusak begitu data mengandung apostrof.
+  const eidx=window._emailStore.push(emails)-1;
+  let c=`<div class="card" style="margin-bottom:12px;"><div class="card-header"><div><div class="card-title">${esc(sx.competency_name||sx.competency_id)}${sx.level?' — L'+sx.level:''}</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${esc(sx.date)}${sx.time?' · '+esc(sx.time):''} · ${esc(sx.location||'—')} · ${esc(sx.trainer||'—')}</div></div><div style="display:flex;gap:8px;align-items:center;"><span class="badge badge-emerald">${parts.length} peserta</span>${emails?`<button class="btn btn-ghost btn-sm" onclick="copyStored(${eidx})">Salin Email</button>`:''}</div></div><div class="card-body"><div>`;
+  shown.forEach(p=>{c+=`<span class="participant-chip">${esc(p.name)}<span style="opacity:0.6;font-family:var(--mono);font-size:10px;">${esc(p.nik)}</span></span>`;});
+  c+=`</div>`;
+  if(parts.length>ENROLL_CHIP_LIMIT){
+    c+=`<div style="margin-top:10px;"><button class="btn btn-ghost btn-sm" onclick="toggleEnrollExpand('${esc(key)}')">${expanded?'&#9652; Tampilkan 50 pertama saja':`&#9662; Tampilkan ${parts.length-ENROLL_CHIP_LIMIT} peserta lainnya`}</button></div>`;
+  }
+  return c+`</div></div>`;
+}
+function toggleEnrollExpand(key){
+  window._enrollExpand=window._enrollExpand||{};
+  window._enrollExpand[key]=!window._enrollExpand[key];
+  dtRefresh('enroll');
 }
 // ── EKSPOR EXCEL ───────────────────────────────────────────
 // SheetJS dimuat dari CDN saat dibutuhkan, pola yang sama dengan jsPDF.
@@ -1875,7 +2187,7 @@ function fallbackCopy(txt){
   catch(e){toast('Gagal menyalin','error');}
 }
 function copyStored(i){const v=(window._emailStore||[])[i];if(v)copyText(v);}
-function copyList(){const l=(typeof filteredNotYet==='function'?filteredNotYet():(window._adminNotYet||[]));if(!l.length){toast('Tidak ada data','warning');return;}copyText(l.map(u=>u.nik).join('\n'));toast(l.length+' NIK disalin','success');}
+function copyList(){const l=(DT['notyet']?dtVisible('notyet'):(window._adminNotYet||[]));if(!l.length){toast('Tidak ada data','warning');return;}copyText(l.map(u=>u.nik).join('\n'));toast(l.length+' NIK disalin','success');}
 
 // ── ADMIN USERS ────────────────────────────────────────────
 async function loadAdminUsers(){
@@ -1884,20 +2196,27 @@ async function loadAdminUsers(){
   window._allUsers=r.data||[];renderAdminUsers(window._allUsers);
 }
 function renderAdminUsers(users){
-  let c=`<div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;"><input type="text" id="user-search" class="form-input" placeholder="Cari NIK, nama, atau departemen..." style="max-width:340px;" oninput="filterUsers()"><span style="font-size:12px;color:var(--text-muted);align-self:center;" id="user-count">${users.length} pengguna</span></div>`;
-  c+=`<div class="card"><div class="table-wrap"><table class="mobile-card"><thead><tr><th>NIK</th><th>Nama</th><th>Grade</th><th>Departemen</th><th>Role</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="users-tbody">`;
-  c+=userRows(users.slice(0,200));
-  html('admin-users-content',c+`</tbody></table></div></div>`);
-}
-function userRows(list){
-  return list.map(u=>`<tr><td data-label="NIK" style="font-family:var(--mono);font-size:12px;">${esc(u.nik)}</td><td data-label="Nama">${esc(u.name)}</td><td data-label="Grade"><span class="badge ${gradeColor(u.grade)}">${esc(u.grade)}</span></td><td data-label="Dept" style="font-size:12px;">${esc(u.department)}</td><td data-label="Role"><span class="badge ${u.role==='admin'?'badge-coral':u.role.includes('leader')?'badge-sky':'badge-gray'}">${roleLabel(u.role)}</span></td><td data-label="Status">${u.status==='inactive'?'<span class="badge badge-gray">Nonaktif</span>':'<span class="badge badge-emerald">Aktif</span>'}${u.must_change_password?'<div style="font-size:10px;color:var(--amber-dark);margin-top:2px;">password default</div>':''}</td><td><button class="btn btn-ghost btn-sm" onclick="openUserEdit('${u.nik}')">Kelola</button></td></tr>`).join('');
-}
-function filterUsers(){
-  const q=(el('user-search').value||'').toLowerCase().trim();
-  const all=window._allUsers||[];
-  const f=q?all.filter(u=>String(u.nik).includes(q)||String(u.name).toLowerCase().includes(q)||String(u.department).toLowerCase().includes(q)):all;
-  const tb=el('users-tbody');if(tb)tb.innerHTML=userRows(f.slice(0,200));
-  const ct=el('user-count');if(ct)ct.textContent=`${f.length} pengguna${f.length>200?' (menampilkan 200)':''}`;
+  html('admin-users-content',
+    `<div class="card"><div class="card-header"><div class="card-title">Data Pengguna</div></div>`+
+    dtInit('users',{
+      label:'pengguna',searchPlaceholder:'Cari NIK, nama, departemen...',
+      empty:'Tidak ada pengguna yang cocok dengan filter',
+      rows:users,
+      cols:[
+        {key:'nik',label:'NIK',style:'font-family:var(--mono);font-size:12px;'},
+        {key:'name',label:'Nama'},
+        {key:'grade',label:'Grade',render:u=>`<span class="badge ${gradeColor(u.grade)}">${esc(u.grade)}</span>`},
+        {key:'division',label:'Divisi',style:'font-size:12px;',render:u=>esc(u.division||'—')},
+        {key:'department',label:'Departemen',style:'font-size:12px;'},
+        {key:'role',label:'Role',plain:u=>roleLabel(u.role),
+         render:u=>`<span class="badge ${u.role==='admin'?'badge-coral':(u.role||'').includes('leader')?'badge-sky':'badge-gray'}">${roleLabel(u.role)}</span>`},
+        {key:'status',label:'Status',plain:u=>u.status==='inactive'?'Nonaktif':'Aktif',
+         render:u=>(u.status==='inactive'?'<span class="badge badge-gray">Nonaktif</span>':'<span class="badge badge-emerald">Aktif</span>')+
+           (u.must_change_password?'<div style="font-size:10px;color:var(--amber-dark);margin-top:2px;">password default</div>':'')},
+        {key:'aksi',label:'Aksi',filter:false,sort:false,
+         plain:()=>'',render:u=>`<button class="btn btn-ghost btn-sm" onclick="openUserEdit('${esc(u.nik)}')">Kelola</button>`}
+      ]
+    })+`</div>`);
 }
 function openUserEdit(nik){
   const u=(window._allUsers||[]).find(x=>x.nik===nik);if(!u)return;
