@@ -438,7 +438,7 @@ tbody tr:hover{background:var(--purple-soft);}
 // lalu unggah ulang file ini ke GitHub. Melewatkan langkah ini adalah
 // sumber bug paling sering di proyek ini.
 // ============================================================
-const API_URL='https://script.google.com/macros/s/AKfycbwwLkSmudyOqwUlse8zIArcZCKMZq2VUAV8SuK1ab5ODspFa5FTwxXY1J3uD9ZdAY5g/exec';
+const API_URL='https://script.google.com/macros/s/AKfycbxnSRR0EuH4qbwYI9fdsUk1Y2xoFAl4ARNv0PiA6YCp_SyPKWsB5e9bHMPkLoaSRIk1/exec';
 
 // ── BAHASA ─────────────────────────────────────────────────
 const LANG={
@@ -507,6 +507,7 @@ function progBar(v,max,color='purple',h=8){return `<div class="prog-wrap" style=
 function scoreRing(p){const cls=p>=100?'score-100':p>=50?'score-mid':p>0?'score-low':'score-zero';return `<div class="score-ring ${cls}">${p}%</div>`;}
 function achievedBadge(st,p){
   if(st==='achieved')return `<span class="achieved-badge achieved-badge-ok">&#10003; Tercapai 100%</span>`;
+  if(st==='no_instrument')return `<span class="thin-warn">&#9888; Tidak ada indikator terdaftar</span>`;
   return `<span class="achieved-badge achieved-badge-no">Belum tercapai${p!==undefined?' — '+p+'%':''}</span>`;
 }
 
@@ -534,7 +535,6 @@ async function doChangePassword(){
 }
 function doLogout(){
   closeModal();
-  if(state.user&&state.user.nik)sessionStorage.removeItem('mirai_submitted_'+state.user.nik);
   state=freshState();
   el('app-layout').style.display='none';
   el('page-login').style.display='flex';
@@ -595,10 +595,11 @@ async function loadDashboard(){
   const totalM=approvals.filter(a=>a.priority==='mandatory').length;
   const enrolled=enrRes.success?(enrRes.data||[]).length:0;
   const submitted=assessRes.success&&assessRes.has_submitted_final;
+  const hasDraft=assessRes.success&&assessRes.has_draft&&!submitted;
   const isLeader=u.role&&u.role.includes('leader');
 
   let c=`<div class="stats-grid">
-    <div class="stat-card stat-card-purple"><div class="stat-icon">${submitted?'&#9989;':'&#128203;'}</div><div class="stat-label">Assessment</div><div style="margin-top:4px;">${statusBadge(submitted?'submitted':'pending')}</div>${assessRes.expected_count?`<div class="stat-sub" style="margin-top:6px;">${assessRes.filled_count}/${assessRes.expected_count} kompetensi</div>`:''}</div>
+    <div class="stat-card stat-card-purple"><div class="stat-icon">${submitted?'&#9989;':hasDraft?'&#128190;':'&#128203;'}</div><div class="stat-label">Assessment</div><div style="margin-top:4px;">${submitted?statusBadge('submitted'):hasDraft?'<span class="badge badge-sky">Draf</span>':statusBadge('pending')}</div>${assessRes.expected_count?`<div class="stat-sub" style="margin-top:6px;">${assessRes.filled_count}/${assessRes.expected_count} kompetensi</div>`:''}</div>
     <div class="stat-card stat-card-emerald"><div class="stat-icon">&#127919;</div><div class="stat-label">Mandatory</div><div class="stat-value">${totalM}</div><div class="stat-sub">Ditetapkan atasan</div></div>
     <div class="stat-card stat-card-sky"><div class="stat-icon">&#128218;</div><div class="stat-label">Terdaftar</div><div class="stat-value">${enrolled}</div><div class="stat-sub">Sesi aktif</div></div>
     <div class="stat-card stat-card-amber"><div class="stat-icon">&#127991;</div><div class="stat-label">Grade</div><div style="margin-top:8px;"><span class="badge" style="font-size:14px;padding:5px 16px;background:rgba(255,255,255,0.2);color:#fff;">${esc(u.grade)}</span></div></div>
@@ -625,14 +626,18 @@ async function loadDashboard(){
 // ── ASSESSMENT ─────────────────────────────────────────────
 async function loadAssessment(){
   const u=state.user;
-  if(state._assessmentSubmitted||sessionStorage.getItem('mirai_submitted_'+u.nik)==='true'){
-    state._assessmentSubmitted=true;html('assessment-content',buildSubmittedView());return;
-  }
+  // Status selalu diverifikasi ke server. Penanda lokal hanya dipakai dalam
+  // sesi yang sama agar layar tidak berkedip setelah submit. Kalau HCD
+  // menambah kompetensi ke Target_Level setelah karyawan mengirim, formulir
+  // harus terbuka lagi untuk kompetensi yang belum dinilai — penanda lokal
+  // yang dipercaya mutlak akan menyembunyikan itu.
   const statusRes=await api('getAssessmentStatus',{nik:u.nik});
   if(statusRes.success&&statusRes.has_submitted_final&&statusRes.expected_count>0){
-    state._assessmentSubmitted=true;sessionStorage.setItem('mirai_submitted_'+u.nik,'true');
+    state._assessmentSubmitted=true;
     html('assessment-content',buildSubmittedView());return;
   }
+  state._assessmentSubmitted=false;
+  state._hasDraft=!!(statusRes&&statusRes.has_draft);
   const libRes=await api('getCompetencyLibrary',{nik:u.nik,grade:u.grade});
   if(!libRes.success){html('assessment-content',`<div class="notice notice-coral"><div class="notice-icon">!</div><div>${esc(libRes.message)}</div></div>`);return;}
   const all=libRes.data.competencies||[];
@@ -678,6 +683,9 @@ function buildSkipBlock(list){
 function renderAssessmentForm(){
   const active=state.compLibrary||[],skipped=state.skippedComps||[];
   let c=`<div class="notice notice-amber"><div class="notice-icon">&#128161;</div><div><strong>${t('assess.instruction')}:</strong> ${t('assess.inst_text')}</div></div>`;
+  if(state._hasDraft){
+    c+=`<div class="notice notice-sky"><div class="notice-icon">&#128190;</div><div>Kamu punya <strong>draf tersimpan</strong> yang belum dikirim. Atasanmu belum bisa melihatnya. Tekan Kirim bila sudah yakin.</div></div>`;
+  }
   c+=buildSkipBlock(skipped);
 
   if(!active.length){
@@ -763,7 +771,6 @@ async function doFinalSubmit(){
   if(!r.success){toast(r.message,'error');return;}
   if((r.rejected_competencies||[]).length)toast(r.rejected_competencies.length+' kompetensi dilewati karena sedang berjalan','warning');
   state._assessmentSubmitted=true;
-  sessionStorage.setItem('mirai_submitted_'+state.user.nik,'true');
   toast('Asesmen terkirim','success');
   state.compLibrary=null;state.assessmentScores={};state.assessmentChecks={};
   html('assessment-content',buildSubmittedView());
@@ -980,6 +987,8 @@ function renderStep1(nik){
       const border=self===0?'var(--border)':'var(--amber)';
       const gapB=self===0?`<span style="font-size:11px;color:var(--text-muted);">Target: L${target}</span>`:`<span class="badge badge-amber">Self L${self} &rarr; Target L${target}</span>`;
       let ind='';
+      const legacyWarn=c.checks_legacy_format
+        ?`<div class="thin-warn" style="margin-top:5px;">&#9888; Data centang berformat lama, posisi level mungkin tidak presisi</div>`:'';
       if(c.levels&&Object.keys(c.levels).length){
         ind=`<details style="margin-top:8px;"><summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--purple);padding:4px 0;">&#9654; Lihat indikator perilaku</summary><div style="margin-top:8px;padding:10px 12px;background:var(--surface);border-radius:var(--r-sm);border:1px solid var(--border);">`;
         Object.keys(c.levels).map(Number).sort((a,b)=>a-b).forEach(lv=>{
@@ -996,7 +1005,7 @@ function renderStep1(nik){
         });
         ind+=`</div></details>`;
       }
-      rows+=`<div style="border:1.5px solid ${border};border-radius:var(--r);margin-bottom:10px;overflow:hidden;"><div style="padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;background:var(--surface);"><div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><span class="badge ${color[c.competency_type]||'badge-gray'}">${esc(c.competency_id)}</span><span style="font-weight:700;font-size:13px;">${esc(c.competency_name)}</span></div><div>${gapB}</div></div><div style="padding:8px 14px 10px;background:var(--purple-soft);border-top:1px solid var(--border);"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:${ind?'4':'0'}px;"><label style="font-size:11px;font-weight:700;color:var(--purple-dark);white-space:nowrap;">Level yang kamu amati:</label><select onchange="setLeaderLevel('${c.competency_id}',this.value)" style="padding:5px 10px;border:1.5px solid var(--purple);border-radius:var(--r-sm);font-size:12px;font-family:var(--font);font-weight:600;background:#fff;cursor:pointer;outline:none;"><option value="">— Pilih —</option>${[1,2,3,4,5].map(l=>`<option value="${l}" ${String(cur)===String(l)?'selected':''}>Level ${l}</option>`).join('')}</select><span style="font-size:11px;color:var(--text-muted);">Self L${self} · Target L${target}</span></div>${ind}</div></div>`;
+      rows+=`<div style="border:1.5px solid ${border};border-radius:var(--r);margin-bottom:10px;overflow:hidden;"><div style="padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;background:var(--surface);"><div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><span class="badge ${color[c.competency_type]||'badge-gray'}">${esc(c.competency_id)}</span><span style="font-weight:700;font-size:13px;">${esc(c.competency_name)}</span></div><div>${gapB}</div></div><div style="padding:8px 14px 10px;background:var(--purple-soft);border-top:1px solid var(--border);"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:${ind?'4':'0'}px;"><label style="font-size:11px;font-weight:700;color:var(--purple-dark);white-space:nowrap;">Level yang kamu amati:</label><select onchange="setLeaderLevel('${c.competency_id}',this.value)" style="padding:5px 10px;border:1.5px solid var(--purple);border-radius:var(--r-sm);font-size:12px;font-family:var(--font);font-weight:600;background:#fff;cursor:pointer;outline:none;"><option value="">— Pilih —</option>${[1,2,3,4,5].map(l=>`<option value="${l}" ${String(cur)===String(l)?'selected':''}>Level ${l}</option>`).join('')}</select><span style="font-size:11px;color:var(--text-muted);">Self L${self} · Target L${target}</span></div>${legacyWarn}${ind}</div></div>`;
     });
   });
 
@@ -1228,6 +1237,7 @@ function renderL3Form(){
 
   comps.forEach((c,ci)=>{
     const done=c.total_indicators>0&&c.checked_count>=c.total_indicators;
+    const st=c.total_indicators===0?'no_instrument':(done?'achieved':'not_achieved');
     body+=`<div class="assessment-section" style="margin-bottom:12px;">
       <div class="assessment-section-hdr" onclick="toggleL3Comp(${ci})">
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex:1;min-width:0;">
@@ -1236,7 +1246,7 @@ function renderL3Form(){
             <div style="font-weight:700;font-size:14px;">${esc(c.competency_name)}</div>
             <div style="font-size:11px;color:var(--text-muted);font-family:var(--mono);">${esc(c.competency_id)} · Level ${c.competency_level}</div>
             <div style="margin-top:3px;display:flex;gap:5px;flex-wrap:wrap;align-items:center;">
-              <span id="l3-status-${ci}">${achievedBadge(done?'achieved':'not_achieved',c.score_percent)}</span>
+              <span id="l3-status-${ci}">${achievedBadge(st,c.score_percent)}</span>
               <span id="l3-count-${ci}" style="font-size:11px;color:var(--text-muted);font-weight:600;">${c.checked_count}/${c.total_indicators} indikator</span>
               ${c.thin_instrument?`<span class="thin-warn">&#9888; hanya ${c.total_indicators} indikator</span>`:''}
             </div>
@@ -1265,7 +1275,7 @@ function toggleL3Ind(ci,ii){
   c.checked_count=c.indicators.filter(x=>x.is_checked).length;
   c.score_percent=c.total_indicators>0?Math.round((c.checked_count/c.total_indicators)*100):0;
   const done=c.total_indicators>0&&c.checked_count>=c.total_indicators;
-  c.achieved_status=done?'achieved':'not_achieved';
+  c.achieved_status=c.total_indicators===0?'no_instrument':(done?'achieved':'not_achieved');
   const ring=el('l3-ring-'+ci);if(ring)ring.innerHTML=scoreRing(c.score_percent);
   const st=el('l3-status-'+ci);if(st)st.innerHTML=achievedBadge(c.achieved_status,c.score_percent);
   const ct=el('l3-count-'+ci);if(ct)ct.textContent=`${c.checked_count}/${c.total_indicators} indikator`;
@@ -1284,18 +1294,22 @@ async function saveL3Draft(){
 }
 function confirmL3Submit(){
   const fd=window._l3FormData;if(!fd)return;
-  const notDone=fd.competencies.filter(c=>c.score_percent<100);
+  const noInst=fd.competencies.filter(c=>c.total_indicators===0);
+  const notDone=fd.competencies.filter(c=>c.total_indicators>0&&c.score_percent<100);
   const warn=notDone.length
     ?`<div class="notice notice-amber"><div class="notice-icon">&#9888;</div><div>${notDone.length} kompetensi belum 100%: ${esc(notDone.map(c=>c.competency_id+' ('+c.score_percent+'%)').join(', '))}. Kompetensi ini akan tercatat <strong>belum tercapai</strong>.</div></div>`
     :`<div class="notice notice-emerald"><div class="notice-icon">&#9989;</div><div>Seluruh kompetensi mencapai 100%.</div></div>`;
-  openModal(`<div class="modal" style="max-width:460px;" onclick="event.stopPropagation()"><div class="modal-header"><div class="modal-title">Konfirmasi Evaluasi Final</div><button class="modal-close" onclick="renderL3Form()">&times;</button></div><div class="modal-body">${warn}<p style="font-size:13px;color:var(--text-2);">Evaluasi ditandai final. Kamu masih bisa membuka dan menyimpannya kembali bila ada koreksi.</p></div><div class="modal-footer"><button class="btn btn-ghost" onclick="renderL3Form()">Kembali</button><button class="btn btn-emerald" onclick="doL3FinalSubmit()">Simpan Final</button></div></div>`);
+  const instWarn=noInst.length?`<div class="notice notice-coral"><div class="notice-icon">!</div><div>${noInst.length} kompetensi (${esc(noInst.map(c=>c.competency_id).join(', '))}) belum punya indikator perilaku terdaftar di level targetnya, jadi tidak bisa dinilai. Laporkan ke HCD.</div></div>`:'';
+  openModal(`<div class="modal" style="max-width:460px;" onclick="event.stopPropagation()"><div class="modal-header"><div class="modal-title">Konfirmasi Evaluasi Final</div><button class="modal-close" onclick="renderL3Form()">&times;</button></div><div class="modal-body">${instWarn}${warn}<p style="font-size:13px;color:var(--text-2);">Evaluasi ditandai final. Kamu masih bisa membuka dan menyimpannya kembali bila ada koreksi.</p></div><div class="modal-footer"><button class="btn btn-ghost" onclick="renderL3Form()">Kembali</button><button class="btn btn-emerald" onclick="doL3FinalSubmit()">Simpan Final</button></div></div>`);
 }
 async function doL3FinalSubmit(){
   const p=buildL3Payload(true);if(!p)return;
   const r=await api('saveL3Evaluation',p);
   if(!r.success){toast(r.message,'error');return;}
-  const done=(r.data||[]).filter(x=>x.achieved_status==='achieved').length;
-  toast(`Evaluasi tersimpan — ${done} dari ${(r.data||[]).length} kompetensi tercapai 100%`,'success',5000);
+  const list=r.data||[];
+  const done=list.filter(x=>x.achieved_status==='achieved').length;
+  const detail=list.map(x=>`${x.competency_id} ${x.score_percent}%`).join(' · ');
+  toast(`Tersimpan — ${done}/${list.length} tercapai 100%  (${detail})`,'success',6000);
   closeModal();loadL3Eval();
 }
 async function downloadL3PDF(){
@@ -1444,6 +1458,7 @@ function renderAdminOverview(d){
     <div class="health-item"><div class="health-num" style="color:${h.orphan_idp_nik?'var(--coral-dark)':'var(--text)'};">${h.orphan_idp_nik||0}</div><div class="health-lbl">NIK di IDP 2026 tidak ada di Users</div></div>
     <div class="health-item"><div class="health-num" style="color:${h.orphan_history_nik?'var(--amber-dark)':'var(--text)'};">${h.orphan_history_nik||0}</div><div class="health-lbl">NIK di Training History tidak ada di Users</div></div>
     <div class="health-item"><div class="health-num" style="color:${h.thin_instrument_rows?'var(--amber-dark)':'var(--text)'};">${h.thin_instrument_rows||0}</div><div class="health-lbl">Evaluasi dgn 1–2 indikator saja</div></div>
+    <div class="health-item"><div class="health-num" style="color:${h.no_instrument_rows?'var(--coral-dark)':'var(--text)'};">${h.no_instrument_rows||0}</div><div class="health-lbl">Tanpa indikator sama sekali (tidak bisa dinilai)</div></div>
   </div><div style="margin-top:12px;font-size:12px;color:var(--text-muted);line-height:1.7;">NIK yatim biasanya muncul setelah pembaruan sheet Users bulanan — karyawan resign atau NIK berubah format. Instrumen tipis berarti kompetensi tersebut hanya punya satu atau dua indikator perilaku, sehingga hasil evaluasinya lebih baik dibaca sebagai indikatif.</div></div></div>`;
   return c;
 }
@@ -1506,16 +1521,32 @@ async function loadAdminEnrollment(){
   const r=await apiFast('getSessionEnrollments');
   const slot=el('admin-enroll-slot');if(!slot)return;
   if(!r.success||!(r.data||[]).length){slot.innerHTML=`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">&#128197;</div><div class="empty-title">Belum ada pendaftaran</div></div></div></div>`;return;}
+  window._emailStore=[];
   let c='';
   r.data.forEach(s=>{
     const emails=s.participants.map(p=>p.email).filter(Boolean).join('; ');
-    c+=`<div class="card" style="margin-bottom:12px;"><div class="card-header"><div><div class="card-title">${esc(s.competency_name||s.competency_id)}${s.level?' — L'+s.level:''}</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${esc(s.date)}${s.time?' · '+esc(s.time):''} · ${esc(s.location||'—')} · ${esc(s.trainer||'—')}</div></div><div style="display:flex;gap:8px;align-items:center;"><span class="badge badge-emerald">${s.participants.length} peserta</span>${emails?`<button class="btn btn-ghost btn-sm" onclick="copyText('${esc(emails).replace(/'/g,"\\'")}')">Salin Email</button>`:''}</div></div><div class="card-body"><div>`;
+    // Email disimpan di array dan dirujuk lewat indeks. Menyisipkan teks
+    // langsung ke atribut onclick rusak begitu data mengandung apostrof:
+    // esc() mengubahnya jadi &#39; yang di-decode browser di dalam atribut,
+    // sehingga string JS-nya terputus.
+    const eidx=window._emailStore.push(emails)-1;
+    c+=`<div class="card" style="margin-bottom:12px;"><div class="card-header"><div><div class="card-title">${esc(s.competency_name||s.competency_id)}${s.level?' — L'+s.level:''}</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${esc(s.date)}${s.time?' · '+esc(s.time):''} · ${esc(s.location||'—')} · ${esc(s.trainer||'—')}</div></div><div style="display:flex;gap:8px;align-items:center;"><span class="badge badge-emerald">${s.participants.length} peserta</span>${emails?`<button class="btn btn-ghost btn-sm" onclick="copyStored(${eidx})">Salin Email</button>`:''}</div></div><div class="card-body"><div>`;
     s.participants.forEach(p=>{c+=`<span class="participant-chip">${esc(p.name)}<span style="opacity:0.6;font-family:var(--mono);font-size:10px;">${esc(p.nik)}</span></span>`;});
     c+=`</div></div></div>`;
   });
   slot.innerHTML=c;
 }
-function copyText(txt){navigator.clipboard.writeText(txt).then(()=>toast('Disalin','success')).catch(()=>toast('Gagal menyalin','error'));}
+function copyText(txt){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(()=>toast('Disalin','success')).catch(()=>fallbackCopy(txt));
+  }else fallbackCopy(txt);
+}
+function fallbackCopy(txt){
+  // clipboard API tidak tersedia di konteks non-HTTPS atau browser lama
+  try{const ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('Disalin','success');}
+  catch(e){toast('Gagal menyalin','error');}
+}
+function copyStored(i){const v=(window._emailStore||[])[i];if(v)copyText(v);}
 function copyList(){const l=window._adminNotYet||[];if(!l.length){toast('Tidak ada data','warning');return;}copyText(l.map(u=>u.nik).join('\n'));}
 
 // ── ADMIN USERS ────────────────────────────────────────────
