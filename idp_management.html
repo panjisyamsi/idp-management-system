@@ -454,14 +454,14 @@ tbody tr:hover{background:var(--purple-soft);}
 </div>
 <script>
 // ============================================================
-// MIRAI IDP — Frontend v3.6
+// MIRAI IDP — Frontend v3.8
 // ------------------------------------------------------------
 // PENTING: setiap kali Code.gs di-deploy ulang dengan "Versi baru",
 // URL /exec bisa berubah. Salin URL terbaru ke API_URL di bawah,
 // lalu unggah ulang file ini ke GitHub. Melewatkan langkah ini adalah
 // sumber bug paling sering di proyek ini.
 // ============================================================
-const API_URL='https://script.google.com/macros/s/AKfycbzDAax51_rQ2l60NwMto5fAJw-6zrHs0HVhYcHrAMGaG8LtoQZtgkmj52pX2i24XKRO/exec';
+const API_URL='https://script.google.com/macros/s/AKfycbzSTKY6yJwMk1Z5xRKy7OnCrFOzmuiB0cBoRo-qmvvYT3plsPjowgZ55ocv3rpSyB98/exec';
 
 // ── BAHASA ─────────────────────────────────────────────────
 const LANG={
@@ -514,7 +514,7 @@ function sessionMinutesLeft(){
 }
 
 // ── STATE ──────────────────────────────────────────────────
-function freshState(){return{user:null,currentView:'dashboard',jadwalTab:'my',monitorTab:'progress',adminTab:'overview',compLibrary:null,skippedComps:[],assessmentScores:{},assessmentChecks:{},teamData:null,enrollments:[],jadwal:[],mandatoryCompIds:[],mandatoryLevelMap:{},mandatoryLevelIsFallback:{},_pipeline:[],miraiHistory:[],_assessmentSubmitted:false};}
+function freshState(){return{user:null,currentView:'dashboard',jadwalTab:'my',monitorTab:'progress',adminTab:'overview',compLibrary:null,skippedComps:[],assessmentScores:{},assessmentChecks:{},teamData:null,enrollments:[],jadwal:[],mandatoryCompIds:[],mandatoryLevelMap:{},mandatoryLevelIsFallback:{},myMandatory:{corporate:[],technical:[],leader:[]},_pipeline:[],miraiHistory:[],_assessmentSubmitted:false};}
 let state=freshState();
 
 // ── API ────────────────────────────────────────────────────
@@ -1062,8 +1062,9 @@ async function doFinalSubmit(){
 // ── JADWAL ─────────────────────────────────────────────────
 async function loadJadwal(){
   const u=state.user;
-  const[enrRes,apprRes,schedRes]=await Promise.all([
-    api('getMyEnrollments',{nik:u.nik}),apiFast('getApprovalData',{nik:u.nik}),apiFast('getSchedule',{grade:u.grade})
+  const[enrRes,apprRes,schedRes,mmRes]=await Promise.all([
+    api('getMyEnrollments',{nik:u.nik}),apiFast('getApprovalData',{nik:u.nik}),apiFast('getSchedule',{grade:u.grade}),
+    apiFast('getMyMandatory',{nik:u.nik,grade:u.grade})
   ]);
   state.enrollments=enrRes.success?enrRes.data:[];
   const pipeline=(apprRes.success?(apprRes.approvals||[]):[]).map(a=>({competency_id:a.competency_id,competency_name:a.competency_name||a.competency_id,decision:a.priority||'',target_level:a.targetLevel||3,leader_level:a.leaderLevel}));
@@ -1077,6 +1078,9 @@ async function loadJadwal(){
     state.mandatoryLevelIsFallback[p.competency_id]=!hasLL;
   });
   state.jadwal=schedRes.success?schedRes.data:[];
+  // v3.8: tiga sumber wajib untuk tab My Mandatory
+  const mm=(mmRes&&mmRes.success&&mmRes.data)?mmRes.data:{corporate:[],technical:[],leader:[]};
+  state.myMandatory={corporate:mm.corporate||[],technical:mm.technical||[],leader:mm.leader||[]};
   renderJadwal();
 }
 function setJadwalTab(tab){state.jadwalTab=tab;el('tab-my').className=tab==='my'?'btn btn-primary btn-sm':'btn btn-ghost btn-sm';el('tab-all').className=tab==='all'?'btn btn-primary btn-sm':'btn btn-ghost btn-sm';renderJadwal();}
@@ -1085,19 +1089,71 @@ function renderJadwal(){
   const tab=state.jadwalTab,enrolledIds=state.enrollments.map(e=>e.session_id);
   let sessions=state.jadwal;
   if(tab==='my'){
-    const mand=state.mandatoryCompIds;
-    sessions=mand.length?sessions.filter(s=>mand.includes(s.competency_id)):sessions.filter(s=>enrolledIds.includes(s.session_id));
-    const scheduled=sessions.map(s=>s.competency_id);
-    const unsch=mand.filter(cid=>!scheduled.includes(cid));
-    let uh='';
-    unsch.forEach(cid=>{
-      const p=state._pipeline.find(x=>x.competency_id===cid);
-      const name=p?(p.competency_name||cid):cid;
-      uh+=`<div class="card" style="margin-bottom:8px;border-left:3px solid var(--amber);opacity:0.9;"><div class="card-body" style="display:flex;align-items:center;gap:12px;padding:14px 16px;"><div style="width:38px;height:38px;background:var(--amber-soft);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">&#128203;</div><div style="flex:1;"><div style="font-weight:700;margin-bottom:2px;">${esc(name)}</div><div style="font-size:11px;font-family:var(--mono);color:var(--text-muted);margin-bottom:5px;">${esc(cid)}</div><div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="badge badge-amber">Jadwal belum tersedia</span>${levelBadge(state.mandatoryLevelMap[cid],state.mandatoryLevelIsFallback[cid])}</div></div></div></div>`;
+    // v3.8: tiga sumber wajib ditumpuk sebagai grup kartu —
+    //   1. Corporate (paling atas)  2. Technical Skill  3. Mandatory Atasan
+    // Technical & Leader tetap bisa cocok ke sesi Jadwal by competency_id.
+    const mm=state.myMandatory||{corporate:[],technical:[],leader:[]};
+    const corp=mm.corporate||[],tech=mm.technical||[],lead=mm.leader||[];
+    // Leader mandatory: gabungkan kode dari getMyMandatory dan pipeline lama
+    // (keduanya sumber yang sama, tapi getMyMandatory sudah difilter periode).
+    const leadIds=lead.length?lead.map(x=>x.competency_id):state.mandatoryCompIds;
+
+    let out='';
+
+    // ── GRUP 1: CORPORATE ──────────────────────────────────
+    if(corp.length){
+      out+=`<div style="margin-bottom:8px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="badge badge-sky">&#127970; Corporate Mandatory</span><div style="flex:1;height:1px;background:var(--border);"></div><span style="font-size:11px;color:var(--text-muted);font-weight:600;">${corp.length}</span></div>`;
+      corp.forEach(x=>{
+        const sess=state.jadwal.filter(s=>s.competency_id&&x.competency_id&&s.competency_id===x.competency_id);
+        out+=`<div class="card" style="margin-bottom:8px;border-left:3px solid var(--sky);"><div class="card-body" style="display:flex;align-items:center;gap:12px;padding:14px 16px;"><div style="width:38px;height:38px;background:var(--sky-soft);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">&#127970;</div><div style="flex:1;min-width:0;"><div style="font-weight:700;margin-bottom:2px;">${esc(x.training_name||x.competency_id)}</div><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:4px;">${x.target_grade?`<span class="badge badge-gray">${esc(x.target_grade)}</span>`:''}${x.deadline?`<span class="badge badge-amber">Deadline ${esc(x.deadline)}</span>`:''}${x.training_type?`<span class="badge badge-sky">${esc(x.training_type)}</span>`:''}</div>${x.location?`<div style="font-size:11px;color:var(--text-muted);margin-top:4px;">&#128205; ${esc(x.location)}</div>`:''}${x.notes?`<div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${esc(x.notes)}</div>`:''}</div></div></div>`;
+      });
+      out+=`</div>`;
+    }
+
+    // ── GRUP 2: TECHNICAL SKILL ────────────────────────────
+    if(tech.length){
+      out+=`<div style="margin-bottom:8px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="badge badge-emerald">&#128295; Technical Skill</span><div style="flex:1;height:1px;background:var(--border);"></div><span style="font-size:11px;color:var(--text-muted);font-weight:600;">${tech.length}</span></div>`;
+      tech.forEach(x=>{
+        const sess=state.jadwal.filter(s=>s.competency_id&&x.competency_id&&s.competency_id===x.competency_id);
+        const tgt=Number(x.target_level)||0,act=Number(x.actual_level)||0;
+        out+=`<div class="card" style="margin-bottom:8px;border-left:3px solid var(--emerald);"><div class="card-body" style="padding:14px 16px;"><div style="display:flex;align-items:center;gap:12px;"><div style="width:38px;height:38px;background:var(--emerald-soft);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">&#128295;</div><div style="flex:1;min-width:0;"><div style="font-weight:700;margin-bottom:2px;">${esc(x.competency_name||x.competency_id)}</div><div style="font-size:11px;font-family:var(--mono);color:var(--text-muted);">${esc(x.competency_id)}</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:5px;">${tgt>0?`<span class="level-badge">&#127919; Target L${tgt}</span>`:''}${act>0?`<span class="badge badge-gray">Saat ini L${act}</span>`:''}${sess.length?'':'<span class="badge badge-amber">Jadwal belum tersedia</span>'}</div></div></div>`;
+        if(sess.length){
+          out+=`<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px;display:flex;flex-direction:column;gap:6px;">`;
+          sess.forEach(s=>{
+            const isEnr=enrolledIds.includes(s.session_id);
+            out+=`<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12px;"><span style="color:var(--text-2);">&#128197; ${esc(s.date||'—')}${s.time?' · '+esc(s.time):''} · ${esc(s.trainer||'—')}</span>${isEnr?`<button class="btn btn-ghost btn-sm" onclick="doCancelEnroll('${esc(s.session_id)}')">Batal</button>`:`<button class="btn btn-primary btn-sm" onclick="doEnroll('${esc(s.competency_id)}','${esc(s.session_id)}')">Daftar</button>`}</div>`;
+          });
+          out+=`</div>`;
+        }
+        out+=`</div></div>`;
+      });
+      out+=`</div>`;
+    }
+
+    // ── GRUP 3: MANDATORY ATASAN ───────────────────────────
+    // Tetap memakai tabel jadwal lama agar perilaku enroll/level-mismatch
+    // yang sudah stabil tidak berubah. Sesi difilter ke kompetensi leader.
+    const leadSessions=leadIds.length?state.jadwal.filter(s=>leadIds.includes(s.competency_id)):[];
+    const scheduledLead=leadSessions.map(s=>s.competency_id);
+    const unschLead=leadIds.filter(cid=>!scheduledLead.includes(cid));
+    let leadHtml='';
+    if(leadSessions.length) leadHtml+=renderJadwalTable(leadSessions,enrolledIds);
+    unschLead.forEach(cid=>{
+      const p=(state._pipeline||[]).find(x=>x.competency_id===cid);
+      const lm=lead.find(x=>x.competency_id===cid);
+      const name=p?(p.competency_name||cid):(lm?(lm.competency_name||cid):cid);
+      leadHtml+=`<div class="card" style="margin-bottom:8px;border-left:3px solid var(--amber);opacity:0.9;"><div class="card-body" style="display:flex;align-items:center;gap:12px;padding:14px 16px;"><div style="width:38px;height:38px;background:var(--amber-soft);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">&#128203;</div><div style="flex:1;"><div style="font-weight:700;margin-bottom:2px;">${esc(name)}</div><div style="font-size:11px;font-family:var(--mono);color:var(--text-muted);margin-bottom:5px;">${esc(cid)}</div><div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="badge badge-amber">Jadwal belum tersedia</span>${levelBadge(state.mandatoryLevelMap[cid],state.mandatoryLevelIsFallback[cid])}</div></div></div></div>`;
     });
-    if(!sessions.length&&!uh){html('jadwal-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">&#128197;</div><div class="empty-title">Belum ada sesi wajib</div><div class="empty-desc">Buka tab All Schedules untuk melihat seluruh jadwal.</div></div></div></div>`);return;}
-    html('jadwal-content',(sessions.length?renderJadwalTable(sessions,enrolledIds):'')+uh);return;
+    if(leadHtml){
+      out+=`<div style="margin-bottom:8px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="badge badge-coral">&#127919; Mandatory dari Atasan</span><div style="flex:1;height:1px;background:var(--border);"></div><span style="font-size:11px;color:var(--text-muted);font-weight:600;">${leadIds.length}</span></div>${leadHtml}</div>`;
+    }
+
+    if(!out){
+      html('jadwal-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">&#128197;</div><div class="empty-title">Belum ada kewajiban</div><div class="empty-desc">Belum ada corporate mandatory, technical skill, atau mandatory dari atasan untukmu. Buka tab All Schedules untuk melihat seluruh jadwal.</div></div></div></div>`);return;
+    }
+    html('jadwal-content',out);return;
   }
+
   if(!sessions.length){html('jadwal-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">&#128197;</div><div class="empty-title">Belum ada sesi tersedia</div></div></div></div>`);return;}
   html('jadwal-content',renderJadwalTable(sessions,enrolledIds));
 }
@@ -1205,6 +1261,20 @@ async function loadProgress(){
     inProc.forEach(h=>{
       const done=h.actual>=h.target&&h.target>0;
       c+=`<div class="pipeline-item"><div class="pipeline-icon" style="background:${done?'var(--amber-soft)':'var(--sky-soft)'};">${done?'&#9203;':'&#128260;'}</div><div class="pipeline-info"><div class="pipeline-name">${esc(h.competency_name||h.competency)} — Level ${h.target}</div><div class="pipeline-meta">${done?'Menunggu evaluasi perilaku oleh atasan':'Level saat ini L'+h.actual+' menuju L'+h.target}</div></div></div>`;
+    });
+    c+=`</div></div>`;
+  }
+
+  // ── Technical Skill (v3.8) ── display-only, dianggap wajib.
+  // Sumber: histRes.tech_skills [{competency,competency_name,target,actual,supervisor_name,resolved,source}]
+  // Indikator TIDAK ditampilkan — cukup nama kompetensi + target/actual + atasan.
+  const techSkills=histRes.success?(histRes.tech_skills||[]):[];
+  if(techSkills.length){
+    c+=`<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title">Technical Skill</div><span class="badge badge-emerald">${techSkills.length}</span></div><div class="card-body" style="padding:0 22px;">`;
+    techSkills.forEach(ts=>{
+      const tgt=Number(ts.target)||0,act=Number(ts.actual)||0;
+      const done=tgt>0&&act>=tgt;
+      c+=`<div class="pipeline-item"><div class="pipeline-icon" style="background:var(--emerald-soft);">${done?'&#9989;':'&#128295;'}</div><div class="pipeline-info"><div class="pipeline-name">${esc(ts.competency_name||ts.competency)}${tgt>0?' — Level '+tgt:''}</div><div class="pipeline-meta">${act>0||tgt>0?'Level saat ini L'+act+(tgt>0?' menuju L'+tgt:''):'Ditetapkan admin'}${ts.supervisor_name?' · Atasan: '+esc(ts.supervisor_name):''}</div></div><div style="flex-shrink:0;">${done?'<span class="badge badge-emerald">Tercapai</span>':'<span class="badge badge-amber">Berjalan</span>'}</div></div>`;
     });
     c+=`</div></div>`;
   }
