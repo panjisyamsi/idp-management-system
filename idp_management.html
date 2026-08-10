@@ -8,18 +8,18 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --purple:#4F46E5;--purple-light:#6366F1;--purple-dark:#3730A3;--purple-soft:#EEF2FF;
-  --amber:#F59E0B;--amber-dark:#B45309;--amber-soft:#FFFBEB;
-  --coral:#F87171;--coral-dark:#EF4444;--coral-soft:#FEF2F2;
-  --emerald:#14B8A6;--emerald-dark:#0D9488;--emerald-soft:#F0FDFA;
-  --sky:#38BDF8;--sky-dark:#0EA5E9;--sky-soft:#F0F9FF;
-  --pink:#A78BFA;--pink-soft:#F5F3FF;
-  --bg:#F8F9FC;--surface:#FFFFFF;--surface2:#F4F5FF;--surface3:#ECEEFF;
-  --text:#1E1B4B;--text-2:#475569;--text-muted:#94A3B8;
-  --border:#E2E8F0;--border-2:#CBD5E1;
-  --shadow-xs:0 1px 2px rgba(0,0,0,0.05);--shadow-sm:0 2px 6px rgba(0,0,0,0.07);
-  --shadow:0 4px 16px rgba(0,0,0,0.09);--shadow-lg:0 8px 30px rgba(0,0,0,0.11);
-  --shadow-xl:0 20px 56px rgba(0,0,0,0.14);
+  --purple:#5B5FEF;--purple-light:#7B7FF5;--purple-dark:#3F3FBD;--purple-soft:#EEEEFE;
+  --amber:#F0A93B;--amber-dark:#B8791E;--amber-soft:#FFF8EC;
+  --coral:#E8654F;--coral-dark:#D14B36;--coral-soft:#FDEEEB;
+  --emerald:#12A576;--emerald-dark:#0C8560;--emerald-soft:#EAFAF3;
+  --sky:#3FA9E8;--sky-dark:#1E88C7;--sky-soft:#EAF6FD;
+  --pink:#C2569A;--pink-soft:#FBEEF5;
+  --bg:#FAFAFC;--surface:#FFFFFF;--surface2:#F5F6FA;--surface3:#ECEDF5;
+  --text:#20232B;--text-2:#585E6E;--text-muted:#9BA0AE;
+  --border:#E6E8EF;--border-2:#D2D5E0;
+  --shadow-xs:0 1px 2px rgba(20,20,30,0.05);--shadow-sm:0 2px 6px rgba(20,20,30,0.06);
+  --shadow:0 4px 16px rgba(20,20,30,0.08);--shadow-lg:0 8px 30px rgba(20,20,30,0.10);
+  --shadow-xl:0 20px 56px rgba(20,20,30,0.13);
   --r-xs:4px;--r-sm:8px;--r:14px;--r-lg:20px;--r-xl:28px;--r-full:100px;
   --font:'DM Sans',sans-serif;--font-display:'DM Serif Display',Georgia,serif;--mono:'DM Mono',monospace;
   --fw-light:300;--fw-regular:400;--fw-medium:500;--fw-semibold:600;--fw-bold:700;
@@ -49,12 +49,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .loader-label{font-size:12px;font-weight:600;color:var(--text-muted);}
 @keyframes spin{to{transform:rotate(360deg);}}
 #page-login{min-height:100vh;display:flex;background:var(--bg);}
-.login-left{flex:1.1;background:linear-gradient(150deg,#1E1B4B 0%,#312E81 45%,#3730A3 80%,#4338CA 100%);display:none;align-items:center;justify-content:center;padding:60px 56px;position:relative;overflow:hidden;}
+.login-left{flex:1.1;background:linear-gradient(150deg,#20232B 0%,#2F3346 45%,#3F3FBD 80%,#5B5FEF 100%);display:none;align-items:center;justify-content:center;padding:60px 56px;position:relative;overflow:hidden;}
 @media(min-width:900px){.login-left{display:flex;}}
 .orb{position:absolute;border-radius:50%;animation:orbFloat 6s ease-in-out infinite;}
-.orb:nth-child(1){width:360px;height:360px;top:-80px;right:-60px;background:rgba(251,191,36,0.18);animation-delay:0s;}
-.orb:nth-child(2){width:220px;height:220px;bottom:80px;left:40px;background:rgba(244,63,94,0.15);animation-delay:-3s;}
-.orb:nth-child(3){width:120px;height:120px;top:45%;left:55%;background:rgba(16,185,129,0.20);animation-delay:-1.5s;}
+.orb:nth-child(1){width:360px;height:360px;top:-80px;right:-60px;background:rgba(245,166,35,0.18);animation-delay:0s;}
+.orb:nth-child(2){width:220px;height:220px;bottom:80px;left:40px;background:rgba(226,79,160,0.16);animation-delay:-3s;}
+.orb:nth-child(3){width:120px;height:120px;top:45%;left:55%;background:rgba(28,174,127,0.22);animation-delay:-1.5s;}
 @keyframes orbFloat{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-18px) scale(1.04);}}
 .login-brand{position:relative;z-index:1;text-align:center;width:100%;}
 .login-wordmark{font-family:var(--font-display);font-size:180px;font-weight:var(--fw-bold);letter-spacing:2px;background:linear-gradient(135deg,#FCD34D 0%,#FDBA74 50%,#FDE68A 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:16px;}
@@ -68,19 +68,19 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .login-form-wrap{width:100%;max-width:360px;}
 .login-mobile-brand{display:flex;align-items:center;gap:12px;margin-bottom:36px;}
 @media(min-width:900px){.login-mobile-brand{display:none;}}
-.login-logo-pill{height:38px;padding:0 16px;background:linear-gradient(135deg,#1E1B4B,#3730A3);border-radius:var(--r-full);display:flex;align-items:center;font-size:15px;font-weight:800;color:#FCD34D;}
+.login-logo-pill{height:38px;padding:0 16px;background:linear-gradient(135deg,#20232B,#3F3FBD);border-radius:var(--r-full);display:flex;align-items:center;font-size:15px;font-weight:800;color:#FCD34D;}
 .login-heading{font-family:var(--font-display);font-size:28px;font-weight:var(--fw-bold);line-height:1.5;margin-bottom:6px;}
 .login-hint{font-size:13px;color:var(--text-2);margin-bottom:28px;line-height:var(--lh-relaxed);}
 .form-group{margin-bottom:16px;}
 .form-label{display:block;font-size:10px;font-weight:var(--fw-semibold);color:var(--text-2);margin-bottom:6px;letter-spacing:var(--ls-wide);text-transform:uppercase;}
 .form-input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:var(--font);font-size:13.5px;color:var(--text);background:var(--surface);outline:none;transition:border-color var(--t) var(--ease),box-shadow var(--t) var(--ease);line-height:var(--lh-normal);}
-.form-input:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(124,58,237,0.10);}
+.form-input:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(67,56,202,0.10);}
 .form-input::placeholder{color:var(--text-muted);}
 .form-input.mono{font-family:var(--mono);letter-spacing:1px;}
 select.form-input{cursor:pointer;}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border-radius:var(--r-sm);font-family:var(--font);font-size:12.5px;font-weight:var(--fw-semibold);letter-spacing:0.02em;border:1.5px solid transparent;cursor:pointer;transition:all var(--t) var(--ease);white-space:nowrap;text-decoration:none;}
-.btn-primary{background:linear-gradient(135deg,#312E81,#4F46E5);color:#fff;box-shadow:0 2px 8px rgba(55,48,163,0.28);}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(55,48,163,0.36);}
+.btn-primary{background:linear-gradient(135deg,#3F3FBD,#5B5FEF);color:#fff;box-shadow:0 2px 8px rgba(46,31,143,0.28);}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(46,31,143,0.36);}
 .btn-amber{background:linear-gradient(135deg,var(--amber-dark),var(--amber));color:#fff;}
 .btn-amber:hover{transform:translateY(-1px);}
 .btn-emerald{background:linear-gradient(135deg,var(--emerald-dark),var(--emerald));color:#fff;}
@@ -95,10 +95,10 @@ select.form-input{cursor:pointer;}
 .btn-lg{padding:13px 28px;font-size:14px;border-radius:var(--r);}
 .btn-full{width:100%;}
 .btn:disabled{opacity:0.45;cursor:not-allowed;transform:none!important;box-shadow:none!important;}
-#page-change-password{display:none;min-height:100vh;align-items:center;justify-content:center;background:linear-gradient(145deg,#1E1B4B,#312E81);position:fixed;inset:0;z-index:500;}
+#page-change-password{display:none;min-height:100vh;align-items:center;justify-content:center;background:linear-gradient(145deg,#20232B,#2F3346);position:fixed;inset:0;z-index:500;}
 .form-card{background:var(--surface);border-radius:var(--r-xl);padding:44px 40px;width:100%;max-width:420px;box-shadow:var(--shadow-xl);}
 #app-layout{display:none;min-height:100vh;}
-.top-nav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:100;background:linear-gradient(90deg,#1E1B4B,#312E81,#3730A3);display:flex;align-items:center;padding:0 20px;box-shadow:0 1px 12px rgba(30,27,75,0.30);}
+.top-nav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:100;background:linear-gradient(90deg,#20232B,#2F3346,#3F3FBD);display:flex;align-items:center;padding:0 20px;box-shadow:0 1px 12px rgba(35,35,66,0.30);}
 .nav-brand{display:flex;align-items:center;gap:10px;margin-right:24px;}
 .nav-brand-pill{height:32px;padding:0 14px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:var(--r-full);font-family:var(--font-display);font-size:14px;font-weight:var(--fw-bold);color:#FCD34D;display:flex;align-items:center;}
 .nav-brand-sub{font-size:11px;font-weight:600;color:rgba(255,255,255,0.5);display:none;}
@@ -110,16 +110,16 @@ select.form-input{cursor:pointer;}
 .nav-user-role{font-size:10.5px;color:rgba(255,255,255,0.55);font-weight:var(--fw-regular);letter-spacing:var(--ls-wide);}
 .nav-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--coral));border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#fff;cursor:pointer;transition:transform var(--t) var(--ease);}
 .nav-avatar:hover{transform:scale(1.08);}
-.sidebar{position:fixed;top:var(--nav-h);left:0;bottom:0;width:var(--sidebar-w);background:linear-gradient(180deg,#1E1B4B 0%,#262058 50%,#2D2869 100%);padding:16px 10px;overflow-y:auto;z-index:50;display:none;box-shadow:3px 0 12px rgba(30,27,75,0.18);}
+.sidebar{position:fixed;top:var(--nav-h);left:0;bottom:0;width:var(--sidebar-w);background:linear-gradient(180deg,#20232B 0%,#282B38 50%,#2F3346 100%);padding:16px 10px;overflow-y:auto;z-index:50;display:none;box-shadow:3px 0 12px rgba(35,35,66,0.18);}
 @media(min-width:768px){.sidebar{display:block;}}
-.sidebar-section{font-size:9px;font-weight:var(--fw-semibold);color:rgba(252,211,77,0.5);letter-spacing:var(--ls-wider);text-transform:uppercase;padding:0 10px;margin:16px 0 4px;display:block;}
+.sidebar-section{font-size:9px;font-weight:var(--fw-semibold);color:rgba(253,216,115,0.5);letter-spacing:var(--ls-wider);text-transform:uppercase;padding:0 10px;margin:16px 0 4px;display:block;}
 .sidebar-section:first-child{margin-top:4px;}
 .sidebar-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:var(--r-sm);cursor:pointer;transition:all var(--t-fast) var(--ease);color:rgba(255,255,255,0.65);font-size:12.5px;font-weight:var(--fw-medium);border:none;background:none;font-family:var(--font);width:100%;text-align:left;position:relative;}
 .sidebar-item:hover{background:rgba(255,255,255,0.10);color:#fff;}
-.sidebar-item.active{background:rgba(252,211,77,0.15);color:#FCD34D;}
+.sidebar-item.active{background:rgba(253,216,115,0.15);color:#FCD34D;}
 .sidebar-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:#FCD34D;border-radius:0 3px 3px 0;}
 .sidebar-icon{width:20px;text-align:center;font-size:15px;flex-shrink:0;}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -4px 20px rgba(124,58,237,0.08);}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -4px 20px rgba(67,56,202,0.08);}
 .bnav-item{flex:1;padding:10px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:color var(--t) var(--ease);color:var(--text-muted);font-size:10px;font-weight:600;border:none;background:none;font-family:var(--font);position:relative;}
 .bnav-item.active{color:var(--purple);}
 .bnav-item.active::before{content:'';position:absolute;top:0;left:20%;right:20%;height:3px;background:linear-gradient(90deg,var(--purple),var(--purple-light));border-radius:0 0 4px 4px;}
@@ -142,12 +142,12 @@ select.form-input{cursor:pointer;}
 .stat-card{border-radius:var(--r);padding:20px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;transition:transform var(--t) var(--ease),box-shadow var(--t) var(--ease);color:#fff;border:none;}
 .stat-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
 .stat-card::after{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.10);}
-.stat-card-purple{background:linear-gradient(135deg,#312E81,#6366F1);}
-.stat-card-amber{background:linear-gradient(135deg,#92400E,#F59E0B);}
-.stat-card-emerald{background:linear-gradient(135deg,#134E4A,#14B8A6);}
-.stat-card-coral{background:linear-gradient(135deg,#991B1B,#F87171);}
-.stat-card-sky{background:linear-gradient(135deg,#0C4A6E,#38BDF8);}
-.stat-card-pink{background:linear-gradient(135deg,#3730A3,#A78BFA);}
+.stat-card-purple{background:linear-gradient(135deg,#3F3FBD,#7B7FF5);}
+.stat-card-amber{background:linear-gradient(135deg,#B8791E,#F0A93B);}
+.stat-card-emerald{background:linear-gradient(135deg,#0C6B4F,#12A576);}
+.stat-card-coral{background:linear-gradient(135deg,#9B3826,#E8654F);}
+.stat-card-sky{background:linear-gradient(135deg,#155F87,#3FA9E8);}
+.stat-card-pink{background:linear-gradient(135deg,#7A3A5F,#C2569A);}
 .stat-icon{font-size:22px;margin-bottom:10px;}
 .stat-label{font-size:10px;font-weight:var(--fw-semibold);opacity:0.9;margin-bottom:4px;letter-spacing:var(--ls-wide);text-transform:uppercase;}
 .stat-value{font-family:var(--font-display);font-size:32px;font-weight:var(--fw-bold);line-height:1.3;margin-bottom:2px;}
@@ -158,7 +158,7 @@ select.form-input{cursor:pointer;}
 .badge-emerald{background:var(--emerald-soft);color:var(--emerald-dark);}
 .badge-coral{background:var(--coral-soft);color:var(--coral-dark);}
 .badge-sky{background:var(--sky-soft);color:var(--sky-dark);}
-.badge-pink{background:var(--pink-soft);color:#BE185D;}
+.badge-pink{background:var(--pink-soft);color:#9C3B77;}
 .badge-gray{background:var(--surface3);color:var(--text-muted);}
 .prog-wrap{background:var(--surface3);border-radius:var(--r-full);overflow:hidden;}
 .prog-bar{height:100%;border-radius:var(--r-full);transition:width 0.6s var(--ease);}
@@ -187,7 +187,7 @@ select.form-input{cursor:pointer;}
 .ind-text{font-size:13px;line-height:1.9;flex:1;}
 .ind-example{font-size:11.5px;color:var(--text-muted);font-style:italic;margin-top:4px;padding-top:4px;border-top:1px solid var(--border);line-height:var(--lh-relaxed);}
 .ind-ro{display:flex;align-items:flex-start;gap:10px;padding:7px 10px;border-radius:var(--r-sm);margin-bottom:4px;border:1.5px solid var(--border);background:var(--surface);}
-.ind-ro.ind-checked{border-color:rgba(16,185,129,0.35);background:rgba(16,185,129,0.04);}
+.ind-ro.ind-checked{border-color:rgba(28,174,127,0.35);background:rgba(28,174,127,0.05);}
 .ind-ro.ind-unchecked{border-color:var(--border);opacity:0.65;}
 .ind-ro-icon-c{width:20px;height:20px;border-radius:5px;background:var(--emerald);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800;flex-shrink:0;margin-top:1px;}
 .ind-ro-icon-u{width:20px;height:20px;border-radius:5px;border:2px solid var(--border-2);background:var(--surface3);display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:14px;flex-shrink:0;margin-top:1px;}
@@ -197,7 +197,7 @@ thead th{padding:10px 14px;text-align:left;font-size:9.5px;font-weight:var(--fw-
 tbody td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:13px;line-height:var(--lh-normal);}
 tbody tr:last-child td{border-bottom:none;}
 tbody tr:hover{background:var(--purple-soft);}
-.modal-overlay{position:fixed;inset:0;background:rgba(30,27,75,0.45);z-index:200;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);animation:fadeIn 0.2s var(--ease);}
+.modal-overlay{position:fixed;inset:0;background:rgba(35,35,66,0.45);z-index:200;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);animation:fadeIn 0.2s var(--ease);}
 @media(min-width:640px){.modal-overlay{align-items:center;}}
 .modal{background:var(--surface);border-radius:var(--r-xl) var(--r-xl) 0 0;width:100%;max-width:640px;max-height:92vh;overflow-y:auto;animation:slideUp 0.3s var(--ease);}
 @media(min-width:640px){.modal{border-radius:var(--r-xl);}}
@@ -210,11 +210,11 @@ tbody tr:hover{background:var(--purple-soft);}
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
 @keyframes slideUp{from{transform:translateY(48px);opacity:0;}to{transform:translateY(0);opacity:1;}}
 .notice{padding:12px 16px;border-radius:var(--r);font-size:13px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px;line-height:1.5;}
-.notice-amber{background:var(--amber-soft);border:1px solid rgba(245,158,11,0.35);}
-.notice-purple{background:var(--purple-soft);border:1px solid rgba(124,58,237,0.25);}
-.notice-emerald{background:var(--emerald-soft);border:1px solid rgba(16,185,129,0.35);}
-.notice-coral{background:var(--coral-soft);border:1px solid rgba(244,63,94,0.35);}
-.notice-sky{background:var(--sky-soft);border:1px solid rgba(14,165,233,0.35);}
+.notice-amber{background:var(--amber-soft);border:1px solid rgba(245,166,35,0.35);}
+.notice-purple{background:var(--purple-soft);border:1px solid rgba(67,56,202,0.25);}
+.notice-emerald{background:var(--emerald-soft);border:1px solid rgba(28,174,127,0.35);}
+.notice-coral{background:var(--coral-soft);border:1px solid rgba(251,107,107,0.35);}
+.notice-sky{background:var(--sky-soft);border:1px solid rgba(14,144,196,0.35);}
 .notice-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
 .cta-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px;}
 .cta-card-purple{border-left:4px solid var(--purple);}
@@ -240,16 +240,16 @@ tbody tr:hover{background:var(--purple-soft);}
 .l3-dot-amber{background:var(--amber);}
 .l3-dot-emerald{background:var(--emerald);}
 .achieved-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:var(--r-full);font-size:11px;font-weight:700;}
-.achieved-badge-ok{background:var(--emerald-soft);color:var(--emerald-dark);border:1px solid rgba(16,185,129,0.3);}
-.achieved-badge-no{background:var(--coral-soft);color:var(--coral-dark);border:1px solid rgba(244,63,94,0.3);}
+.achieved-badge-ok{background:var(--emerald-soft);color:var(--emerald-dark);border:1px solid rgba(28,174,127,0.3);}
+.achieved-badge-no{background:var(--coral-soft);color:var(--coral-dark);border:1px solid rgba(251,107,107,0.3);}
 .hist-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:var(--r-full);font-size:11px;font-weight:700;}
-.hist-badge-achieved{background:#d1fae5;color:#065f46;border:1px solid #a7f3d0;}
-.hist-badge-training{background:#dbeafe;color:#1e40af;border:1px solid #bfdbfe;}
-.hist-badge-l3{background:#fef3c7;color:#92400e;border:1px solid #fde68a;}
-.level-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:var(--r-full);font-size:11px;font-weight:700;background:var(--purple-soft);color:var(--purple-dark);border:1px solid rgba(124,58,237,0.2);}
+.hist-badge-achieved{background:#d9f5e7;color:#0C6B4F;border:1px solid #b3ead0;}
+.hist-badge-training{background:#e2f0fa;color:#155F87;border:1px solid #bfe0f3;}
+.hist-badge-l3{background:#fdf0dc;color:#B8791E;border:1px solid #fbdfaf;}
+.level-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:var(--r-full);font-size:11px;font-weight:700;background:var(--purple-soft);color:var(--purple-dark);border:1px solid rgba(67,56,202,0.2);}
 .level-badge.fallback{background:var(--surface3);color:var(--text-2);border-color:var(--border);}
 .level-mismatch-row td{background:var(--coral-soft)!important;}
-.level-warn{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;color:var(--coral-dark);background:var(--coral-soft);padding:2px 8px;border-radius:var(--r-full);border:1px solid rgba(244,63,94,0.3);margin-top:3px;}
+.level-warn{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;color:var(--coral-dark);background:var(--coral-soft);padding:2px 8px;border-radius:var(--r-full);border:1px solid rgba(251,107,107,0.3);margin-top:3px;}
 .level-ok{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;color:var(--emerald-dark);}
 .filter-row th{padding:6px 10px;background:var(--surface);border-bottom:1px solid var(--border);}
 .col-filter{width:100%;min-width:88px;padding:5px 9px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:var(--font);font-size:11.5px;color:var(--text);background:var(--surface2);outline:none;transition:border-color var(--t-fast) var(--ease);font-weight:500;}
@@ -284,15 +284,15 @@ tbody tr:hover{background:var(--purple-soft);}
 .skip-group{margin-bottom:12px;}
 .skip-group-title{font-size:11px;font-weight:800;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.04em;}
 .skip-chip{display:inline-flex;align-items:center;gap:7px;border-radius:var(--r-full);padding:6px 13px;margin:0 6px 6px 0;font-size:12px;font-weight:600;}
-.skip-chip-green{background:#d1fae5;border:1px solid #a7f3d0;color:#065f46;}
-.skip-chip-amber{background:#fef3c7;border:1px solid #fde68a;color:#92400e;}
-.skip-chip-blue{background:#dbeafe;border:1px solid #bfdbfe;color:#1e40af;}
+.skip-chip-green{background:#d9f5e7;border:1px solid #b3ead0;color:#0C6B4F;}
+.skip-chip-amber{background:#fdf0dc;border:1px solid #fbdfaf;color:#B8791E;}
+.skip-chip-blue{background:#e2f0fa;border:1px solid #bfe0f3;color:#155F87;}
 .score-ring{display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;font-size:13px;font-weight:800;flex-shrink:0;}
 .score-100{background:var(--emerald-soft);color:var(--emerald-dark);border:3px solid var(--emerald);}
 .score-mid{background:var(--amber-soft);color:var(--amber-dark);border:3px solid var(--amber);}
 .score-low{background:var(--coral-soft);color:var(--coral-dark);border:3px solid var(--coral);}
 .score-zero{background:var(--surface3);color:var(--text-muted);border:3px solid var(--border-2);}
-.thin-warn{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--amber-dark);background:var(--amber-soft);border:1px solid rgba(245,158,11,0.35);padding:2px 8px;border-radius:var(--r-full);}
+.thin-warn{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--amber-dark);background:var(--amber-soft);border:1px solid rgba(245,166,35,0.35);padding:2px 8px;border-radius:var(--r-full);}
 .health-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));}
 .health-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;}
 .health-num{font-size:22px;font-weight:800;color:var(--text);line-height:1.2;}
@@ -302,7 +302,7 @@ tbody tr:hover{background:var(--purple-soft);}
 #mirai-bubble{background:var(--surface);border:1px solid var(--border);border-radius:12px 12px 2px 12px;padding:10px 14px;max-width:200px;font-size:12px;line-height:1.5;box-shadow:var(--shadow);font-weight:500;color:var(--text-2);}
 #mirai-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);width:320px;box-shadow:var(--shadow-lg);display:none;flex-direction:column;overflow:hidden;animation:slideUp 0.25s var(--ease);}
 #mirai-panel.open{display:flex;}
-.mirai-hdr{background:linear-gradient(135deg,#1E1B4B,#3730A3);padding:12px 14px;display:flex;align-items:center;gap:10px;}
+.mirai-hdr{background:linear-gradient(135deg,#20232B,#3F3FBD);padding:12px 14px;display:flex;align-items:center;gap:10px;}
 .mirai-av{width:34px;height:34px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,0.3);flex-shrink:0;}
 .mirai-av img{width:100%;height:100%;object-fit:cover;object-position:top;}
 .mirai-hdr-name{font-size:13px;font-weight:700;color:#fff;}
@@ -313,18 +313,18 @@ tbody tr:hover{background:var(--purple-soft);}
 .mirai-msgs{padding:12px;max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;background:var(--surface2);}
 .mirai-msg{padding:8px 12px;border-radius:10px;font-size:12.5px;line-height:1.5;max-width:90%;}
 .mirai-msg.bot{background:var(--surface);color:var(--text);align-self:flex-start;border-bottom-left-radius:2px;box-shadow:var(--shadow-xs);}
-.mirai-msg.user{background:linear-gradient(135deg,#1E1B4B,#3730A3);color:#fff;align-self:flex-end;border-bottom-right-radius:2px;}
+.mirai-msg.user{background:linear-gradient(135deg,#20232B,#3F3FBD);color:#fff;align-self:flex-end;border-bottom-right-radius:2px;}
 .mirai-typing{font-size:11px;color:var(--text-muted);font-style:italic;align-self:flex-start;padding:2px 6px;}
 .mirai-input-row{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--border);background:var(--surface);}
 .mirai-input{flex:1;padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--r-full);font-size:12px;font-family:var(--font);outline:none;background:var(--surface2);transition:border-color var(--t-fast) var(--ease);}
 .mirai-input:focus{border-color:var(--purple);}
-.mirai-send{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#312E81,#4F46E5);border:none;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all var(--t-fast) var(--ease);}
+.mirai-send{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#3F3FBD,#5B5FEF);border:none;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all var(--t-fast) var(--ease);}
 .mirai-send:hover{transform:scale(1.05);}
 .mirai-send:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
-#mirai-fab{width:56px;height:56px;border-radius:50%;border:none;background:linear-gradient(135deg,#1E1B4B,#3730A3);cursor:pointer;overflow:hidden;padding:0;box-shadow:var(--shadow-lg);transition:transform var(--t) var(--ease);animation:fabPulse 3s ease-in-out infinite;}
+#mirai-fab{width:56px;height:56px;border-radius:50%;border:none;background:linear-gradient(135deg,#20232B,#3F3FBD);cursor:pointer;overflow:hidden;padding:0;box-shadow:var(--shadow-lg);transition:transform var(--t) var(--ease);animation:fabPulse 3s ease-in-out infinite;}
 #mirai-fab:hover{transform:scale(1.08);animation:none;}
 #mirai-fab img{width:100%;height:100%;object-fit:cover;object-position:top;}
-@keyframes fabPulse{0%,100%{box-shadow:var(--shadow-lg),0 0 0 0 rgba(55,48,163,0.35);}50%{box-shadow:var(--shadow-lg),0 0 0 10px rgba(55,48,163,0);}}
+@keyframes fabPulse{0%,100%{box-shadow:var(--shadow-lg),0 0 0 0 rgba(46,31,143,0.35);}50%{box-shadow:var(--shadow-lg),0 0 0 10px rgba(46,31,143,0);}}
 @media(max-width:767px){
   .page-view{padding:18px 14px 90px;}
   .page-header h1{font-size:20px;}
@@ -348,7 +348,6 @@ tbody tr:hover{background:var(--purple-soft);}
 <body>
 <div id="toast-container"></div>
 <div id="loading-overlay" class="hidden"><div class="loader-ring"></div><div class="loader-label">Memuat...</div></div>
-
 <!-- LOGIN -->
 <div id="page-login">
   <div class="login-left">
@@ -382,11 +381,10 @@ tbody tr:hover{background:var(--purple-soft);}
       <div class="form-group"><label class="form-label">Password</label><input type="password" id="login-password" class="form-input" placeholder="Enter your password"></div>
       <button class="btn btn-primary btn-full btn-lg" onclick="doLogin()" style="margin-bottom:14px;">Sign In &rarr;</button>
       <div style="text-align:center;"><button onclick="showForgotPassword()" style="background:none;border:none;color:var(--purple);font-size:13px;cursor:pointer;font-family:var(--font);font-weight:600;text-decoration:underline;text-underline-offset:3px;">Forgot password?</button></div>
-      <div style="margin-top:18px;padding:12px 14px;background:var(--purple-soft);border-radius:var(--r-sm);font-size:12px;color:var(--text-2);text-align:center;border:1px solid rgba(124,58,237,0.15);">Default password: <strong style="font-family:var(--mono);">AIO + YOUR NIK</strong> &middot; e.g: AIO4546</div>
+      <div style="margin-top:18px;padding:12px 14px;background:var(--purple-soft);border-radius:var(--r-sm);font-size:12px;color:var(--text-2);text-align:center;border:1px solid rgba(67,56,202,0.15);">Default password: <strong style="font-family:var(--mono);">AIO + YOUR NIK</strong> &middot; e.g: AIO4546</div>
     </div>
   </div>
 </div>
-
 <!-- CHANGE PASSWORD -->
 <div id="page-change-password">
   <div class="form-card">
@@ -400,7 +398,6 @@ tbody tr:hover{background:var(--purple-soft);}
     <button class="btn btn-primary btn-full btn-lg" onclick="doChangePassword()">Save Password</button>
   </div>
 </div>
-
 <!-- APP LAYOUT -->
 <div id="app-layout">
   <nav class="top-nav">
@@ -433,7 +430,6 @@ tbody tr:hover{background:var(--purple-soft);}
   </main>
 </div>
 <div id="modal-container"></div>
-
 <!-- MIRAI -->
 <div id="mirai-widget">
   <div id="mirai-bubble">Ada pertanyaan? Tanya Mirai!</div>
@@ -462,7 +458,6 @@ tbody tr:hover{background:var(--purple-soft);}
 // sumber bug paling sering di proyek ini.
 // ============================================================
 const API_URL='https://script.google.com/macros/s/AKfycbyXHidmqIhlv03siWkJjXy-mp_i_WJSe9Xr2aMmJLr_fq9vqq63L3EonQ-wPdC3q4N7/exec';
-
 // ── BAHASA ─────────────────────────────────────────────────
 const LANG={
 en:{'login.welcome':'Welcome back','login.hint':'Sign in with your Employee ID to continue','assess.instruction':'Instruction','assess.inst_text':'Check every behavioral indicator you demonstrate consistently. Be honest — this is for your own development.','assess.save_draft':'Save Draft','assess.submit':'Submit','assess.submitted':'Assessment Submitted','assess.submitted_desc':'Your self-assessment has been recorded. Your manager will review it and set your development priorities.','assess.notified':'You will be notified once your manager has completed the review.','assess.draft_saved':'Draft saved.','misc.password_mismatch':'Passwords do not match','skip.title':'Competencies you do not need to reassess this cycle','skip.achieved':'Achieved from previous IDP implementation','skip.awaiting':'Awaiting behavior evaluation by your manager','skip.inprocess':'Currently running in IDP Semester 1 2026'},
@@ -477,7 +472,6 @@ function applyLanguage(){
   const ne=el('nav-btn-en'),ni=el('nav-btn-id');
   if(ne&&ni){const on=currentLang==='en';ne.style.background=on?'rgba(255,255,255,0.25)':'transparent';ne.style.color=on?'#fff':'rgba(255,255,255,0.6)';ni.style.background=on?'transparent':'rgba(255,255,255,0.25)';ni.style.color=on?'rgba(255,255,255,0.6)':'#fff';}
 }
-
 // ── SESI ───────────────────────────────────────────────────
 // Disimpan di sessionStorage, bukan localStorage. Bedanya penting di
 // lingkungan dengan terminal bersama: sessionStorage ikut mati begitu tab
@@ -490,7 +484,6 @@ function applyLanguage(){
 // dari waktu login, tidak diperpanjang oleh aktivitas.
 const SESSION_KEY='mirai_session';
 const SESSION_MAX_AGE=60*60*1000;   // 1 jam
-
 function saveSession(user){
   try{sessionStorage.setItem(SESSION_KEY,JSON.stringify({user,at:Date.now()}));}catch(e){}
 }
@@ -512,11 +505,9 @@ function sessionMinutesLeft(){
     return Math.max(0,Math.ceil((SESSION_MAX_AGE-(Date.now()-s.at))/60000));
   }catch(e){return 0;}
 }
-
 // ── STATE ──────────────────────────────────────────────────
 function freshState(){return{user:null,currentView:'dashboard',jadwalTab:'my',monitorTab:'progress',adminTab:'overview',compLibrary:null,skippedComps:[],assessmentScores:{},assessmentChecks:{},teamData:null,enrollments:[],jadwal:[],mandatoryCompIds:[],mandatoryLevelMap:{},mandatoryLevelIsFallback:{},myMandatory:{corporate:[],technical:[],leader:[]},_pipeline:[],miraiHistory:[],_assessmentSubmitted:false};}
 let state=freshState();
-
 // ── API ────────────────────────────────────────────────────
 const POST_ACTIONS=new Set(['submitAssessment','saveApproval','enrollSession','cancelEnrollment','saveL3Evaluation','sendL3Email','changePassword','updateUser','miraiChat','forgotPassword','reassignL3']);
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -543,7 +534,6 @@ async function apiWithRetry(action,payload={},maxRetries=2){
 }
 async function api(action,payload={}){showLoading(true);try{return await apiWithRetry(action,payload);}finally{showLoading(false);}}
 async function apiFast(action,payload={}){return await apiWithRetry(action,payload);}
-
 // ── KOMPONEN LISTING BERSAMA ───────────────────────────────
 // Satu implementasi untuk seluruh daftar di aplikasi: filter per kolom,
 // pencarian menyeluruh, urutan A-Z / Z-A, dan paginasi 50 baris.
@@ -557,7 +547,6 @@ async function apiFast(action,payload={}){return await apiWithRetry(action,paylo
 // kursor lepas setiap satu huruf dan filternya tidak bisa dipakai.
 const DT={};
 const DT_PAGE_SIZE=50;
-
 // cols: [{key,label,filter,sort,render(row),plain(row),cls,style,thStyle}]
 function dtInit(id,cfg){
   DT[id]={
@@ -726,7 +715,6 @@ function dtSetFilter(id,key,val){
   if(w)window.scrollTo({top:w.getBoundingClientRect().top+window.scrollY-140,behavior:'smooth'});
 }
 function dtVisible(id){return dtFiltered(id);}
-
 // ── UI HELPERS ─────────────────────────────────────────────
 function el(id){return document.getElementById(id);}
 function html(id,c){const e=el(id);if(e)e.innerHTML=c;}
@@ -742,7 +730,6 @@ function gradeColor(g){if(['G1','D1','D2','D3'].includes(g))return 'badge-coral'
 function statusBadge(s){const m={assigned:['badge-amber','Assigned'],enrolled:['badge-sky','Enrolled'],completed:['badge-emerald','Completed'],submitted:['badge-emerald','Terkirim'],pending:['badge-gray','Belum'],mandatory:['badge-coral','Mandatory'],additional:['badge-purple','Additional']};const[c,l]=m[s]||['badge-gray',s];return `<span class="badge ${c}">${l}</span>`;}
 function pct(a,b){return b>0?Math.round((a/b)*100):0;}
 function progBar(v,max,color='purple',h=8){return `<div class="prog-wrap" style="height:${h}px;"><div class="prog-bar prog-${color}" style="width:${pct(v,max)}%"></div></div>`;}
-
 // Ambang kelulusan evaluasi perilaku bersifat mutlak: 100%.
 // 99% tetap belum tercapai. Tidak ada status "partial".
 function scoreRing(p){const cls=p>=100?'score-100':p>=50?'score-mid':p>0?'score-low':'score-zero';return `<div class="score-ring ${cls}">${p}%</div>`;}
@@ -751,7 +738,6 @@ function achievedBadge(st,p){
   if(st==='no_instrument')return `<span class="thin-warn">&#9888; Tidak ada indikator terdaftar</span>`;
   return `<span class="achieved-badge achieved-badge-no">Belum tercapai${p!==undefined?' — '+p+'%':''}</span>`;
 }
-
 // ── AUTH ───────────────────────────────────────────────────
 async function doLogin(){
   const nik=el('login-nik').value.trim(),pwd=el('login-password').value.trim();
@@ -787,7 +773,6 @@ function doLogout(){
 }
 function showForgotPassword(){openModal(`<div class="modal" onclick="event.stopPropagation()"><div class="modal-header"><div class="modal-title">Lupa Password</div><button class="modal-close" onclick="closeModal()">&times;</button></div><div class="modal-body"><p style="font-size:13px;color:var(--text-2);margin-bottom:14px;">Masukkan NIK kamu. Permintaan akan diteruskan ke HCD untuk verifikasi.</p><div class="form-group"><label class="form-label">NIK</label><input type="text" id="forgot-nik" class="form-input mono" placeholder="Masukkan NIK"></div></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">Batal</button><button class="btn btn-primary" onclick="doForgotPassword()">Kirim Permintaan</button></div></div>`);}
 async function doForgotPassword(){const nik=el('forgot-nik').value.trim();if(!nik){toast('NIK harus diisi','error');return;}const r=await api('forgotPassword',{nik});if(r.success){toast(r.message,'success');closeModal();}else toast(r.message,'error');}
-
 // ── NAV ────────────────────────────────────────────────────
 function initApp(){
   el('page-login').style.display='none';
@@ -814,7 +799,7 @@ function buildNav(){
   if(isLeader){s+='<span class="sidebar-section">Leader</span>';lead.forEach(i=>s+=sItem(i));}
   if(isAdmin){s+='<span class="sidebar-section">Admin</span>';adm.forEach(i=>s+=sItem(i));}
   s+='<span class="sidebar-section">Account</span>'+sItem({id:'account',icon:'&#9881;',label:'Account'});
-  s+='<div style="margin-top:6px;"><button class="sidebar-item" style="color:#FC8181;" onclick="doLogout()"><span class="sidebar-icon">&#128682;</span> Sign Out</button></div>';
+  s+='<div style="margin-top:6px;"><button class="sidebar-item" style="color:#E8654F;" onclick="doLogout()"><span class="sidebar-icon">&#128682;</span> Sign Out</button></div>';
   el('sidebar').innerHTML=s;
   const m=[{id:'dashboard',icon:'&#127968;',label:'Home'},{id:'assessment',icon:'&#128203;',label:'Assess'},{id:'jadwal',icon:'&#128197;',label:'Jadwal'},{id:'progress',icon:'&#128200;',label:'Progress'},{id:'account',icon:'&#9881;',label:'Akun'}];
   el('bottom-nav').innerHTML=m.map(i=>`<button class="bnav-item" id="bnav-${i.id}" onclick="navigateTo('${i.id}')"><div class="bnav-icon">${i.icon}</div><span>${i.label}</span></button>`).join('');
@@ -830,7 +815,6 @@ function navigateTo(v){
   if(loaders[v])loaders[v]();
   window.scrollTo(0,0);
 }
-
 // ── DASHBOARD ──────────────────────────────────────────────
 async function loadDashboard(){
   const u=state.user;
@@ -846,14 +830,12 @@ async function loadDashboard(){
   const submitted=assessRes.success&&assessRes.has_submitted_final;
   const hasDraft=assessRes.success&&assessRes.has_draft&&!submitted;
   const isLeader=u.has_subordinates===true||u.isLeader===true||(u.role||'').includes('leader')||u.role==='admin';
-
   let c=`<div class="stats-grid">
     <div class="stat-card stat-card-purple" style="cursor:pointer;" onclick="navigateTo('assessment')"><div class="stat-icon">${submitted?'&#9989;':hasDraft?'&#128190;':'&#128203;'}</div><div class="stat-label">Assessment</div><div style="margin-top:4px;">${submitted?statusBadge('submitted'):hasDraft?'<span class="badge badge-sky">Draf</span>':statusBadge('pending')}</div>${assessRes.expected_count?`<div class="stat-sub" style="margin-top:6px;">${assessRes.filled_count}/${assessRes.expected_count} kompetensi</div>`:''}</div>
     <div class="stat-card stat-card-emerald" style="cursor:pointer;" onclick="navigateTo('jadwal');setTimeout(()=>setJadwalTab('my'),400)"><div class="stat-icon">&#127919;</div><div class="stat-label">Mandatory</div><div class="stat-value">${totalM}</div><div class="stat-sub">Ditetapkan atasan</div></div>
     <div class="stat-card stat-card-sky" style="cursor:pointer;" onclick="navigateTo('jadwal');setTimeout(()=>setJadwalTab('my'),400)"><div class="stat-icon">&#128218;</div><div class="stat-label">Terdaftar</div><div class="stat-value">${enrolled}</div><div class="stat-sub">Sesi aktif</div></div>
     <div class="stat-card stat-card-amber" style="cursor:pointer;" onclick="navigateTo('account')"><div class="stat-icon">&#127991;</div><div class="stat-label">Grade</div><div style="margin-top:8px;"><span class="badge" style="font-size:14px;padding:5px 16px;background:rgba(255,255,255,0.2);color:#fff;">${esc(u.grade)}</span></div></div>
   </div>`;
-
   const mandatoryApprovals=approvals.filter(a=>a.priority==='mandatory');
   if(mandatoryApprovals.length){
     c+=`<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title">Kompetensi Wajibku</div><span class="badge badge-coral">${mandatoryApprovals.length} kompetensi</span></div><div class="card-body" style="padding:0 22px;">`;
@@ -869,7 +851,6 @@ async function loadDashboard(){
   }
   html('dash-content',c);
 }
-
 // ── ASSESSMENT ─────────────────────────────────────────────
 async function loadAssessment(){
   const u=state.user;
@@ -895,7 +876,6 @@ async function loadAssessment(){
     state.assessmentChecks[c.competency_id]={};
     for(let l=1;l<=5;l++)state.assessmentChecks[c.competency_id][l]=(c.levels[l]||[]).map(()=>false);
   });
-
   // Centang draf dipulihkan dari server, bukan hanya skornya. Tanpa ini,
   // karyawan yang kembali setelah menyimpan draf melihat formulir kosong
   // padahal skornya sudah terisi — lalu mengirim skor tanpa satu pun
@@ -929,7 +909,6 @@ async function loadAssessment(){
 function buildSubmittedView(){
   return `<div class="card" style="max-width:520px;margin:0 auto;"><div class="card-body" style="text-align:center;padding:48px 32px;"><div style="width:72px;height:72px;background:var(--emerald-soft);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 20px;">&#9989;</div><div style="font-size:20px;font-weight:800;margin-bottom:8px;">${t('assess.submitted')}</div><div style="font-size:14px;color:var(--text-2);line-height:1.7;margin-bottom:24px;">${t('assess.submitted_desc')}</div><div style="background:var(--surface2);border-radius:var(--r);padding:16px 20px;font-size:13px;color:var(--text-muted);border:1px solid var(--border);">${t('assess.notified')}</div></div></div>`;
 }
-
 // Blok informasi kompetensi yang tidak perlu dinilai ulang.
 // Tiga kategori dibedakan karena artinya berbeda bagi karyawan:
 //   achieved_historical -> sudah selesai di siklus lalu
@@ -946,7 +925,7 @@ function buildSkipBlock(list){
   groups.forEach(g=>{
     const items=list.filter(c=>c.skip_reason===g.key);
     if(!items.length)return;
-    inner+=`<div class="skip-group"><div class="skip-group-title" style="color:${g.cls==='skip-chip-green'?'#065f46':g.cls==='skip-chip-amber'?'#92400e':'#1e40af'};">${g.title}</div><div>`;
+    inner+=`<div class="skip-group"><div class="skip-group-title" style="color:${g.cls==='skip-chip-green'?'#0C6B4F':g.cls==='skip-chip-amber'?'#B8791E':'#155F87'};">${g.title}</div><div>`;
     items.forEach(c=>{
       inner+=`<span class="skip-chip ${g.cls}"><span>${g.icon}</span><span>${esc(c.competency_name)}</span><span style="opacity:0.65;font-size:10px;font-family:var(--mono);">${esc(c.competency_id)}${c.target_level?' · L'+c.target_level:''}</span></span>`;
     });
@@ -954,7 +933,6 @@ function buildSkipBlock(list){
   });
   return `<div style="margin-bottom:18px;border-radius:var(--r);overflow:hidden;border:1px solid var(--border);"><div style="padding:12px 16px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#8505;</span><span style="font-size:12px;font-weight:700;color:var(--text-2);">${t('skip.title')}</span><span class="badge badge-gray" style="margin-left:auto;">${list.length}</span></div><div style="padding:14px 16px;background:var(--surface);">${inner}</div></div>`;
 }
-
 function renderAssessmentForm(){
   const active=state.compLibrary||[],skipped=state.skippedComps||[];
   let c=`<div class="notice notice-amber"><div class="notice-icon">&#128161;</div><div><strong>${t('assess.instruction')}:</strong> ${t('assess.inst_text')}</div></div>`;
@@ -962,12 +940,10 @@ function renderAssessmentForm(){
     c+=`<div class="notice notice-sky"><div class="notice-icon">&#128190;</div><div>Kamu punya <strong>draf tersimpan</strong> yang belum dikirim. Atasanmu belum bisa melihatnya. Tekan Kirim bila sudah yakin.</div></div>`;
   }
   c+=buildSkipBlock(skipped);
-
   if(!active.length){
     c+=`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">&#127881;</div><div class="empty-title">Tidak ada yang perlu dinilai siklus ini</div><div class="empty-desc">Seluruh kompetensimu sudah tercapai atau sedang dalam program pengembangan yang berjalan. Kamu tidak perlu melakukan apa pun sekarang.</div></div></div></div>`;
     html('assessment-content',c);return;
   }
-
   const order={core:0,role:1,jf:2},label={core:'Core Competency',role:'Role Competency',jf:'Job Family Competency'},color={core:'badge-purple',role:'badge-sky',jf:'badge-amber'};
   const grouped={};active.forEach(x=>{(grouped[x.competency_type]=grouped[x.competency_type]||[]).push(x);});
   Object.keys(grouped).sort((a,b)=>(order[a]||0)-(order[b]||0)).forEach(tp=>{
@@ -1056,7 +1032,6 @@ async function doFinalSubmit(){
   state.compLibrary=null;state.assessmentScores={};state.assessmentChecks={};
   html('assessment-content',buildSubmittedView());
 }
-
 // ── JADWAL ─────────────────────────────────────────────────
 async function loadJadwal(){
   const u=state.user;
@@ -1095,9 +1070,7 @@ function renderJadwal(){
     // Leader mandatory: gabungkan kode dari getMyMandatory dan pipeline lama
     // (keduanya sumber yang sama, tapi getMyMandatory sudah difilter periode).
     const leadIds=lead.length?lead.map(x=>x.competency_id):state.mandatoryCompIds;
-
     let out='';
-
     // ── GRUP 1: CORPORATE ──────────────────────────────────
     if(corp.length){
       out+=`<div style="margin-bottom:8px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="badge badge-sky">&#127970; Corporate Mandatory</span><div style="flex:1;height:1px;background:var(--border);"></div><span style="font-size:11px;color:var(--text-muted);font-weight:600;">${corp.length}</span></div>`;
@@ -1107,7 +1080,6 @@ function renderJadwal(){
       });
       out+=`</div>`;
     }
-
     // ── GRUP 2: TECHNICAL SKILL ────────────────────────────
     if(tech.length){
       out+=`<div style="margin-bottom:8px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="badge badge-emerald">&#128295; Technical Skill</span><div style="flex:1;height:1px;background:var(--border);"></div><span style="font-size:11px;color:var(--text-muted);font-weight:600;">${tech.length}</span></div>`;
@@ -1127,7 +1099,6 @@ function renderJadwal(){
       });
       out+=`</div>`;
     }
-
     // ── GRUP 3: MANDATORY ATASAN ───────────────────────────
     // Tetap memakai tabel jadwal lama agar perilaku enroll/level-mismatch
     // yang sudah stabil tidak berubah. Sesi difilter ke kompetensi leader.
@@ -1145,13 +1116,11 @@ function renderJadwal(){
     if(leadHtml){
       out+=`<div style="margin-bottom:8px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="badge badge-coral">&#127919; Mandatory dari Atasan</span><div style="flex:1;height:1px;background:var(--border);"></div><span style="font-size:11px;color:var(--text-muted);font-weight:600;">${leadIds.length}</span></div>${leadHtml}</div>`;
     }
-
     if(!out){
       html('jadwal-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">&#128197;</div><div class="empty-title">Belum ada kewajiban</div><div class="empty-desc">Belum ada corporate mandatory, technical skill, atau mandatory dari atasan untukmu. Buka tab All Schedules untuk melihat seluruh jadwal.</div></div></div></div>`);return;
     }
     html('jadwal-content',out);return;
   }
-
   if(!sessions.length){html('jadwal-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">&#128197;</div><div class="empty-title">Belum ada sesi tersedia</div></div></div></div>`);return;}
   html('jadwal-content',renderJadwalTable(sessions,enrolledIds));
 }
@@ -1244,7 +1213,6 @@ function showCalendarModal(s){
   const dd=isSL&&s.date_end?`${s.date} – ${s.date_end}`:`${s.date}${s.time?' · '+s.time:''}`;
   openModal(`<div class="modal" onclick="event.stopPropagation()" style="max-width:420px;"><div class="modal-header"><div class="modal-title">Pendaftaran Berhasil</div><button class="modal-close" onclick="closeModal()">&times;</button></div><div class="modal-body"><div class="notice notice-emerald" style="margin-bottom:16px;"><div class="notice-icon">&#9989;</div><div>Kamu berhasil terdaftar di sesi ini.</div></div><div style="background:var(--surface2);border-radius:var(--r);padding:14px;margin-bottom:16px;"><div style="font-weight:800;margin-bottom:6px;">${esc(s.competency_name||s.competency_id)}</div><div style="font-size:12px;color:var(--text-2);display:flex;flex-direction:column;gap:4px;"><span>&#128197; ${esc(dd)}</span><span>&#128205; ${esc(s.location||s.area||'—')}</span><span>&#128100; ${esc(s.trainer||'—')}</span></div></div><a href="${url}" target="_blank" rel="noopener" class="btn btn-primary btn-full" style="text-decoration:none;justify-content:center;">&#128197; Tambahkan ke Google Calendar</a></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">Tutup</button></div></div>`);
 }
-
 // ── PROGRESS ───────────────────────────────────────────────
 async function loadProgress(){
   const u=state.user;
@@ -1253,7 +1221,6 @@ async function loadProgress(){
   const inProc=histRes.success?(histRes.in_process||[]):[];
   const hist=histRes.success?(histRes.history||[]).filter(h=>h.status==='Completed'):[];
   let c='';
-
   if(inProc.length){
     c+=`<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title">Sedang Berjalan — IDP Semester 1 2026</div><span class="badge badge-sky">${inProc.length}</span></div><div class="card-body" style="padding:0 22px;">`;
     inProc.forEach(h=>{
@@ -1262,7 +1229,6 @@ async function loadProgress(){
     });
     c+=`</div></div>`;
   }
-
   // ── Technical Skill (v3.8) ── display-only, dianggap wajib.
   // Sumber: histRes.tech_skills [{competency,competency_name,target,actual,supervisor_name,resolved,source}]
   // Indikator TIDAK ditampilkan — cukup nama kompetensi + target/actual + atasan.
@@ -1276,7 +1242,6 @@ async function loadProgress(){
     });
     c+=`</div></div>`;
   }
-
   const mand=approvals.filter(a=>a.priority==='mandatory');
   const add=approvals.filter(a=>a.priority==='additional');
   const sec=(title,items,color,icon)=>{
@@ -1287,17 +1252,14 @@ async function loadProgress(){
   };
   c+=sec('Kompetensi Wajib',mand,'emerald','&#127919;');
   c+=sec('Kompetensi Tambahan',add,'purple','&#128218;');
-
   if(hist.length){
     c+=`<div class="card"><div class="card-header"><div class="card-title">Riwayat Tercapai</div><span class="badge badge-emerald">${hist.length}</span></div><div class="card-body"><div>`;
     hist.forEach(h=>{c+=`<span class="skip-chip skip-chip-green"><span>&#10003;</span><span>${esc(h.competency_name||h.competency)}</span><span style="opacity:0.65;font-size:10px;">${esc(h.period)}</span></span>`;});
     c+=`</div></div></div>`;
   }
-
   if(!c)c=`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">&#128200;</div><div class="empty-title">Belum ada data progres</div><div class="empty-desc">Selesaikan asesmen mandirimu dan tunggu penetapan dari atasan.</div></div></div></div>`;
   html('progress-content',c);
 }
-
 // ── CORPORATE ──────────────────────────────────────────────
 async function loadCorporate(){
   const u=state.user;
@@ -1318,7 +1280,6 @@ async function loadCorporate(){
     ]
   })+`</div>`);
 }
-
 // ── TEAM ASSESSMENT ────────────────────────────────────────
 async function loadTeamAssessment(){
   const r=await api('getTeamAssessments',{leader_nik:state.user.nik});
@@ -1367,7 +1328,6 @@ function openAssignModal(nik){
   });
   renderStep1(nik);
 }
-
 // STEP 1 — tinjau indikator & tetapkan level teramati
 function renderStep1(nik){
   const m=(state.teamData||[]).find(x=>x.nik===nik);if(!m)return;
@@ -1375,7 +1335,6 @@ function renderStep1(nik){
   const active=m.competencies.filter(c=>!c.is_skipped);
   const skipped=m.competencies.filter(c=>c.is_skipped);
   const grouped={};active.forEach(c=>{(grouped[c.competency_type]=grouped[c.competency_type]||[]).push(c);});
-
   let rows='';
   if(skipped.length){
     rows+=`<div style="margin-bottom:14px;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);"><div style="font-size:11px;font-weight:800;color:var(--text-2);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;">Tidak dinilai siklus ini (${skipped.length})</div><div>`;
@@ -1386,7 +1345,6 @@ function renderStep1(nik){
     });
     rows+=`</div></div>`;
   }
-
   Object.keys(grouped).forEach(tp=>{
     rows+=`<div style="font-size:10px;font-weight:800;color:var(--text-muted);letter-spacing:0.8px;text-transform:uppercase;margin:14px 0 8px;">${label[tp]||tp}</div>`;
     grouped[tp].forEach(c=>{
@@ -1415,20 +1373,16 @@ function renderStep1(nik){
       rows+=`<div style="border:1.5px solid ${border};border-radius:var(--r);margin-bottom:10px;overflow:hidden;"><div style="padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;background:var(--surface);"><div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><span class="badge ${color[c.competency_type]||'badge-gray'}">${esc(c.competency_id)}</span><span style="font-weight:700;font-size:13px;">${esc(c.competency_name)}</span></div><div>${gapB}</div></div><div style="padding:8px 14px 10px;background:var(--purple-soft);border-top:1px solid var(--border);"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:${ind?'4':'0'}px;"><label style="font-size:11px;font-weight:700;color:var(--purple-dark);white-space:nowrap;">Level yang kamu amati:</label><select onchange="setLeaderLevel('${c.competency_id}',this.value)" style="padding:5px 10px;border:1.5px solid var(--purple);border-radius:var(--r-sm);font-size:12px;font-family:var(--font);font-weight:600;background:#fff;cursor:pointer;outline:none;"><option value="">— Pilih —</option>${[1,2,3,4,5].map(l=>`<option value="${l}" ${String(cur)===String(l)?'selected':''}>Level ${l}</option>`).join('')}</select><span style="font-size:11px;color:var(--text-muted);">Self L${self} · Target L${target}</span></div>${legacyWarn}${ind}</div></div>`;
     });
   });
-
   if(!active.length)rows+=`<div class="notice notice-emerald"><div class="notice-icon">&#127881;</div><div>Seluruh kompetensi anggota ini sudah tercapai atau sedang dalam program berjalan. Tidak ada yang perlu dinilai.</div></div>`;
-
   openModal(`<div class="modal" style="max-width:720px;" onclick="event.stopPropagation()"><div class="modal-header"><div><div style="font-size:11px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Langkah 1 dari 2 — Tinjau &amp; Nilai</div><div class="modal-title">${esc(m.name)}</div><div style="font-size:12px;color:var(--text-muted);margin-top:1px;">${esc(m.grade)} · ${esc(m.department)}</div></div><button class="modal-close" onclick="closeModal()">&times;</button></div><div class="modal-body"><div class="notice notice-purple"><div class="notice-icon">&#128203;</div><div>Tetapkan <strong>level yang kamu amati</strong> untuk tiap kompetensi. Buka &#9654; untuk melihat indikator. Tercentang (&#10003;) = karyawan menyatakan menunjukkan perilaku itu; kosong (&#9675;) = tidak dinyatakan.</div></div>${rows}</div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">Batal</button><button class="btn btn-primary btn-lg" onclick="renderStep2('${nik}')">Lihat Ringkasan Gap &rarr;</button></div></div>`);
 }
 function setLeaderLevel(cid,v){if(window._curLeaderLvls)window._curLeaderLvls[cid]=v;}
-
 // STEP 2 — ringkasan gap & penetapan prioritas
 function renderStep2(nik){
   const m=(state.teamData||[]).find(x=>x.nik===nik);if(!m)return;
   const color={core:'badge-purple',role:'badge-sky',jf:'badge-amber'};
   const active=m.competencies.filter(c=>!c.is_skipped);
   const skipped=m.competencies.filter(c=>c.is_skipped);
-
   const comps=active.map(c=>{
     const self=c.self_score||0,target=c.target_level||3,ll=Number(window._curLeaderLvls[c.competency_id])||0;
     let fs,gap,isGap;
@@ -1438,16 +1392,14 @@ function renderStep2(nik){
   });
   const gapC=comps.filter(c=>c.isGap),okC=comps.filter(c=>!c.isGap);
   const initM=Object.values(window._curDecisions).filter(d=>d==='mandatory').length;
-
   let gapRows='';
   gapC.forEach(c=>{
     const d=window._curDecisions[c.competency_id]||'';
     gapRows+=`<tr><td><span class="badge ${color[c.competency_type]||'badge-gray'}" style="font-size:10px;">${esc(c.competency_id)}</span><span style="font-weight:600;margin-left:5px;font-size:13px;">${esc(c.competency_name)}</span></td><td style="text-align:center;font-weight:700;">${c.self_score||'—'}</td><td style="text-align:center;font-weight:700;color:var(--purple);">${c.leaderLevel||'—'}</td><td style="text-align:center;font-weight:800;font-size:14px;">${c.finalScore}</td><td style="text-align:center;"><span style="font-weight:800;color:var(--coral);">-${c.gap}</span></td><td style="text-align:center;">L${c.target_level}</td><td><div style="display:flex;gap:4px;" id="dec-${c.competency_id}"><button class="btn btn-sm ${d==='mandatory'?'btn-coral':'btn-ghost'}" onclick="setDecision('${c.competency_id}','mandatory')">Mandatory</button><button class="btn btn-sm ${d==='additional'?'btn-primary':'btn-ghost'}" onclick="setDecision('${c.competency_id}','additional')">Additional</button><button class="btn btn-sm btn-ghost" onclick="setDecision('${c.competency_id}','')">—</button></div></td></tr>`;
   });
-
   let extra='';
   if(okC.length){
-    extra+=`<div style="margin-top:20px;"><div style="font-size:12px;font-weight:700;color:#065f46;padding:5px 12px;background:#d1fae5;border-radius:6px;display:inline-block;margin-bottom:10px;">Tercapai pada penilaian siklus ini</div><div>`;
+    extra+=`<div style="margin-top:20px;"><div style="font-size:12px;font-weight:700;color:#0C6B4F;padding:5px 12px;background:#d9f5e7;border-radius:6px;display:inline-block;margin-bottom:10px;">Tercapai pada penilaian siklus ini</div><div>`;
     okC.forEach(c=>{extra+=`<span class="skip-chip skip-chip-green"><span>&#10003;</span><span>${esc(c.competency_name)}</span><span style="opacity:0.7;font-size:10px;">final ${c.finalScore} / target L${c.target_level}</span></span>`;});
     extra+=`</div></div>`;
   }
@@ -1455,16 +1407,14 @@ function renderStep2(nik){
     const groups=[['achieved_historical','Achieved dari IDP sebelumnya','skip-chip-green','&#10003;'],['awaiting_l3','Menunggu evaluasi perilaku atasan','skip-chip-amber','&#9203;'],['idp_inprocess','Sedang berjalan di IDP Semester 1 2026','skip-chip-blue','&#128260;']];
     groups.forEach(([k,title,cls,icon])=>{
       const items=skipped.filter(c=>c.skip_reason===k);if(!items.length)return;
-      extra+=`<div style="margin-top:16px;"><div style="font-size:12px;font-weight:700;padding:5px 12px;border-radius:6px;display:inline-block;margin-bottom:10px;background:${cls==='skip-chip-green'?'#d1fae5':cls==='skip-chip-amber'?'#fef3c7':'#dbeafe'};color:${cls==='skip-chip-green'?'#065f46':cls==='skip-chip-amber'?'#92400e':'#1e40af'};">${title}</div><div>`;
+      extra+=`<div style="margin-top:16px;"><div style="font-size:12px;font-weight:700;padding:5px 12px;border-radius:6px;display:inline-block;margin-bottom:10px;background:${cls==='skip-chip-green'?'#d9f5e7':cls==='skip-chip-amber'?'#fdf0dc':'#e2f0fa'};color:${cls==='skip-chip-green'?'#0C6B4F':cls==='skip-chip-amber'?'#B8791E':'#155F87'};">${title}</div><div>`;
       items.forEach(c=>{extra+=`<span class="skip-chip ${cls}"><span>${icon}</span><span>${esc(c.competency_name)}</span></span>`;});
       extra+=`</div></div>`;
     });
   }
-
   const body=gapC.length
     ?`<div style="margin-bottom:16px;"><div style="font-size:12px;font-weight:800;margin-bottom:8px;">Kompetensi dengan gap <span style="font-size:11px;font-weight:400;color:var(--text-muted);">(Self &times; 30% + Atasan &times; 70% = Skor Akhir)</span></div><div class="table-wrap"><table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr style="background:var(--surface2);"><th style="padding:8px 10px;text-align:left;">Kompetensi</th><th style="padding:8px 10px;text-align:center;">Self</th><th style="padding:8px 10px;text-align:center;">Atasan</th><th style="padding:8px 10px;text-align:center;">Akhir</th><th style="padding:8px 10px;text-align:center;">Gap</th><th style="padding:8px 10px;text-align:center;">Target</th><th style="padding:8px 10px;text-align:left;">Prioritas</th></tr></thead><tbody>${gapRows}</tbody></table></div></div>`
     :`<div class="notice notice-emerald"><div class="notice-icon">&#127881;</div><div>Tidak ada gap yang perlu ditindaklanjuti pada kompetensi yang dinilai siklus ini.</div></div>`;
-
   openModal(`<div class="modal" style="max-width:820px;" onclick="event.stopPropagation()"><div class="modal-header"><div><div style="font-size:11px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Langkah 2 dari 2 — Ringkasan Gap &amp; Prioritas</div><div class="modal-title">${esc(m.name)}</div><div style="font-size:12px;color:var(--text-muted);">${esc(m.grade)} · ${esc(m.department)}</div></div><button class="modal-close" onclick="closeModal()">&times;</button></div><div class="modal-body"><div class="notice notice-amber"><div class="notice-icon">&#9888;</div><div><strong>Maksimal 2 Mandatory</strong> per anggota.<span id="mand-counter" style="margin-left:8px;font-weight:800;color:var(--coral);">Terpilih: ${initM}/2</span></div></div>${body}${extra}</div><div class="modal-footer"><button class="btn btn-ghost" onclick="renderStep1('${nik}')">&larr; Kembali</button><button class="btn btn-emerald btn-lg" onclick="doSaveApproval('${nik}')">&#128190; Simpan Assignment</button></div></div>`);
 }
 function setDecision(cid,dec){
@@ -1498,7 +1448,6 @@ async function doSaveApproval(nik,confirmed){
   if(r.success){toast('Assignment tersimpan','success');closeModal();loadTeamAssessment();}
   else toast(r.message,'error');
 }
-
 // SheetJS dimuat saat dibutuhkan saja, sama seperti jsPDF, supaya halaman
 // utama tidak menanggung bobotnya. Menghasilkan .xlsx sungguhan, bukan CSV
 // yang gampang salah baca karena pemisah desimal Indonesia.
@@ -1514,7 +1463,6 @@ function saveSheet(rows,sheetName,fileName){
   window.XLSX.writeFile(wb,fileName);
 }
 const stamp=()=>new Date().toISOString().split('T')[0];
-
 // Kolom A-F sesuai permintaan. Satu baris per karyawan yang di-assign;
 // kolom C berisi jumlah untuk kombinasi kompetensi + level yang sama,
 // diulang di tiap baris supaya siap langsung di-pivot.
@@ -1533,7 +1481,6 @@ async function downloadDemandExcel(){
   }catch(e){toast('Gagal membuat Excel: '+e.message,'error');}
   finally{showLoading(false);}
 }
-
 // Format sama dengan Demand, ditambah kolom waktu sesi yang dipilih peserta.
 async function downloadEnrollmentExcel(){
   const sessions=window._enrollData||[];
@@ -1554,7 +1501,6 @@ async function downloadEnrollmentExcel(){
   }catch(e){toast('Gagal membuat Excel: '+e.message,'error');}
   finally{showLoading(false);}
 }
-
 async function loadJsPDF(){
   if(window.jspdf)return;
   await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
@@ -1575,21 +1521,20 @@ async function downloadAssignmentPDF(){
     const{jsPDF}=window.jspdf;
     const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
     const today=new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
-    doc.setFillColor(79,70,229);doc.rect(0,0,297,22,'F');
+    doc.setFillColor(91,95,239);doc.rect(0,0,297,22,'F');
     doc.setTextColor(255,255,255);doc.setFontSize(13);doc.setFont('helvetica','bold');
     doc.text('MIRAI — IDP Competency Assignment Report',14,10);
     doc.setFontSize(9);doc.setFont('helvetica','normal');
     doc.text(`Atasan: ${state.user.name||''}   ·   ${today}   ·   PT. Amerta Indah Otsuka`,14,17);
     doc.autoTable({startY:25,head:[['NIK','Nama','Grade','Posisi','Kompetensi','Self','Target','Gap','Prioritas']],
       body:rows.map(r=>[r.nik,r.name,r.grade,r.position,r.competency,r.self,r.target,r.gap,r.decision]),
-      styles:{fontSize:8,cellPadding:3,textColor:[30,27,75]},headStyles:{fillColor:[79,70,229],textColor:[255,255,255],fontStyle:'bold'},
-      alternateRowStyles:{fillColor:[243,238,255]},margin:{left:14,right:14}});
+      styles:{fontSize:8,cellPadding:3,textColor:[35,35,66]},headStyles:{fillColor:[67,56,202],textColor:[255,255,255],fontStyle:'bold'},
+      alternateRowStyles:{fillColor:[238,240,255]},margin:{left:14,right:14}});
     doc.save(`MIRAI_Assignment_${String(state.user.name||'').replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);
     toast('PDF terunduh','success');
   }catch(e){toast('Gagal membuat PDF: '+e.message,'error');}
   finally{showLoading(false);}
 }
-
 // ── TEAM MONITOR ───────────────────────────────────────────
 function setMonitorTab(tab){state.monitorTab=tab;el('tab-mon-p').className=tab==='progress'?'btn btn-primary btn-sm':'btn btn-ghost btn-sm';el('tab-mon-s').className=tab==='schedule'?'btn btn-primary btn-sm':'btn btn-ghost btn-sm';if(tab==='progress')loadTeamMonitor();else loadTeamSchedule();}
 async function loadTeamMonitor(){
@@ -1669,7 +1614,6 @@ async function loadTeamSchedule(){
   }catch(e){html('team-monitor-content',`<div class="notice notice-coral"><div class="notice-icon">!</div><div>Gagal memuat jadwal tim.</div></div>`);}
   finally{showLoading(false);}
 }
-
 // ── EVALUASI L3 KIRKPATRICK ────────────────────────────────
 // Menilai perubahan perilaku setelah program pengembangan.
 // Indikator yang ditampilkan adalah indikator pada LEVEL TARGET orang
@@ -1738,7 +1682,6 @@ function l3Card(e){
         ${open?'<span style="color:var(--text-muted);font-size:18px;">&rsaquo;</span>':'<span style="color:var(--text-muted);font-size:14px;">&#128274;</span>'}
       </div></div>`;
 }
-
 async function openL3Form(nik){
   const r=await api('getL3Form',{evaluatee_nik:nik,evaluator_nik:state.user.nik});
   if(!r.success){toast(r.message,'error');return;}
@@ -1757,7 +1700,6 @@ function renderL3Form(){
     body+=`<div class="notice notice-amber"><div class="notice-icon">&#9888;</div><div>Evaluasi ini semula dibuka oleh <strong>${esc(window._l3LockedName)}</strong>. Kamu tetap bisa menyimpan, dan namamu tercatat sebagai penyunting terakhir.</div></div>`;
   }
   body+=`<div class="notice notice-purple"><div class="notice-icon">&#128161;</div><div>Nilai berdasarkan perilaku yang <strong>kamu amati setelah program pengembangan</strong>, bukan berdasarkan pelatihan yang diikuti. Kompetensi dinyatakan tercapai hanya bila <strong>seluruh</strong> indikator tercentang.</div></div>`;
-
   comps.forEach((c,ci)=>{
     const done=c.total_indicators>0&&c.checked_count>=c.total_indicators;
     const st=c.total_indicators===0?'no_instrument':(done?'achieved':'not_achieved');
@@ -1787,7 +1729,6 @@ function renderL3Form(){
     });
     body+=`</div></div></div>`;
   });
-
   openModal(`<div class="modal" style="max-width:740px;" onclick="event.stopPropagation()"><div class="modal-header"><div><div style="font-size:11px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Evaluasi Perilaku — L3 Kirkpatrick</div><div class="modal-title">${esc(e.name)}</div><div style="font-size:12px;color:var(--text-muted);margin-top:1px;">${esc(e.grade||'—')} · ${esc(e.department)} · ${esc(e.position||'—')}</div></div><button class="modal-close" onclick="closeModal()">&times;</button></div><div class="modal-body">${body}</div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">Tutup</button><button class="btn btn-ghost" onclick="saveL3Draft()">&#128190; Simpan Draf</button><button class="btn btn-amber" onclick="downloadL3PDF()">&#8681; PDF</button><button class="btn btn-emerald" onclick="confirmL3Submit()">&#9989; Simpan Final</button></div></div>`);
 }
 function toggleL3Comp(ci){const b=el('l3-body-'+ci),a=el('l3-arrow-'+ci);if(!b)return;const open=b.style.display!=='none';b.style.display=open?'none':'block';if(a)a.style.transform=open?'rotate(0deg)':'rotate(180deg)';}
@@ -1843,7 +1784,7 @@ async function downloadL3PDF(){
     const{jsPDF}=window.jspdf;
     const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
     const today=new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
-    doc.setFillColor(79,70,229);doc.rect(0,0,210,22,'F');
+    doc.setFillColor(91,95,239);doc.rect(0,0,210,22,'F');
     doc.setTextColor(255,255,255);doc.setFontSize(13);doc.setFont('helvetica','bold');
     doc.text('MIRAI — Evaluasi Perilaku L3 Kirkpatrick',14,10);
     doc.setFontSize(8);doc.setFont('helvetica','normal');
@@ -1851,15 +1792,15 @@ async function downloadL3PDF(){
     let y=28;
     fd.competencies.forEach(c=>{
       if(y+18>270){doc.addPage();y=14;}
-      doc.setFillColor(238,242,255);doc.roundedRect(10,y,190,15,2,2,'F');
-      doc.setDrawColor(79,70,229);doc.roundedRect(10,y,190,15,2,2,'S');
-      doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(55,48,163);
+      doc.setFillColor(238,238,254);doc.roundedRect(10,y,190,15,2,2,'F');
+      doc.setDrawColor(91,95,239);doc.roundedRect(10,y,190,15,2,2,'S');
+      doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(63,63,189);
       doc.text(`${c.competency_id} — ${String(c.competency_name).substring(0,50)}`,14,y+6);
       doc.setFontSize(8);doc.setTextColor(100,100,100);
       doc.text(`Level ${c.competency_level} · ${c.checked_count}/${c.total_indicators} indikator`,14,y+11.5);
       const okc=c.score_percent>=100;
       doc.setFontSize(11);doc.setFont('helvetica','bold');
-      doc.setTextColor(okc?13:239,okc?148:68,okc?136:68);
+      doc.setTextColor(okc?12:209,okc?165:75,okc?118:54);
       doc.text(`${c.score_percent}%`,196,y+7,{align:'right'});
       doc.setFontSize(7);
       doc.text(okc?'TERCAPAI':'BELUM',196,y+12,{align:'right'});
@@ -1867,10 +1808,10 @@ async function downloadL3PDF(){
       doc.setFont('helvetica','normal');
       c.indicators.forEach(i=>{
         if(y+8>276){doc.addPage();y=14;}
-        if(i.is_checked){doc.setFillColor(20,184,166);doc.roundedRect(14,y-3.6,4.6,4.6,1,1,'F');doc.setTextColor(255,255,255);doc.setFontSize(7);doc.setFont('helvetica','bold');doc.text('v',15.5,y);}
+        if(i.is_checked){doc.setFillColor(18,165,118);doc.roundedRect(14,y-3.6,4.6,4.6,1,1,'F');doc.setTextColor(255,255,255);doc.setFontSize(7);doc.setFont('helvetica','bold');doc.text('v',15.5,y);}
         else{doc.setDrawColor(200,200,200);doc.roundedRect(14,y-3.6,4.6,4.6,1,1,'S');}
         doc.setFontSize(7.5);doc.setFont('helvetica',i.is_checked?'bold':'normal');
-        doc.setTextColor(i.is_checked?30:110,i.is_checked?27:110,i.is_checked?75:110);
+        doc.setTextColor(i.is_checked?35:110,i.is_checked?35:110,i.is_checked?66:110);
         doc.splitTextToSize(String(i.behavioral_indicator).substring(0,300),172).forEach(ln=>{doc.text(ln,21,y);y+=4.4;});
         y+=1.6;
       });
@@ -1894,20 +1835,20 @@ async function downloadAllTeamL3PDF(){
     const{jsPDF}=window.jspdf;
     const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
     const today=new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
-    const hdr=()=>{doc.setFillColor(79,70,229);doc.rect(0,0,210,22,'F');doc.setTextColor(252,211,77);doc.setFontSize(13);doc.setFont('helvetica','bold');doc.text('MIRAI — Evaluasi Perilaku L3 Kirkpatrick',14,10);doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text(`Atasan: ${td.leader_name} · ${td.leader_dept} · ${today}`,14,17);};
+    const hdr=()=>{doc.setFillColor(91,95,239);doc.rect(0,0,210,22,'F');doc.setTextColor(252,211,77);doc.setFontSize(13);doc.setFont('helvetica','bold');doc.text('MIRAI — Evaluasi Perilaku L3 Kirkpatrick',14,10);doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text(`Atasan: ${td.leader_name} · ${td.leader_dept} · ${today}`,14,17);};
     evs.forEach((ev,idx)=>{
       if(idx>0)doc.addPage();
       hdr();let y=26;
-      doc.setFillColor(243,238,255);doc.roundedRect(10,y,190,22,2,2,'F');
-      doc.setDrawColor(79,70,229);doc.roundedRect(10,y,190,22,2,2,'S');
-      doc.setFontSize(12);doc.setFont('helvetica','bold');doc.setTextColor(55,48,163);
+      doc.setFillColor(238,238,254);doc.roundedRect(10,y,190,22,2,2,'F');
+      doc.setDrawColor(91,95,239);doc.roundedRect(10,y,190,22,2,2,'S');
+      doc.setFontSize(12);doc.setFont('helvetica','bold');doc.setTextColor(63,63,189);
       doc.text(String(ev.name).substring(0,60),14,y+8);
       doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(100,100,100);
       doc.text(`NIK ${ev.nik} · ${ev.grade||'—'} · ${ev.position||'—'} · ${ev.department||'—'}`,14,y+15);
       y+=26;
       (ev.competencies||[]).forEach(c=>{
         if(y+16>268){doc.addPage();hdr();y=26;}
-        doc.setFillColor(79,70,229);doc.rect(10,y,190,12,'F');
+        doc.setFillColor(91,95,239);doc.rect(10,y,190,12,'F');
         doc.setTextColor(252,211,77);doc.setFontSize(9);doc.setFont('helvetica','bold');
         doc.text(`${c.competency_id} L${c.competency_level} — ${String(c.competency_name).substring(0,40)}`,14,y+8);
         const okc=c.score_percent>=100;
@@ -1916,12 +1857,12 @@ async function downloadAllTeamL3PDF(){
         y+=14;
         (c.indicators||[]).forEach((i,ii)=>{
           if(y+8>276){doc.addPage();hdr();y=26;}
-          const bg=i.is_checked?[240,253,250]:(ii%2===0?[255,255,255]:[249,250,252]);
+          const bg=i.is_checked?[235,251,244]:(ii%2===0?[255,255,255]:[247,248,251]);
           doc.setFillColor(bg[0],bg[1],bg[2]);doc.rect(10,y-4,190,8,'F');
-          if(i.is_checked){doc.setFillColor(20,184,166);doc.roundedRect(13,y-3,5,5,1,1,'F');doc.setTextColor(255,255,255);doc.setFontSize(7);doc.setFont('helvetica','bold');doc.text('v',14.8,y+0.5);}
+          if(i.is_checked){doc.setFillColor(18,165,118);doc.roundedRect(13,y-3,5,5,1,1,'F');doc.setTextColor(255,255,255);doc.setFontSize(7);doc.setFont('helvetica','bold');doc.text('v',14.8,y+0.5);}
           else{doc.setDrawColor(180,180,180);doc.roundedRect(13,y-3,5,5,1,1,'S');}
           doc.setFontSize(7.5);doc.setFont('helvetica',i.is_checked?'bold':'normal');
-          doc.setTextColor(i.is_checked?30:100,i.is_checked?80:100,i.is_checked?70:100);
+          doc.setTextColor(i.is_checked?14:100,i.is_checked?107:100,i.is_checked?79:100);
           doc.text(String(i.behavioral_indicator).substring(0,110),20,y+0.5);
           y+=8;
         });
@@ -1935,7 +1876,6 @@ async function downloadAllTeamL3PDF(){
   }catch(e){toast('Gagal membuat PDF: '+e.message,'error');}
   finally{showLoading(false);}
 }
-
 // ── ADMIN ──────────────────────────────────────────────────
 async function loadAdmin(){
   const r=await api('getAdminDashboard');
@@ -1991,7 +1931,6 @@ function renderAdminAssessment(d){
   window._divStats=ds;
   state.assessFilters=state.assessFilters||{nik:'',name:'',grade:'',dept:'',div:''};
   state.assessPage=1;
-
   // Divisi jauh lebih sedikit daripada departemen, jadi grafiknya muat satu
   // layar. Klik satu batang untuk membuka rincian departemen di dalamnya.
   const divs=Object.entries(ds).sort((a,b)=>b[1].total-a[1].total);
@@ -2010,7 +1949,6 @@ function renderAdminAssessment(d){
     c+=`<div style="margin-top:6px;"><button class="btn btn-ghost btn-sm" onclick="filterByDivision('${esc(dv).replace(/'/g,"\\'")}')">Lihat yang belum asesmen di divisi ini &rarr;</button></div></div></div>`;
   });
   c+=`</div></div></div>`;
-
   // Tabel memakai komponen listing bersama: filter per kolom, pencarian
   // menyeluruh, urutan A-Z / Z-A, paginasi 50 baris.
   //
@@ -2103,12 +2041,10 @@ function openAssignmentDetail(nik){
   if(!l){toast('Data atasan tidak ditemukan','error');return;}
   const reps=l.reports||[];
   const sudah=reps.filter(r=>r.assigned),belum=reps.filter(r=>!r.assigned);
-
   const chip=cp=>`<span class="skip-chip ${cp.decision==='mandatory'?'skip-chip-amber':'skip-chip-blue'}" style="margin:2px 4px 2px 0;">
     <span style="font-weight:800;font-size:10px;">${esc(cp.competency_id)}</span>
     <span>${esc(cp.competency_name||'')}</span>
     <span style="opacity:0.7;font-size:10px;">${cp.decision==='mandatory'?'Mandatory':'Additional'}${cp.target_level?' · L'+cp.target_level:''}</span></span>`;
-
   let body='';
   if(!reps.length){
     body=`<div class="notice notice-amber"><div class="notice-icon">&#9888;</div><div>Atasan ini tercatat punya bawahan, tetapi tidak ada karyawan aktif yang SPV_NIK-nya mengarah ke NIK ${esc(l.nik)}. Periksa kolom SPV_NIK di sheet Users.</div></div>`;
@@ -2120,11 +2056,11 @@ function openAssignmentDetail(nik){
     </div>`;
     if(belum.length){
       body+=`<div style="margin-bottom:16px;"><div style="font-size:12px;font-weight:800;color:var(--coral-dark);margin-bottom:8px;">Belum di-assign (${belum.length})</div><div>`;
-      belum.forEach(r=>{body+=`<span class="skip-chip" style="background:var(--coral-soft);border:1px solid rgba(244,63,94,0.3);color:var(--coral-dark);">${esc(r.name)}<span style="opacity:0.65;font-family:var(--mono);font-size:10px;">${esc(r.nik)}</span></span>`;});
+      belum.forEach(r=>{body+=`<span class="skip-chip" style="background:var(--coral-soft);border:1px solid rgba(251,107,107,0.3);color:var(--coral-dark);">${esc(r.name)}<span style="opacity:0.65;font-family:var(--mono);font-size:10px;">${esc(r.nik)}</span></span>`;});
       body+=`</div></div>`;
     }
     if(sudah.length){
-      body+=`<div style="font-size:12px;font-weight:800;color:#065f46;margin-bottom:8px;">Sudah di-assign (${sudah.length})</div>`;
+      body+=`<div style="font-size:12px;font-weight:800;color:#0C6B4F;margin-bottom:8px;">Sudah di-assign (${sudah.length})</div>`;
       body+=`<div class="table-wrap"><table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr style="background:var(--surface2);"><th style="padding:8px 10px;text-align:left;">Anggota</th><th style="padding:8px 10px;text-align:center;">Mandatory</th><th style="padding:8px 10px;text-align:left;">Assignment</th></tr></thead><tbody>`;
       sudah.forEach(r=>{
         body+=`<tr><td style="padding:8px 10px;border-bottom:1px solid var(--border);"><div style="font-weight:700;">${esc(r.name)}</div><div style="font-size:10px;font-family:var(--mono);color:var(--text-muted);">${esc(r.nik)} · ${esc(r.grade||'')}</div></td>
@@ -2134,7 +2070,6 @@ function openAssignmentDetail(nik){
       body+=`</tbody></table></div>`;
     }
   }
-
   openModal(`<div class="modal" style="max-width:820px;" onclick="event.stopPropagation()">
     <div class="modal-header"><div>
       <div style="font-size:11px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Rincian Tim</div>
@@ -2335,7 +2270,6 @@ async function exportSheet(header,rows,sheetName,baseName){
   }catch(e){toast('Gagal mengunduh: '+e.message,'error');}
   finally{showLoading(false);}
 }
-
 // Demand — A Kompetensi, B Level Target, C NIK, D Nama, E Divisi
 function downloadDemandExcel(){
   const det=(DT['demand']?dtVisible('demand'):((window._adminData&&window._adminData.demand_detail)||[]));
@@ -2349,7 +2283,6 @@ function downloadDemandExcel(){
   exportSheet(['Kompetensi','Level Target','NIK','Nama Karyawan','Divisi'],
     rows,'Demand','MIRAI_Demand_Pelatihan');
 }
-
 // Pendaftaran — kolom A sampai E sama seperti Demand, lalu F Tanggal dan
 // G Waktu Training, ditambah data peserta yang dibutuhkan admin untuk
 // menyusun undangan: email, departemen, grade, trainer, dan lokasi.
@@ -2384,7 +2317,6 @@ function downloadEnrollmentExcel(){
     'Email','Departemen','Grade','Trainer','Lokasi','Tipe Training'],
     rows,'Pendaftaran','MIRAI_Pendaftaran_Training');
 }
-
 function copyText(txt){
   if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(txt).then(()=>toast('Disalin','success')).catch(()=>fallbackCopy(txt));
@@ -2397,7 +2329,6 @@ function fallbackCopy(txt){
 }
 function copyStored(i){const v=(window._emailStore||[])[i];if(v)copyText(v);}
 function copyList(){const l=(DT['notyet']?dtVisible('notyet'):(window._assessAll||[]));if(!l.length){toast('Tidak ada data','warning');return;}copyText(l.map(u=>u.nik).join('\n'));toast(l.length+' NIK disalin','success');}
-
 // ── ADMIN USERS ────────────────────────────────────────────
 async function loadAdminUsers(){
   const r=await api('getAdminUsers');
@@ -2438,7 +2369,6 @@ async function doUpdateUser(nik){
   if(r.success){toast('Data pengguna diperbarui','success');closeModal();loadAdminUsers();}
   else toast(r.message,'error');
 }
-
 // ── ACCOUNT ────────────────────────────────────────────────
 function loadAccount(){
   const u=state.user;
@@ -2467,7 +2397,6 @@ async function doAccChangePwd(){
   if(r.success){toast('Password berhasil diubah','success');closeModal();}
   else toast(r.message,'error');
 }
-
 // ── MIRAI CHATBOT ──────────────────────────────────────────
 function initMirai(){
   state.miraiHistory=[{role:'bot',text:`Halo ${String(state.user.name||'').split(' ')[0]}! Aku Mirai. Ada yang bisa kubantu soal IDP, jadwal pelatihan, atau kompetensi?`}];
@@ -2510,7 +2439,6 @@ async function sendMirai(){
     renderMiraiMsgs();
   }
 }
-
 // ── INIT ───────────────────────────────────────────────────
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape')closeModal();
