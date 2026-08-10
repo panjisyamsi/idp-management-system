@@ -417,7 +417,6 @@ tbody tr:hover{background:var(--purple-soft);}
   <nav class="bottom-nav" id="bottom-nav"></nav>
   <main class="main-content">
     <div id="view-dashboard" class="page-view"><div class="page-header"><div class="page-eyebrow">Overview</div><h1>Dashboard</h1><p id="dash-greeting">Welcome</p></div><div id="dash-content"></div></div>
-    <div id="view-assessment" class="page-view"><div class="page-header"><div class="page-eyebrow">Self Assessment</div><h1>Competency Assessment</h1><p>Nilai kompetensimu berdasarkan indikator perilaku</p></div><div id="assessment-content"></div></div>
     <div id="view-jadwal" class="page-view"><div class="page-header"><div class="page-eyebrow">Training</div><h1>Training Schedule</h1><p>Lihat dan daftar ke sesi pelatihan yang tersedia</p></div><div class="tab-row" id="jadwal-tabs"><button class="btn btn-primary btn-sm" onclick="setJadwalTab('my')" id="tab-my">My Mandatory</button><button class="btn btn-ghost btn-sm" onclick="setJadwalTab('all')" id="tab-all">All Schedules</button></div><div id="jadwal-content"></div></div>
     <div id="view-progress" class="page-view"><div class="page-header"><div class="page-eyebrow">Development</div><h1>Progress IDP</h1><p>Pantau perkembangan program pengembangan individumu</p></div><div id="progress-content"></div></div>
     <div id="view-corporate" class="page-view"><div class="page-header"><div class="page-eyebrow">Training</div><h1>Corporate Mandatory</h1><p>Pelatihan wajib tingkat perusahaan</p></div><div id="corporate-content"></div></div>
@@ -792,7 +791,7 @@ function buildNav(){
   // Role-nya masih 'employee' tidak pernah melihat menunya sama sekali.
   const u=state.user,isAdmin=u.role==='admin';
   const isLeader=u.has_subordinates===true||u.isLeader===true||(u.role||'').includes('leader')||isAdmin;
-  const emp=[{id:'dashboard',icon:'&#127968;',label:'Dashboard'},{id:'assessment',icon:'&#128203;',label:'Assessment'},{id:'jadwal',icon:'&#128197;',label:'Schedule'},{id:'progress',icon:'&#128200;',label:'Progress'},{id:'corporate',icon:'&#127970;',label:'Corporate'}];
+  const emp=[{id:'dashboard',icon:'&#127968;',label:'Dashboard'},{id:'jadwal',icon:'&#128197;',label:'Schedule'},{id:'progress',icon:'&#128200;',label:'Progress'},{id:'corporate',icon:'&#127970;',label:'Corporate'}];
   const lead=[{id:'team-assessment',icon:'&#128101;',label:'Team'},{id:'team-monitor',icon:'&#128202;',label:'Monitor'},{id:'l3-eval',icon:'&#127919;',label:'Evaluasi L3'}];
   const adm=[{id:'admin',icon:'&#128737;',label:'Admin'},{id:'admin-users',icon:'&#128100;',label:'Pengguna'}];
   let s='<span class="sidebar-section">Main Menu</span>';emp.forEach(i=>s+=sItem(i));
@@ -801,7 +800,7 @@ function buildNav(){
   s+='<span class="sidebar-section">Account</span>'+sItem({id:'account',icon:'&#9881;',label:'Account'});
   s+='<div style="margin-top:6px;"><button class="sidebar-item" style="color:#E8654F;" onclick="doLogout()"><span class="sidebar-icon">&#128682;</span> Sign Out</button></div>';
   el('sidebar').innerHTML=s;
-  const m=[{id:'dashboard',icon:'&#127968;',label:'Home'},{id:'assessment',icon:'&#128203;',label:'Assess'},{id:'jadwal',icon:'&#128197;',label:'Jadwal'},{id:'progress',icon:'&#128200;',label:'Progress'},{id:'account',icon:'&#9881;',label:'Akun'}];
+  const m=[{id:'dashboard',icon:'&#127968;',label:'Home'},{id:'jadwal',icon:'&#128197;',label:'Jadwal'},{id:'progress',icon:'&#128200;',label:'Progress'},{id:'account',icon:'&#9881;',label:'Akun'}];
   el('bottom-nav').innerHTML=m.map(i=>`<button class="bnav-item" id="bnav-${i.id}" onclick="navigateTo('${i.id}')"><div class="bnav-icon">${i.icon}</div><span>${i.label}</span></button>`).join('');
 }
 function navigateTo(v){
@@ -811,7 +810,7 @@ function navigateTo(v){
   const sn=el('snav-'+v);if(sn)sn.classList.add('active');
   const bn=el('bnav-'+v);if(bn)bn.classList.add('active');
   state.currentView=v;
-  const loaders={dashboard:loadDashboard,assessment:loadAssessment,jadwal:loadJadwal,progress:loadProgress,corporate:loadCorporate,'team-assessment':loadTeamAssessment,'team-monitor':loadTeamMonitor,'l3-eval':loadL3Eval,admin:loadAdmin,'admin-users':loadAdminUsers,account:loadAccount};
+  const loaders={dashboard:loadDashboard,jadwal:loadJadwal,progress:loadProgress,corporate:loadCorporate,'team-assessment':loadTeamAssessment,'team-monitor':loadTeamMonitor,'l3-eval':loadL3Eval,admin:loadAdmin,'admin-users':loadAdminUsers,account:loadAccount};
   if(loaders[v])loaders[v]();
   window.scrollTo(0,0);
 }
@@ -819,20 +818,16 @@ function navigateTo(v){
 async function loadDashboard(){
   const u=state.user;
   el('dash-greeting').textContent=`${u.name} · ${u.position||u.grade} · ${u.department}`;
-  const[assessRes,approvalRes,enrRes]=await Promise.all([
-    api('getAssessmentStatus',{nik:u.nik}),
+  const[approvalRes,enrRes]=await Promise.all([
     apiFast('getApprovalData',{nik:u.nik}),
     apiFast('getMyEnrollments',{nik:u.nik})
   ]);
   const approvals=approvalRes.success?(approvalRes.approvals||[]):[];
   const totalM=approvals.filter(a=>a.priority==='mandatory').length;
   const enrolled=enrRes.success?(enrRes.data||[]).length:0;
-  const submitted=assessRes.success&&assessRes.has_submitted_final;
-  const hasDraft=assessRes.success&&assessRes.has_draft&&!submitted;
   const isLeader=u.has_subordinates===true||u.isLeader===true||(u.role||'').includes('leader')||u.role==='admin';
   let c=`<div class="stats-grid">
-    <div class="stat-card stat-card-purple" style="cursor:pointer;" onclick="navigateTo('assessment')"><div class="stat-icon">${submitted?'&#9989;':hasDraft?'&#128190;':'&#128203;'}</div><div class="stat-label">Assessment</div><div style="margin-top:4px;">${submitted?statusBadge('submitted'):hasDraft?'<span class="badge badge-sky">Draf</span>':statusBadge('pending')}</div>${assessRes.expected_count?`<div class="stat-sub" style="margin-top:6px;">${assessRes.filled_count}/${assessRes.expected_count} kompetensi</div>`:''}</div>
-    <div class="stat-card stat-card-emerald" style="cursor:pointer;" onclick="navigateTo('jadwal');setTimeout(()=>setJadwalTab('my'),400)"><div class="stat-icon">&#127919;</div><div class="stat-label">Mandatory</div><div class="stat-value">${totalM}</div><div class="stat-sub">Ditetapkan atasan</div></div>
+    <div class="stat-card stat-card-purple" style="cursor:pointer;" onclick="navigateTo('jadwal');setTimeout(()=>setJadwalTab('my'),400)"><div class="stat-icon">&#127919;</div><div class="stat-label">Mandatory</div><div class="stat-value">${totalM}</div><div class="stat-sub">Ditetapkan atasan</div></div>
     <div class="stat-card stat-card-sky" style="cursor:pointer;" onclick="navigateTo('jadwal');setTimeout(()=>setJadwalTab('my'),400)"><div class="stat-icon">&#128218;</div><div class="stat-label">Terdaftar</div><div class="stat-value">${enrolled}</div><div class="stat-sub">Sesi aktif</div></div>
     <div class="stat-card stat-card-amber" style="cursor:pointer;" onclick="navigateTo('account')"><div class="stat-icon">&#127991;</div><div class="stat-label">Grade</div><div style="margin-top:8px;"><span class="badge" style="font-size:14px;padding:5px 16px;background:rgba(255,255,255,0.2);color:#fff;">${esc(u.grade)}</span></div></div>
   </div>`;
@@ -843,8 +838,8 @@ async function loadDashboard(){
       c+=`<div class="pipeline-item"><div class="pipeline-icon" style="background:var(--coral-soft);">&#127919;</div><div class="pipeline-info"><div class="pipeline-name">${esc(a.competency_name||a.competency_id)} — Level ${a.targetLevel||'?'}</div><div class="pipeline-meta">${esc(a.competency_id)} · Gap: ${a.gap||0}${a.notes?` · ${esc(a.notes)}`:''}</div></div><div style="flex-shrink:0;"><span class="badge badge-coral">Mandatory</span></div></div>`;
     });
     c+=`</div></div>`;
-  }else if(submitted){
-    c+=`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">&#8987;</div><div class="empty-title">Menunggu Tinjauan Atasan</div><div class="empty-desc">Atasanmu belum menetapkan kompetensi wajib. Kamu akan mendapat notifikasi setelah penetapan selesai.</div></div></div></div>`;
+  }else{
+    c+=`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">&#8987;</div><div class="empty-title">Belum Ada Kompetensi Wajib</div><div class="empty-desc">Atasanmu belum menetapkan kompetensi wajib untuk siklus ini. Kamu akan mendapat notifikasi setelah penetapan selesai.</div></div></div></div>`;
   }
   if(isLeader){
     c+=`<div class="cta-card cta-card-purple" style="margin-top:14px;"><div><div style="font-weight:800;margin-bottom:3px;">Menu Atasan</div><div style="font-size:13px;color:var(--text-2);">Tinjau asesmen tim, pantau progres, dan lakukan evaluasi perilaku</div></div><div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn btn-ghost btn-sm" onclick="navigateTo('team-assessment')">Team Assessment</button><button class="btn btn-ghost btn-sm" onclick="navigateTo('l3-eval')">Evaluasi L3</button><button class="btn btn-primary btn-sm" onclick="navigateTo('team-monitor')">Monitor &rarr;</button></div></div>`;
@@ -852,186 +847,6 @@ async function loadDashboard(){
   html('dash-content',c);
 }
 // ── ASSESSMENT ─────────────────────────────────────────────
-async function loadAssessment(){
-  const u=state.user;
-  // Status selalu diverifikasi ke server. Penanda lokal hanya dipakai dalam
-  // sesi yang sama agar layar tidak berkedip setelah submit. Kalau HCD
-  // menambah kompetensi ke Target_Level setelah karyawan mengirim, formulir
-  // harus terbuka lagi untuk kompetensi yang belum dinilai — penanda lokal
-  // yang dipercaya mutlak akan menyembunyikan itu.
-  const statusRes=await api('getAssessmentStatus',{nik:u.nik});
-  if(statusRes.success&&statusRes.has_submitted_final&&statusRes.expected_count>0){
-    state._assessmentSubmitted=true;
-    html('assessment-content',buildSubmittedView());return;
-  }
-  state._assessmentSubmitted=false;
-  state._hasDraft=!!(statusRes&&statusRes.has_draft);
-  const libRes=await api('getCompetencyLibrary',{nik:u.nik,grade:u.grade});
-  if(!libRes.success){html('assessment-content',`<div class="notice notice-coral"><div class="notice-icon">!</div><div>${esc(libRes.message)}</div></div>`);return;}
-  const all=libRes.data.competencies||[];
-  state.compLibrary=all.filter(c=>!c.is_skipped);
-  state.skippedComps=all.filter(c=>c.is_skipped);
-  state.compLibrary.forEach(c=>{
-    if(state.assessmentChecks[c.competency_id])return;
-    state.assessmentChecks[c.competency_id]={};
-    for(let l=1;l<=5;l++)state.assessmentChecks[c.competency_id][l]=(c.levels[l]||[]).map(()=>false);
-  });
-  // Centang draf dipulihkan dari server, bukan hanya skornya. Tanpa ini,
-  // karyawan yang kembali setelah menyimpan draf melihat formulir kosong
-  // padahal skornya sudah terisi — lalu mengirim skor tanpa satu pun
-  // centang yang mendukungnya, dan atasannya melihat data yang janggal.
-  if(statusRes.success&&(statusRes.scores||[]).length){
-    statusRes.scores.forEach(sc=>{
-      const cid=sc.competency_id;
-      const comp=state.compLibrary.find(c=>c.competency_id===cid);
-      if(!comp)return;
-      (sc.checked_indicators||[]).forEach(ci=>{
-        const no=ci&&ci.indicator_no!==undefined?ci.indicator_no:ci;
-        const lvl=ci&&ci.level!==undefined&&ci.level!==null?ci.level:null;
-        // Baris berformat lama tidak menyimpan level. Memulihkannya ke semua
-        // level akan mengulang persis bug kebocoran centang, jadi baris
-        // seperti itu sengaja tidak dipulihkan.
-        if(lvl===null)return;
-        const inds=comp.levels[lvl]||[];
-        const i=inds.findIndex(x=>Number(x.indicator_no)===Number(no));
-        if(i>=0&&state.assessmentChecks[cid]&&state.assessmentChecks[cid][lvl])
-          state.assessmentChecks[cid][lvl][i]=true;
-      });
-      // Skor dihitung ulang dari centang yang benar-benar pulih, bukan
-      // diambil mentah dari server, supaya keduanya selalu konsisten.
-      recalcScore(cid);
-      if(!(state.assessmentChecks[cid]&&Object.values(state.assessmentChecks[cid]).some(a=>(a||[]).some(Boolean))))
-        state.assessmentScores[cid]=sc.self_score;
-    });
-  }
-  renderAssessmentForm();
-}
-function buildSubmittedView(){
-  return `<div class="card" style="max-width:520px;margin:0 auto;"><div class="card-body" style="text-align:center;padding:48px 32px;"><div style="width:72px;height:72px;background:var(--emerald-soft);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 20px;">&#9989;</div><div style="font-size:20px;font-weight:800;margin-bottom:8px;">${t('assess.submitted')}</div><div style="font-size:14px;color:var(--text-2);line-height:1.7;margin-bottom:24px;">${t('assess.submitted_desc')}</div><div style="background:var(--surface2);border-radius:var(--r);padding:16px 20px;font-size:13px;color:var(--text-muted);border:1px solid var(--border);">${t('assess.notified')}</div></div></div>`;
-}
-// Blok informasi kompetensi yang tidak perlu dinilai ulang.
-// Tiga kategori dibedakan karena artinya berbeda bagi karyawan:
-//   achieved_historical -> sudah selesai di siklus lalu
-//   awaiting_l3         -> tinggal menunggu atasan menilai perilakunya
-//   idp_inprocess       -> masih dalam pengembangan siklus berjalan
-function buildSkipBlock(list){
-  if(!list.length)return '';
-  const groups=[
-    {key:'achieved_historical',title:t('skip.achieved'),cls:'skip-chip-green',icon:'&#10003;'},
-    {key:'awaiting_l3',title:t('skip.awaiting'),cls:'skip-chip-amber',icon:'&#9203;'},
-    {key:'idp_inprocess',title:t('skip.inprocess'),cls:'skip-chip-blue',icon:'&#128260;'}
-  ];
-  let inner='';
-  groups.forEach(g=>{
-    const items=list.filter(c=>c.skip_reason===g.key);
-    if(!items.length)return;
-    inner+=`<div class="skip-group"><div class="skip-group-title" style="color:${g.cls==='skip-chip-green'?'#0C6B4F':g.cls==='skip-chip-amber'?'#B8791E':'#155F87'};">${g.title}</div><div>`;
-    items.forEach(c=>{
-      inner+=`<span class="skip-chip ${g.cls}"><span>${g.icon}</span><span>${esc(c.competency_name)}</span><span style="opacity:0.65;font-size:10px;font-family:var(--mono);">${esc(c.competency_id)}${c.target_level?' · L'+c.target_level:''}</span></span>`;
-    });
-    inner+=`</div></div>`;
-  });
-  return `<div style="margin-bottom:18px;border-radius:var(--r);overflow:hidden;border:1px solid var(--border);"><div style="padding:12px 16px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#8505;</span><span style="font-size:12px;font-weight:700;color:var(--text-2);">${t('skip.title')}</span><span class="badge badge-gray" style="margin-left:auto;">${list.length}</span></div><div style="padding:14px 16px;background:var(--surface);">${inner}</div></div>`;
-}
-function renderAssessmentForm(){
-  const active=state.compLibrary||[],skipped=state.skippedComps||[];
-  let c=`<div class="notice notice-amber"><div class="notice-icon">&#128161;</div><div><strong>${t('assess.instruction')}:</strong> ${t('assess.inst_text')}</div></div>`;
-  if(state._hasDraft){
-    c+=`<div class="notice notice-sky"><div class="notice-icon">&#128190;</div><div>Kamu punya <strong>draf tersimpan</strong> yang belum dikirim. Atasanmu belum bisa melihatnya. Tekan Kirim bila sudah yakin.</div></div>`;
-  }
-  c+=buildSkipBlock(skipped);
-  if(!active.length){
-    c+=`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">&#127881;</div><div class="empty-title">Tidak ada yang perlu dinilai siklus ini</div><div class="empty-desc">Seluruh kompetensimu sudah tercapai atau sedang dalam program pengembangan yang berjalan. Kamu tidak perlu melakukan apa pun sekarang.</div></div></div></div>`;
-    html('assessment-content',c);return;
-  }
-  const order={core:0,role:1,jf:2},label={core:'Core Competency',role:'Role Competency',jf:'Job Family Competency'},color={core:'badge-purple',role:'badge-sky',jf:'badge-amber'};
-  const grouped={};active.forEach(x=>{(grouped[x.competency_type]=grouped[x.competency_type]||[]).push(x);});
-  Object.keys(grouped).sort((a,b)=>(order[a]||0)-(order[b]||0)).forEach(tp=>{
-    c+=`<div style="margin-bottom:8px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="badge ${color[tp]||'badge-gray'}">${label[tp]||tp}</span><div style="flex:1;height:1px;background:var(--border);"></div><span style="font-size:11px;color:var(--text-muted);font-weight:600;">${grouped[tp].length}</span></div>`;
-    grouped[tp].forEach(comp=>{c+=renderCompBlock(comp);});
-    c+=`</div>`;
-  });
-  c+=`<div style="display:flex;gap:10px;margin-top:24px;padding-top:18px;border-top:1px solid var(--border);flex-wrap:wrap;"><button class="btn btn-ghost" onclick="saveDraft()">&#128190; ${t('assess.save_draft')}</button><button class="btn btn-primary btn-lg" onclick="confirmFinalSubmit()">${t('assess.submit')} &rarr;</button></div>`;
-  html('assessment-content',c);
-}
-function renderCompBlock(comp){
-  const cid=comp.competency_id,color={core:'badge-purple',role:'badge-sky',jf:'badge-amber'};
-  let o=`<div class="assessment-section" id="comp-block-${cid}"><div class="assessment-section-hdr" onclick="toggleComp('${cid}')"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="badge ${color[comp.competency_type]||'badge-gray'}">${esc(cid)}</span><span style="font-weight:700;font-size:14px;">${esc(comp.competency_name)}</span><span style="font-size:11px;color:var(--text-muted);">Target L${comp.target_level}</span></div><span id="arrow-${cid}" style="transition:transform 0.2s;font-size:11px;color:var(--text-muted);">&#9660;</span></div><div id="comp-body-${cid}" style="display:none;">`;
-  for(let lv=1;lv<=5;lv++){
-    const inds=comp.levels[lv]||[];if(!inds.length)continue;
-    const checks=(state.assessmentChecks[cid]||{})[lv]||[];
-    o+=`<div class="comp-block"><div class="level-label">Level ${lv}${lv===comp.target_level?' &mdash; target':''}</div>`;
-    inds.forEach((ind,i)=>{
-      const ck=checks[i]||false;
-      o+=`<div class="indicator-item${ck?' checked':''}" onclick="toggleInd('${cid}',${lv},${i})"><div class="ind-check">${ck?'&#10003;':''}</div><div class="ind-text">${esc(ind.behavioral_indicator)}${ind.example_note?`<div class="ind-example">${esc(ind.example_note)}</div>`:''}</div></div>`;
-    });
-    o+=`</div>`;
-  }
-  return o+`</div></div>`;
-}
-function toggleComp(cid){const b=el('comp-body-'+cid),a=el('arrow-'+cid);if(!b)return;const open=b.style.display!=='none';b.style.display=open?'none':'block';if(a)a.style.transform=open?'rotate(0deg)':'rotate(180deg)';}
-function toggleInd(cid,lv,i){
-  if(!state.assessmentChecks[cid]||!state.assessmentChecks[cid][lv])return;
-  state.assessmentChecks[cid][lv][i]=!state.assessmentChecks[cid][lv][i];
-  recalcScore(cid);refreshCompBlock(cid);
-}
-// Spencer & Spencer kumulatif: level N baru terhitung bila SELURUH indikator
-// di level N tercentang, dan seluruh level di bawahnya juga penuh.
-function recalcScore(cid){
-  const comp=(state.compLibrary||[]).find(c=>c.competency_id===cid);if(!comp)return;
-  let achieved=0;
-  for(let l=1;l<=5;l++){
-    const inds=comp.levels[l]||[];if(!inds.length)continue;
-    const ck=state.assessmentChecks[cid][l]||[];
-    if(inds.every((_,i)=>ck[i]===true))achieved=l;else break;
-  }
-  state.assessmentScores[cid]=achieved;
-}
-function refreshCompBlock(cid){
-  const comp=(state.compLibrary||[]).find(c=>c.competency_id===cid);if(!comp)return;
-  for(let l=1;l<=5;l++){
-    (comp.levels[l]||[]).forEach((_,i)=>{
-      const item=document.querySelector(`[onclick="toggleInd('${cid}',${l},${i})"]`);if(!item)return;
-      const ck=(state.assessmentChecks[cid]||{})[l]&&state.assessmentChecks[cid][l][i];
-      item.classList.toggle('checked',!!ck);
-      item.querySelector('.ind-check').innerHTML=ck?'&#10003;':'';
-    });
-  }
-}
-function buildAssessmentScores(){
-  return (state.compLibrary||[]).map(comp=>{
-    const cid=comp.competency_id,checks=state.assessmentChecks[cid]||{},checked=[];
-    Object.entries(checks).forEach(([lv,arr])=>{
-      const inds=comp.levels[lv]||[];
-      (arr||[]).forEach((ck,i)=>{if(ck&&inds[i])checked.push({indicator_no:inds[i].indicator_no,level:parseInt(lv,10)});});
-    });
-    return{competency_id:cid,competency_type:comp.competency_type,self_score:state.assessmentScores[cid]||0,notes:'',checked_indicators:checked};
-  });
-}
-async function saveDraft(){
-  const r=await api('submitAssessment',{nik:state.user.nik,scores:buildAssessmentScores(),is_final:false});
-  if(r.success)toast(t('assess.draft_saved'),'success');else toast(r.message,'error');
-}
-function confirmFinalSubmit(){
-  const n=(state.compLibrary||[]).length;
-  openModal(`<div class="modal" onclick="event.stopPropagation()"><div class="modal-header"><div class="modal-title">Konfirmasi Pengiriman</div><button class="modal-close" onclick="closeModal()">&times;</button></div><div class="modal-body"><div class="notice notice-amber"><div class="notice-icon">&#9888;</div><div>Setelah dikirim, asesmen <strong>tidak dapat diubah</strong>. ${n} kompetensi akan dikirim ke atasanmu.</div></div></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">Batal</button><button class="btn btn-primary" onclick="doFinalSubmit()">Ya, Kirim</button></div></div>`);
-}
-async function doFinalSubmit(){
-  closeModal();
-  const r=await api('submitAssessment',{nik:state.user.nik,scores:buildAssessmentScores(),is_final:true});
-  if(!r.success){
-    toast(r.message,'error');
-    // Server menolak karena asesmen sudah final di tempat lain (tab kedua
-    // atau perangkat lain). Layar disamakan dengan keadaan sebenarnya.
-    if(r.locked){state._assessmentSubmitted=true;html('assessment-content',buildSubmittedView());}
-    return;
-  }
-  if((r.rejected_competencies||[]).length)toast(r.rejected_competencies.length+' kompetensi dilewati karena sedang berjalan','warning');
-  state._assessmentSubmitted=true;
-  toast('Asesmen terkirim','success');
-  state.compLibrary=null;state.assessmentScores={};state.assessmentChecks={};
-  html('assessment-content',buildSubmittedView());
-}
 // ── JADWAL ─────────────────────────────────────────────────
 async function loadJadwal(){
   const u=state.user;
