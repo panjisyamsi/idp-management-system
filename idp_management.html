@@ -848,23 +848,21 @@ async function loadDashboard(){
   const isLeader=u.has_subordinates===true||u.isLeader===true||(u.role||'').includes('leader')||u.role==='admin';
 
   let c=`<div class="stats-grid">
-    <div class="stat-card stat-card-purple"><div class="stat-icon">${submitted?'&#9989;':hasDraft?'&#128190;':'&#128203;'}</div><div class="stat-label">Assessment</div><div style="margin-top:4px;">${submitted?statusBadge('submitted'):hasDraft?'<span class="badge badge-sky">Draf</span>':statusBadge('pending')}</div>${assessRes.expected_count?`<div class="stat-sub" style="margin-top:6px;">${assessRes.filled_count}/${assessRes.expected_count} kompetensi</div>`:''}</div>
-    <div class="stat-card stat-card-emerald"><div class="stat-icon">&#127919;</div><div class="stat-label">Mandatory</div><div class="stat-value">${totalM}</div><div class="stat-sub">Ditetapkan atasan</div></div>
-    <div class="stat-card stat-card-sky"><div class="stat-icon">&#128218;</div><div class="stat-label">Terdaftar</div><div class="stat-value">${enrolled}</div><div class="stat-sub">Sesi aktif</div></div>
-    <div class="stat-card stat-card-amber"><div class="stat-icon">&#127991;</div><div class="stat-label">Grade</div><div style="margin-top:8px;"><span class="badge" style="font-size:14px;padding:5px 16px;background:rgba(255,255,255,0.2);color:#fff;">${esc(u.grade)}</span></div></div>
+    <div class="stat-card stat-card-purple" style="cursor:pointer;" onclick="navigateTo('assessment')"><div class="stat-icon">${submitted?'&#9989;':hasDraft?'&#128190;':'&#128203;'}</div><div class="stat-label">Assessment</div><div style="margin-top:4px;">${submitted?statusBadge('submitted'):hasDraft?'<span class="badge badge-sky">Draf</span>':statusBadge('pending')}</div>${assessRes.expected_count?`<div class="stat-sub" style="margin-top:6px;">${assessRes.filled_count}/${assessRes.expected_count} kompetensi</div>`:''}</div>
+    <div class="stat-card stat-card-emerald" style="cursor:pointer;" onclick="navigateTo('jadwal');setTimeout(()=>setJadwalTab('my'),400)"><div class="stat-icon">&#127919;</div><div class="stat-label">Mandatory</div><div class="stat-value">${totalM}</div><div class="stat-sub">Ditetapkan atasan</div></div>
+    <div class="stat-card stat-card-sky" style="cursor:pointer;" onclick="navigateTo('jadwal');setTimeout(()=>setJadwalTab('my'),400)"><div class="stat-icon">&#128218;</div><div class="stat-label">Terdaftar</div><div class="stat-value">${enrolled}</div><div class="stat-sub">Sesi aktif</div></div>
+    <div class="stat-card stat-card-amber" style="cursor:pointer;" onclick="navigateTo('account')"><div class="stat-icon">&#127991;</div><div class="stat-label">Grade</div><div style="margin-top:8px;"><span class="badge" style="font-size:14px;padding:5px 16px;background:rgba(255,255,255,0.2);color:#fff;">${esc(u.grade)}</span></div></div>
   </div>`;
 
-  if(approvals.length){
-    c+=`<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title">Rencana Pengembanganku</div></div><div class="card-body" style="padding:0 22px;">`;
-    approvals.forEach(a=>{
-      const d=a.priority||'';
-      const icon=d==='mandatory'?'&#127919;':d==='additional'?'&#128218;':'&#128203;';
-      const bg=d==='mandatory'?'var(--coral-soft)':d==='additional'?'var(--purple-soft)':'var(--surface3)';
-      c+=`<div class="pipeline-item"><div class="pipeline-icon" style="background:${bg};">${icon}</div><div class="pipeline-info"><div class="pipeline-name">${esc(a.competency_name||a.competency_id)} — Level ${a.targetLevel||'?'}</div><div class="pipeline-meta">${esc(a.competency_id)} · Gap: ${a.gap||0}</div></div><div style="flex-shrink:0;">${statusBadge(d||'pending')}</div></div>`;
+  const mandatoryApprovals=approvals.filter(a=>a.priority==='mandatory');
+  if(mandatoryApprovals.length){
+    c+=`<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title">Kompetensi Wajibku</div><span class="badge badge-coral">${mandatoryApprovals.length} kompetensi</span></div><div class="card-body" style="padding:0 22px;">`;
+    mandatoryApprovals.forEach(a=>{
+      c+=`<div class="pipeline-item"><div class="pipeline-icon" style="background:var(--coral-soft);">&#127919;</div><div class="pipeline-info"><div class="pipeline-name">${esc(a.competency_name||a.competency_id)} — Level ${a.targetLevel||'?'}</div><div class="pipeline-meta">${esc(a.competency_id)} · Gap: ${a.gap||0}${a.notes?` · ${esc(a.notes)}`:''}</div></div><div style="flex-shrink:0;"><span class="badge badge-coral">Mandatory</span></div></div>`;
     });
     c+=`</div></div>`;
   }else if(submitted){
-    c+=`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">&#8987;</div><div class="empty-title">Menunggu Tinjauan</div><div class="empty-desc">Atasanmu belum menetapkan prioritas pengembangan.</div></div></div></div>`;
+    c+=`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">&#8987;</div><div class="empty-title">Menunggu Tinjauan Atasan</div><div class="empty-desc">Atasanmu belum menetapkan kompetensi wajib. Kamu akan mendapat notifikasi setelah penetapan selesai.</div></div></div></div>`;
   }
   if(isLeader){
     c+=`<div class="cta-card cta-card-purple" style="margin-top:14px;"><div><div style="font-weight:800;margin-bottom:3px;">Menu Atasan</div><div style="font-size:13px;color:var(--text-2);">Tinjau asesmen tim, pantau progres, dan lakukan evaluasi perilaku</div></div><div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn btn-ghost btn-sm" onclick="navigateTo('team-assessment')">Team Assessment</button><button class="btn btn-ghost btn-sm" onclick="navigateTo('l3-eval')">Evaluasi L3</button><button class="btn btn-primary btn-sm" onclick="navigateTo('team-monitor')">Monitor &rarr;</button></div></div>`;
