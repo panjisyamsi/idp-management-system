@@ -508,7 +508,7 @@ function sessionMinutesLeft(){
 function freshState(){return{user:null,currentView:'dashboard',jadwalTab:'my',monitorTab:'progress',adminTab:'overview',compLibrary:null,skippedComps:[],assessmentScores:{},assessmentChecks:{},teamData:null,enrollments:[],jadwal:[],mandatoryCompIds:[],mandatoryLevelMap:{},mandatoryLevelIsFallback:{},myMandatory:{corporate:[],technical:[],leader:[]},_pipeline:[],miraiHistory:[],_assessmentSubmitted:false};}
 let state=freshState();
 // ── API ────────────────────────────────────────────────────
-const POST_ACTIONS=new Set(['submitAssessment','saveApproval','enrollSession','cancelEnrollment','saveL3Evaluation','sendL3Email','changePassword','updateUser','miraiChat','forgotPassword','reassignL3']);
+const POST_ACTIONS=new Set(['submitAssessment','saveApproval','saveLeaderAssignment','enrollSession','cancelEnrollment','saveL3Evaluation','sendL3Email','changePassword','updateUser','miraiChat','forgotPassword','reassignL3']);
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function apiWithRetry(action,payload={},maxRetries=2){
   for(let attempt=0;attempt<=maxRetries;attempt++){
