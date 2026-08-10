@@ -1281,16 +1281,22 @@ async function loadCorporate(){
   })+`</div>`);
 }
 // ── TEAM ASSESSMENT ────────────────────────────────────────
+// ── TEAM ASSESSMENT — v3.12: Leader Gap Assignment ──────────
+// Menggantikan alur lama yang menunggu self-assessment karyawan.
+// Sumber data: getTeamGapAssignment (bukan getTeamAssessments).
+// Atasan membaca indikator perilaku level 1-5 sebagai referensi
+// bacaan, lalu input angka level per kompetensi tanpa mencentang
+// indikator satu per satu.
 async function loadTeamAssessment(){
-  const r=await api('getTeamAssessments',{leader_nik:state.user.nik});
+  const r=await api('getTeamGapAssignment',{leader_nik:state.user.nik});
   if(!r.success){html('team-assessment-content',`<div class="notice notice-coral"><div class="notice-icon">!</div><div>${esc(r.message)}</div></div>`);return;}
   state.teamData=r.data||[];renderTeamList();
 }
 function renderTeamList(){
   const team=state.teamData||[];
   if(!team.length){html('team-assessment-content',`<div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">&#128101;</div><div class="empty-title">Tidak ada bawahan langsung</div></div></div></div>`);return;}
-  const pending=team.filter(m=>m.has_submitted&&!m.already_assigned).length;
-  let c=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;"><button class="btn btn-sky" onclick="downloadAssignmentPDF()">&#8681; Unduh PDF Assignment</button>${pending?`<span style="font-size:12px;color:var(--text-muted);">${pending} anggota belum di-assign</span>`:''}</div>`;
+  const withGap=team.filter(m=>m.gap_count>0).length;
+  let c=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;"><button class="btn btn-sky" onclick="downloadAssignmentPDF()">&#8681; Unduh PDF Assignment</button>${withGap?`<span style="font-size:12px;color:var(--text-muted);">${withGap} anggota punya kompetensi gap</span>`:''}</div>`;
   c+=`<div class="card">`;
   c+=dtInit('team',{
     label:'anggota',searchPlaceholder:'Cari nama, NIK, departemen...',
@@ -1301,44 +1307,49 @@ function renderTeamList(){
        plain:m=>m.name+' '+m.nik},
       {key:'grade',label:'Grade',render:m=>`<span class="badge ${gradeColor(m.grade)}">${esc(m.grade)}</span>`},
       {key:'department',label:'Departemen',style:'font-size:12px;'},
-      {key:'has_submitted',label:'Asesmen',filter:false,plain:m=>m.has_submitted?'Lengkap':'Belum',
-       render:m=>(m.has_submitted?'<span class="badge badge-emerald">Lengkap</span>':'<span class="badge badge-gray">Belum</span>')+
-         `<div style="font-size:10px;color:var(--text-muted);margin-top:2px;">${m.assessable_count>0?`${m.submitted_count}/${m.assessable_count}`:'—'}</div>`},
-      {key:'already_assigned',label:'Assignment',filter:false,plain:m=>m.already_assigned?'Selesai':'Belum',
-       render:m=>m.already_assigned?'<span class="badge badge-sky">Selesai</span>':'<span class="badge badge-amber">Belum</span>'},
-      {key:'mandatory_count',label:'Mandatory',filter:false,
-       render:m=>`<span style="font-weight:800;color:var(--coral);">${m.mandatory_count}</span>/2`},
+      {key:'gap_count',label:'Kompetensi Gap',filter:false,
+       render:m=>m.gap_count>0?`<span style="font-weight:800;color:var(--coral);">${m.gap_count}</span>`:'<span class="badge badge-emerald">Tidak ada gap</span>'},
+      {key:'already_assigned_count',label:'Sudah Dinilai',filter:false,
+       render:m=>m.gap_count>0?`${m.already_assigned_count}/${m.gap_count}`:'<span class="text-muted">—</span>'},
       {key:'aksi',label:'Aksi',filter:false,sort:false,plain:()=>'',
-       render:m=>m.has_submitted?`<button class="btn btn-primary btn-sm" onclick="openAssignModal('${esc(m.nik)}')">Tinjau &amp; Assign</button>`:'<span class="text-muted text-sm">Menunggu asesmen</span>'}
+       render:m=>m.gap_count>0?`<button class="btn btn-primary btn-sm" onclick="openGapAssignModal('${esc(m.nik)}')">Nilai &amp; Assign</button>`:'<span class="text-muted text-sm">Tidak ada kompetensi gap</span>'}
     ]
   });
   html('team-assessment-content',c+`</div>`);
 }
-function openAssignModal(nik){
+// Modal input level per kompetensi gap. Seluruh indikator level 1-5
+// ditampilkan sebagai bacaan referensi (read-only, tanpa checkbox) —
+// atasan membacanya untuk kalibrasi, lalu input satu angka level.
+function openGapAssignModal(nik){
   const m=(state.teamData||[]).find(x=>x.nik===nik);if(!m)return;
-  window._curDecisions={};window._curLeaderLvls={};window._curMemberNik=nik;
-  // Hanya kompetensi yang benar-benar dinilai siklus ini yang masuk ke
-  // keputusan. Kompetensi yang sedang berjalan di IDP 2026 bisa masih
-  // memegang Decision 'mandatory' dari periode yang sama; kalau ikut
-  // dihitung, penghitung sudah menunjukkan 1/2 sebelum atasan memilih
-  // apa pun, dan pilihan keduanya ditolak server.
-  m.competencies.filter(c=>!c.is_skipped).forEach(c=>{
-    window._curLeaderLvls[c.competency_id]=c.leader_level||'';
-    window._curDecisions[c.competency_id]=c.decision||'';
+  window._curLevels={};window._curDecisions={};window._curGapNik=nik;
+  m.competencies.forEach(c=>{
+    window._curLevels[c.competency_id]=c.current_leader_level||'';
+    window._curDecisions[c.competency_id]=c.current_decision||'';
   });
-  renderStep1(nik);
+  renderGapAssignForm(nik);
 }
-// STEP 1 — tinjau indikator & tetapkan level teramati
-function renderStep1(nik){
+function _levelReferenceHtml(levels,targetLevel){
+  if(!levels||!Object.keys(levels).length)return '<div style="font-size:12px;color:var(--text-muted);padding:8px 0;">Indikator perilaku belum tersedia untuk kompetensi ini.</div>';
+  let h='';
+  Object.keys(levels).map(Number).sort((a,b)=>a-b).forEach(lv=>{
+    const inds=levels[lv]||[];if(!inds.length)return;
+    h+=`<div style="margin-bottom:10px;"><div style="font-size:10px;font-weight:800;color:var(--text-muted);margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid var(--border);">Level ${lv}${Number(lv)===Number(targetLevel)?' &nbsp;<span style="background:var(--amber);color:#fff;font-size:9px;padding:1px 6px;border-radius:4px;">TARGET</span>':''}</div>`;
+    inds.forEach(i=>{
+      h+=`<div style="padding:5px 0;font-size:12px;line-height:1.6;color:var(--text-2);">${esc(i.behavioral_indicator)}${i.example_note?`<div style="font-size:11px;color:var(--text-muted);font-style:italic;">${esc(i.example_note)}</div>`:''}</div>`;
+    });
+    h+=`</div>`;
+  });
+  return h;
+}
+function renderGapAssignForm(nik){
   const m=(state.teamData||[]).find(x=>x.nik===nik);if(!m)return;
   const label={core:'Core',role:'Role',jf:'Job Family'},color={core:'badge-purple',role:'badge-sky',jf:'badge-amber'};
-  const active=m.competencies.filter(c=>!c.is_skipped);
-  const skipped=m.competencies.filter(c=>c.is_skipped);
-  const grouped={};active.forEach(c=>{(grouped[c.competency_type]=grouped[c.competency_type]||[]).push(c);});
+  const grouped={};m.competencies.forEach(c=>{(grouped[c.competency_type]=grouped[c.competency_type]||[]).push(c);});
   let rows='';
-  if(skipped.length){
-    rows+=`<div style="margin-bottom:14px;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);"><div style="font-size:11px;font-weight:800;color:var(--text-2);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;">Tidak dinilai siklus ini (${skipped.length})</div><div>`;
-    skipped.forEach(c=>{
+  if(m.skipped&&m.skipped.length){
+    rows+=`<div style="margin-bottom:14px;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);"><div style="font-size:11px;font-weight:800;color:var(--text-2);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;">Tidak perlu dinilai (${m.skipped.length})</div><div>`;
+    m.skipped.forEach(c=>{
       const cls=c.skip_reason==='achieved_historical'?'skip-chip-green':c.skip_reason==='awaiting_l3'?'skip-chip-amber':'skip-chip-blue';
       const icon=c.skip_reason==='achieved_historical'?'&#10003;':c.skip_reason==='awaiting_l3'?'&#9203;':'&#128260;';
       rows+=`<span class="skip-chip ${cls}" title="${esc(c.skip_label)}"><span>${icon}</span><span>${esc(c.competency_name)}</span><span style="opacity:0.65;font-size:10px;">${esc(c.skip_label)}</span></span>`;
@@ -1348,105 +1359,156 @@ function renderStep1(nik){
   Object.keys(grouped).forEach(tp=>{
     rows+=`<div style="font-size:10px;font-weight:800;color:var(--text-muted);letter-spacing:0.8px;text-transform:uppercase;margin:14px 0 8px;">${label[tp]||tp}</div>`;
     grouped[tp].forEach(c=>{
-      const self=c.self_score||0,target=c.target_level||3,cur=window._curLeaderLvls[c.competency_id]||'';
-      const border=self===0?'var(--border)':'var(--amber)';
-      const gapB=self===0?`<span style="font-size:11px;color:var(--text-muted);">Target: L${target}</span>`:`<span class="badge badge-amber">Self L${self} &rarr; Target L${target}</span>`;
-      let ind='';
-      const legacyWarn=c.checks_legacy_format
-        ?`<div class="thin-warn" style="margin-top:5px;">&#9888; Data centang berformat lama, posisi level mungkin tidak presisi</div>`:'';
-      if(c.levels&&Object.keys(c.levels).length){
-        ind=`<details style="margin-top:8px;"><summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--purple);padding:4px 0;">&#9654; Lihat indikator perilaku</summary><div style="margin-top:8px;padding:10px 12px;background:var(--surface);border-radius:var(--r-sm);border:1px solid var(--border);">`;
-        Object.keys(c.levels).map(Number).sort((a,b)=>a-b).forEach(lv=>{
-          const inds=c.levels[lv]||[];if(!inds.length)return;
-          const ck=inds.filter(i=>i.is_checked).length;
-          const col=ck===inds.length?'var(--emerald)':ck>0?'var(--amber)':'var(--text-muted)';
-          const note=ck===inds.length?` — <span style="color:var(--emerald);">semua tercentang</span>`:ck>0?` — <span style="color:var(--amber);">${ck}/${inds.length}</span>`:'';
-          ind+=`<div style="font-size:10px;font-weight:800;color:${col};margin:8px 0 4px;padding-bottom:3px;border-bottom:1px solid var(--border);">Level ${lv}${note}${lv===target?' &nbsp;<span style="background:var(--amber);color:#fff;font-size:9px;padding:1px 6px;border-radius:4px;">TARGET</span>':''}</div>`;
-          inds.forEach(i=>{
-            ind+=i.is_checked
-              ?`<div class="ind-ro ind-checked"><div class="ind-ro-icon-c">&#10003;</div><span style="font-size:12px;line-height:1.5;font-weight:500;">${esc(i.behavioral_indicator)}</span></div>`
-              :`<div class="ind-ro ind-unchecked"><div class="ind-ro-icon-u">&#9675;</div><span style="font-size:12px;line-height:1.5;color:var(--text-2);">${esc(i.behavioral_indicator)}</span></div>`;
-          });
-        });
-        ind+=`</div></details>`;
-      }
-      rows+=`<div style="border:1.5px solid ${border};border-radius:var(--r);margin-bottom:10px;overflow:hidden;"><div style="padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;background:var(--surface);"><div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><span class="badge ${color[c.competency_type]||'badge-gray'}">${esc(c.competency_id)}</span><span style="font-weight:700;font-size:13px;">${esc(c.competency_name)}</span></div><div>${gapB}</div></div><div style="padding:8px 14px 10px;background:var(--purple-soft);border-top:1px solid var(--border);"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:${ind?'4':'0'}px;"><label style="font-size:11px;font-weight:700;color:var(--purple-dark);white-space:nowrap;">Level yang kamu amati:</label><select onchange="setLeaderLevel('${c.competency_id}',this.value)" style="padding:5px 10px;border:1.5px solid var(--purple);border-radius:var(--r-sm);font-size:12px;font-family:var(--font);font-weight:600;background:#fff;cursor:pointer;outline:none;"><option value="">— Pilih —</option>${[1,2,3,4,5].map(l=>`<option value="${l}" ${String(cur)===String(l)?'selected':''}>Level ${l}</option>`).join('')}</select><span style="font-size:11px;color:var(--text-muted);">Self L${self} · Target L${target}</span></div>${legacyWarn}${ind}</div></div>`;
+      const cur=window._curLevels[c.competency_id]||'';
+      const dec=window._curDecisions[c.competency_id]||'';
+      rows+=`<div style="border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden;">
+        <div style="padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;background:var(--surface);">
+          <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><span class="badge ${color[c.competency_type]||'badge-gray'}">${esc(c.competency_id)}</span><span style="font-weight:700;font-size:13px;">${esc(c.competency_name)}</span></div>
+          <span style="font-size:11px;color:var(--text-muted);">Target L${c.target_level}</span>
+        </div>
+        <div style="padding:8px 14px 10px;background:var(--purple-soft);border-top:1px solid var(--border);">
+          <details style="margin-bottom:8px;"><summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--purple);padding:4px 0;">&#9654; Baca indikator perilaku (referensi kalibrasi)</summary>
+            <div style="margin-top:6px;padding:10px 12px;background:var(--surface);border-radius:var(--r-sm);border:1px solid var(--border);">${_levelReferenceHtml(c.levels,c.target_level)}</div>
+          </details>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <label style="font-size:11px;font-weight:700;color:var(--purple-dark);white-space:nowrap;">Level yang kamu nilai:</label>
+            <select onchange="setGapLevel('${c.competency_id}',this.value)" style="padding:5px 10px;border:1.5px solid var(--purple);border-radius:var(--r-sm);font-size:12px;font-family:var(--font);font-weight:600;background:#fff;cursor:pointer;outline:none;">
+              <option value="">— Pilih —</option>
+              ${[1,2,3,4,5].map(l=>`<option value="${l}" ${String(cur)===String(l)?'selected':''}>Level ${l}</option>`).join('')}
+            </select>
+            <div style="display:flex;gap:4px;margin-left:auto;" id="gap-dec-${c.competency_id}">
+              <button class="btn btn-sm ${dec==='mandatory'?'btn-coral':'btn-ghost'}" onclick="setGapDecision('${c.competency_id}','mandatory')">Mandatory</button>
+              <button class="btn btn-sm ${dec==='additional'?'btn-primary':'btn-ghost'}" onclick="setGapDecision('${c.competency_id}','additional')">Additional</button>
+              <button class="btn btn-sm btn-ghost" onclick="setGapDecision('${c.competency_id}','')">—</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
     });
   });
-  if(!active.length)rows+=`<div class="notice notice-emerald"><div class="notice-icon">&#127881;</div><div>Seluruh kompetensi anggota ini sudah tercapai atau sedang dalam program berjalan. Tidak ada yang perlu dinilai.</div></div>`;
-  openModal(`<div class="modal" style="max-width:720px;" onclick="event.stopPropagation()"><div class="modal-header"><div><div style="font-size:11px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Langkah 1 dari 2 — Tinjau &amp; Nilai</div><div class="modal-title">${esc(m.name)}</div><div style="font-size:12px;color:var(--text-muted);margin-top:1px;">${esc(m.grade)} · ${esc(m.department)}</div></div><button class="modal-close" onclick="closeModal()">&times;</button></div><div class="modal-body"><div class="notice notice-purple"><div class="notice-icon">&#128203;</div><div>Tetapkan <strong>level yang kamu amati</strong> untuk tiap kompetensi. Buka &#9654; untuk melihat indikator. Tercentang (&#10003;) = karyawan menyatakan menunjukkan perilaku itu; kosong (&#9675;) = tidak dinyatakan.</div></div>${rows}</div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">Batal</button><button class="btn btn-primary btn-lg" onclick="renderStep2('${nik}')">Lihat Ringkasan Gap &rarr;</button></div></div>`);
-}
-function setLeaderLevel(cid,v){if(window._curLeaderLvls)window._curLeaderLvls[cid]=v;}
-// STEP 2 — ringkasan gap & penetapan prioritas
-function renderStep2(nik){
-  const m=(state.teamData||[]).find(x=>x.nik===nik);if(!m)return;
-  const color={core:'badge-purple',role:'badge-sky',jf:'badge-amber'};
-  const active=m.competencies.filter(c=>!c.is_skipped);
-  const skipped=m.competencies.filter(c=>c.is_skipped);
-  const comps=active.map(c=>{
-    const self=c.self_score||0,target=c.target_level||3,ll=Number(window._curLeaderLvls[c.competency_id])||0;
-    let fs,gap,isGap;
-    if(ll>0){const w=self*0.3+ll*0.7;fs=Math.round(w*10)/10;gap=Math.max(0,target-Math.round(w));isGap=Math.round(w)<target;}
-    else{fs=self;gap=Math.max(0,target-self);isGap=self<target;}
-    return{...c,leaderLevel:ll,finalScore:fs,gap,isGap};
-  });
-  const gapC=comps.filter(c=>c.isGap),okC=comps.filter(c=>!c.isGap);
   const initM=Object.values(window._curDecisions).filter(d=>d==='mandatory').length;
-  let gapRows='';
-  gapC.forEach(c=>{
-    const d=window._curDecisions[c.competency_id]||'';
-    gapRows+=`<tr><td><span class="badge ${color[c.competency_type]||'badge-gray'}" style="font-size:10px;">${esc(c.competency_id)}</span><span style="font-weight:600;margin-left:5px;font-size:13px;">${esc(c.competency_name)}</span></td><td style="text-align:center;font-weight:700;">${c.self_score||'—'}</td><td style="text-align:center;font-weight:700;color:var(--purple);">${c.leaderLevel||'—'}</td><td style="text-align:center;font-weight:800;font-size:14px;">${c.finalScore}</td><td style="text-align:center;"><span style="font-weight:800;color:var(--coral);">-${c.gap}</span></td><td style="text-align:center;">L${c.target_level}</td><td><div style="display:flex;gap:4px;" id="dec-${c.competency_id}"><button class="btn btn-sm ${d==='mandatory'?'btn-coral':'btn-ghost'}" onclick="setDecision('${c.competency_id}','mandatory')">Mandatory</button><button class="btn btn-sm ${d==='additional'?'btn-primary':'btn-ghost'}" onclick="setDecision('${c.competency_id}','additional')">Additional</button><button class="btn btn-sm btn-ghost" onclick="setDecision('${c.competency_id}','')">—</button></div></td></tr>`;
-  });
-  let extra='';
-  if(okC.length){
-    extra+=`<div style="margin-top:20px;"><div style="font-size:12px;font-weight:700;color:#0C6B4F;padding:5px 12px;background:#d9f5e7;border-radius:6px;display:inline-block;margin-bottom:10px;">Tercapai pada penilaian siklus ini</div><div>`;
-    okC.forEach(c=>{extra+=`<span class="skip-chip skip-chip-green"><span>&#10003;</span><span>${esc(c.competency_name)}</span><span style="opacity:0.7;font-size:10px;">final ${c.finalScore} / target L${c.target_level}</span></span>`;});
-    extra+=`</div></div>`;
-  }
-  if(skipped.length){
-    const groups=[['achieved_historical','Achieved dari IDP sebelumnya','skip-chip-green','&#10003;'],['awaiting_l3','Menunggu evaluasi perilaku atasan','skip-chip-amber','&#9203;'],['idp_inprocess','Sedang berjalan di IDP Semester 1 2026','skip-chip-blue','&#128260;']];
-    groups.forEach(([k,title,cls,icon])=>{
-      const items=skipped.filter(c=>c.skip_reason===k);if(!items.length)return;
-      extra+=`<div style="margin-top:16px;"><div style="font-size:12px;font-weight:700;padding:5px 12px;border-radius:6px;display:inline-block;margin-bottom:10px;background:${cls==='skip-chip-green'?'#d9f5e7':cls==='skip-chip-amber'?'#fdf0dc':'#e2f0fa'};color:${cls==='skip-chip-green'?'#0C6B4F':cls==='skip-chip-amber'?'#B8791E':'#155F87'};">${title}</div><div>`;
-      items.forEach(c=>{extra+=`<span class="skip-chip ${cls}"><span>${icon}</span><span>${esc(c.competency_name)}</span></span>`;});
-      extra+=`</div></div>`;
-    });
-  }
-  const body=gapC.length
-    ?`<div style="margin-bottom:16px;"><div style="font-size:12px;font-weight:800;margin-bottom:8px;">Kompetensi dengan gap <span style="font-size:11px;font-weight:400;color:var(--text-muted);">(Self &times; 30% + Atasan &times; 70% = Skor Akhir)</span></div><div class="table-wrap"><table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr style="background:var(--surface2);"><th style="padding:8px 10px;text-align:left;">Kompetensi</th><th style="padding:8px 10px;text-align:center;">Self</th><th style="padding:8px 10px;text-align:center;">Atasan</th><th style="padding:8px 10px;text-align:center;">Akhir</th><th style="padding:8px 10px;text-align:center;">Gap</th><th style="padding:8px 10px;text-align:center;">Target</th><th style="padding:8px 10px;text-align:left;">Prioritas</th></tr></thead><tbody>${gapRows}</tbody></table></div></div>`
-    :`<div class="notice notice-emerald"><div class="notice-icon">&#127881;</div><div>Tidak ada gap yang perlu ditindaklanjuti pada kompetensi yang dinilai siklus ini.</div></div>`;
-  openModal(`<div class="modal" style="max-width:820px;" onclick="event.stopPropagation()"><div class="modal-header"><div><div style="font-size:11px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Langkah 2 dari 2 — Ringkasan Gap &amp; Prioritas</div><div class="modal-title">${esc(m.name)}</div><div style="font-size:12px;color:var(--text-muted);">${esc(m.grade)} · ${esc(m.department)}</div></div><button class="modal-close" onclick="closeModal()">&times;</button></div><div class="modal-body"><div class="notice notice-amber"><div class="notice-icon">&#9888;</div><div><strong>Maksimal 2 Mandatory</strong> per anggota.<span id="mand-counter" style="margin-left:8px;font-weight:800;color:var(--coral);">Terpilih: ${initM}/2</span></div></div>${body}${extra}</div><div class="modal-footer"><button class="btn btn-ghost" onclick="renderStep1('${nik}')">&larr; Kembali</button><button class="btn btn-emerald btn-lg" onclick="doSaveApproval('${nik}')">&#128190; Simpan Assignment</button></div></div>`);
+  openModal(`<div class="modal" style="max-width:720px;" onclick="event.stopPropagation()">
+    <div class="modal-header"><div>
+      <div style="font-size:11px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Nilai &amp; Assign Kompetensi Gap</div>
+      <div class="modal-title">${esc(m.name)}</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:1px;">${esc(m.grade)} · ${esc(m.department)}</div>
+    </div><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body">
+      <div class="notice notice-purple"><div class="notice-icon">&#128161;</div><div>Baca indikator perilaku sebagai referensi kalibrasi, lalu tetapkan <strong>level yang kamu amati</strong> untuk tiap kompetensi. Maksimal 2 kompetensi Mandatory.<span id="gap-mand-counter" style="margin-left:8px;font-weight:800;color:var(--coral);">Terpilih: ${initM}/2</span></div></div>
+      ${rows}
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">Batal</button><button class="btn btn-primary btn-lg" onclick="doSaveGapAssignment('${nik}')">&#128190; Simpan Assignment</button></div>
+  </div>`);
 }
-function setDecision(cid,dec){
+function setGapLevel(cid,v){if(window._curLevels)window._curLevels[cid]=v;}
+function setGapDecision(cid,dec){
   if(!window._curDecisions)return;
   if(dec==='mandatory'){
     const cnt=Object.entries(window._curDecisions).filter(([k,v])=>v==='mandatory'&&k!==cid).length;
     if(cnt>=2){toast('Maksimal 2 Mandatory per anggota','warning');return;}
   }
   window._curDecisions[cid]=dec;
-  const btns=el('dec-'+cid);
+  const btns=el('gap-dec-'+cid);
   if(btns){const b=btns.querySelectorAll('button');b[0].className=`btn btn-sm ${dec==='mandatory'?'btn-coral':'btn-ghost'}`;b[1].className=`btn btn-sm ${dec==='additional'?'btn-primary':'btn-ghost'}`;b[2].className='btn btn-sm btn-ghost';}
-  const ctr=el('mand-counter');
+  const ctr=el('gap-mand-counter');
   if(ctr)ctr.textContent=`Terpilih: ${Object.values(window._curDecisions).filter(d=>d==='mandatory').length}/2`;
 }
-async function doSaveApproval(nik,confirmed){
-  const decisions=Object.entries(window._curDecisions).map(([cid,dec])=>({competency_id:cid,decision:dec,suggestion:'',leader_level:(window._curLeaderLvls||{})[cid]||''}));
-  // Level yang tidak diisi tersimpan sebagai 0. Skor akhir lalu jatuh ke
-  // nilai self, dan kompetensi itu tidak akan pernah tercatat tercapai —
-  // tanpa ada yang memberi tahu atasannya. Karena itu dikonfirmasi dulu.
-  const kosong=decisions.filter(d=>!Number(d.leader_level));
-  if(kosong.length&&!confirmed){
-    const m=(state.teamData||[]).find(x=>x.nik===nik)||{};
-    const nama=kosong.map(d=>{
-      const c=(m.competencies||[]).find(x=>x.competency_id===d.competency_id);
-      return esc(c?(c.competency_name||c.competency_id):d.competency_id);
-    }).join(', ');
-    openModal(`<div class="modal" style="max-width:460px;" onclick="event.stopPropagation()"><div class="modal-header"><div class="modal-title">Level Belum Ditetapkan</div><button class="modal-close" onclick="renderStep2('${nik}')">&times;</button></div><div class="modal-body"><div class="notice notice-amber"><div class="notice-icon">&#9888;</div><div><strong>${kosong.length} kompetensi</strong> belum kamu tetapkan levelnya: ${nama}.</div></div><p style="font-size:13px;color:var(--text-2);line-height:1.7;">Tanpa level dari kamu, skor akhir memakai nilai self karyawan saja dan kompetensi ini tidak akan pernah tercatat tercapai. Kamu bisa kembali dan mengisinya, atau tetap menyimpan dan melengkapinya nanti.</p></div><div class="modal-footer"><button class="btn btn-ghost" onclick="renderStep1('${nik}')">&larr; Isi Sekarang</button><button class="btn btn-emerald" onclick="doSaveApproval('${nik}',true)">Tetap Simpan</button></div></div>`);
+async function doSaveGapAssignment(nik){
+  const m=(state.teamData||[]).find(x=>x.nik===nik);if(!m)return;
+  const assignments=m.competencies.map(c=>({
+    competency_id:c.competency_id,
+    leader_level:window._curLevels[c.competency_id]||0,
+    decision:window._curDecisions[c.competency_id]||''
+  })).filter(a=>Number(a.leader_level)>0||a.decision);
+  const kosong=m.competencies.filter(c=>!Number(window._curLevels[c.competency_id]));
+  if(kosong.length){
+    toast(`${kosong.length} kompetensi belum diisi levelnya. Lengkapi seluruh kompetensi sebelum menyimpan.`,'warning',5000);
     return;
   }
-  const r=await api('saveApproval',{leader_nik:state.user.nik,member_nik:nik,decisions});
-  if(r.success){toast('Assignment tersimpan','success');closeModal();loadTeamAssessment();}
-  else toast(r.message,'error');
+  const r=await api('saveLeaderAssignment',{leader_nik:state.user.nik,member_nik:nik,assignments,is_reskilling:false});
+  if(!r.success){toast(r.message,'error');return;}
+  toast('Assignment tersimpan','success');
+  closeModal();
+  if(r.trigger_reskilling){
+    // Seluruh kompetensi departemen karyawan ini sudah tertutup (tidak ada
+    // gap tersisa). Tawarkan reskilling ke kompetensi Job Family dari
+    // department lain, sebelum kembali memuat ulang daftar tim.
+    await openReskillingModal(nik);
+  }
+  loadTeamAssessment();
+}
+// ── RESKILLING ───────────────────────────────────────────────
+// Muncul setelah SEMUA kompetensi gap seorang karyawan selesai diinput
+// dan levelnya sudah menutup seluruh kompetensi departemen. Menawarkan
+// opsi pengembangan lintas Job Family dari department lain mana pun.
+async function openReskillingModal(nik){
+  const r=await api('getReskillingOptions',{nik});
+  if(!r.success||!r.data||!r.data.options||!r.data.options.length){
+    toast('Seluruh kompetensi departemen sudah tercapai. Tidak ada opsi reskilling tersedia saat ini.','success',5000);
+    return;
+  }
+  window._reskillNik=nik;
+  window._reskillLevels={};
+  window._reskillSelected={};
+  renderReskillingForm(r.data);
+}
+function renderReskillingForm(data){
+  const opts=data.options||[];
+  let rows='';
+  opts.forEach(o=>{
+    const cur=window._reskillLevels[o.competency_id]||'';
+    const checked=!!window._reskillSelected[o.competency_id];
+    rows+=`<div style="border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden;">
+      <div style="padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;background:var(--surface);">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:1;min-width:0;">
+          <input type="checkbox" ${checked?'checked':''} onchange="toggleReskillSelect('${o.competency_id}',this.checked)" style="width:16px;height:16px;cursor:pointer;flex-shrink:0;">
+          <span class="badge badge-sky">${esc(o.source_department)}</span>
+          <span style="font-weight:700;font-size:13px;">${esc(o.competency_name)}</span>
+        </label>
+        <span style="font-size:11px;color:var(--text-muted);">Target L${o.target_level}</span>
+      </div>
+      <div style="padding:8px 14px 10px;background:var(--sky-soft);border-top:1px solid var(--border);">
+        <details style="margin-bottom:8px;"><summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--sky-dark);padding:4px 0;">&#9654; Baca indikator perilaku</summary>
+          <div style="margin-top:6px;padding:10px 12px;background:var(--surface);border-radius:var(--r-sm);border:1px solid var(--border);">${_levelReferenceHtml(o.levels,o.target_level)}</div>
+        </details>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <label style="font-size:11px;font-weight:700;color:var(--sky-dark);white-space:nowrap;">Level awal karyawan:</label>
+          <select onchange="setReskillLevel('${o.competency_id}',this.value)" style="padding:5px 10px;border:1.5px solid var(--sky);border-radius:var(--r-sm);font-size:12px;font-family:var(--font);font-weight:600;background:#fff;cursor:pointer;outline:none;">
+            <option value="">— Pilih —</option>
+            ${[1,2,3,4,5].map(l=>`<option value="${l}" ${String(cur)===String(l)?'selected':''}>Level ${l}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+    </div>`;
+  });
+  openModal(`<div class="modal" style="max-width:720px;" onclick="event.stopPropagation()">
+    <div class="modal-header"><div>
+      <div style="font-size:11px;font-weight:700;color:var(--sky-dark);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Peluang Reskilling</div>
+      <div class="modal-title">${esc(data.name)}</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:1px;">${esc(data.grade)} · Seluruh kompetensi ${esc(data.own_division)} sudah tercapai</div>
+    </div><button class="modal-close" onclick="closeReskillingModal()">&times;</button></div>
+    <div class="modal-body">
+      <div class="notice notice-sky"><div class="notice-icon">&#127919;</div><div>Karyawan ini sudah menutup seluruh kompetensi wajib departemennya. Kamu bisa mengembangkannya ke kompetensi Job Family dari department lain — centang kompetensi yang relevan, baca indikatornya, lalu tetapkan level awal.</div></div>
+      ${rows}
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeReskillingModal()">Lewati</button><button class="btn btn-primary btn-lg" onclick="doSaveReskilling()">&#128190; Simpan Reskilling</button></div>
+  </div>`);
+}
+function setReskillLevel(cid,v){if(window._reskillLevels)window._reskillLevels[cid]=v;}
+function toggleReskillSelect(cid,checked){if(window._reskillSelected)window._reskillSelected[cid]=checked;}
+function closeReskillingModal(){closeModal();window._reskillNik=null;window._reskillLevels={};window._reskillSelected={};}
+async function doSaveReskilling(){
+  const nik=window._reskillNik;if(!nik)return;
+  const selected=Object.keys(window._reskillSelected||{}).filter(cid=>window._reskillSelected[cid]);
+  if(!selected.length){toast('Pilih minimal satu kompetensi untuk reskilling, atau tekan Lewati','warning');return;}
+  const missingLevel=selected.filter(cid=>!Number((window._reskillLevels||{})[cid]));
+  if(missingLevel.length){toast('Isi level awal untuk seluruh kompetensi yang dicentang','warning');return;}
+  const assignments=selected.map(cid=>({competency_id:cid,leader_level:window._reskillLevels[cid],decision:'additional'}));
+  const r=await api('saveLeaderAssignment',{leader_nik:state.user.nik,member_nik:nik,assignments,is_reskilling:true});
+  if(!r.success){toast(r.message,'error');return;}
+  toast('Reskilling tersimpan','success');
+  closeReskillingModal();
+  loadTeamAssessment();
 }
 // SheetJS dimuat saat dibutuhkan saja, sama seperti jsPDF, supaya halaman
 // utama tidak menanggung bobotnya. Menghasilkan .xlsx sungguhan, bukan CSV
@@ -1510,9 +1572,9 @@ async function downloadAssignmentPDF(){
   const team=state.teamData||[];
   const rows=[];
   team.forEach(m=>{
-    if(!m.already_assigned||!m.competencies)return;
-    const a=m.competencies.filter(c=>c.decision==='mandatory'||c.decision==='additional');
-    a.forEach((c,i)=>rows.push({nik:i===0?m.nik:'',name:i===0?m.name:'',grade:i===0?m.grade:'',position:i===0?(m.position||''):'',competency:c.competency_name||c.competency_id,self:String(c.self_score==null?'-':c.self_score),target:String(c.target_level==null?'-':c.target_level),gap:String(c.gap==null?'-':c.gap),decision:c.decision}));
+    if(!m.competencies)return;
+    const a=m.competencies.filter(c=>c.current_decision==='mandatory'||c.current_decision==='additional');
+    a.forEach((c,i)=>rows.push({nik:i===0?m.nik:'',name:i===0?m.name:'',grade:i===0?m.grade:'',position:i===0?(m.position||''):'',competency:c.competency_name||c.competency_id,target:String(c.target_level==null?'-':c.target_level),level:String(c.current_leader_level==null?'-':c.current_leader_level),decision:c.current_decision}));
   });
   if(!rows.length){toast('Belum ada data assignment','warning');return;}
   showLoading(true);
@@ -1526,8 +1588,8 @@ async function downloadAssignmentPDF(){
     doc.text('MIRAI — IDP Competency Assignment Report',14,10);
     doc.setFontSize(9);doc.setFont('helvetica','normal');
     doc.text(`Atasan: ${state.user.name||''}   ·   ${today}   ·   PT. Amerta Indah Otsuka`,14,17);
-    doc.autoTable({startY:25,head:[['NIK','Nama','Grade','Posisi','Kompetensi','Self','Target','Gap','Prioritas']],
-      body:rows.map(r=>[r.nik,r.name,r.grade,r.position,r.competency,r.self,r.target,r.gap,r.decision]),
+    doc.autoTable({startY:25,head:[['NIK','Nama','Grade','Posisi','Kompetensi','Level Dinilai','Target','Prioritas']],
+      body:rows.map(r=>[r.nik,r.name,r.grade,r.position,r.competency,r.level,r.target,r.decision]),
       styles:{fontSize:8,cellPadding:3,textColor:[35,35,66]},headStyles:{fillColor:[67,56,202],textColor:[255,255,255],fontStyle:'bold'},
       alternateRowStyles:{fillColor:[238,240,255]},margin:{left:14,right:14}});
     doc.save(`MIRAI_Assignment_${String(state.user.name||'').replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);
