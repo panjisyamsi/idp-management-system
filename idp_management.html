@@ -98,26 +98,26 @@ select.form-input{cursor:pointer;}
 #page-change-password{display:none;min-height:100vh;align-items:center;justify-content:center;background:linear-gradient(145deg,#20232B,#2F3346);position:fixed;inset:0;z-index:500;}
 .form-card{background:var(--surface);border-radius:var(--r-xl);padding:44px 40px;width:100%;max-width:420px;box-shadow:var(--shadow-xl);}
 #app-layout{display:none;min-height:100vh;}
-.top-nav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:100;background:linear-gradient(90deg,#20232B,#2F3346,#3F3FBD);display:flex;align-items:center;padding:0 20px;box-shadow:0 1px 12px rgba(35,35,66,0.30);}
+.top-nav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:100;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;box-shadow:var(--shadow-xs);}
 .nav-brand{display:flex;align-items:center;gap:10px;margin-right:24px;}
-.nav-brand-pill{height:32px;padding:0 14px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:var(--r-full);font-family:var(--font-display);font-size:14px;font-weight:var(--fw-bold);color:#FCD34D;display:flex;align-items:center;}
-.nav-brand-sub{font-size:11px;font-weight:600;color:rgba(255,255,255,0.5);display:none;}
+.nav-brand-pill{height:32px;padding:0 14px;background:var(--purple-soft);border:1px solid rgba(91,95,239,0.25);border-radius:var(--r-full);font-family:var(--font-display);font-size:14px;font-weight:var(--fw-bold);color:var(--purple-dark);display:flex;align-items:center;}
+.nav-brand-sub{font-size:11px;font-weight:600;color:var(--text-muted);display:none;}
 @media(min-width:600px){.nav-brand-sub{display:block;}}
 .nav-user{margin-left:auto;display:flex;align-items:center;gap:10px;}
 .nav-user-info{text-align:right;line-height:1.35;display:none;}
 @media(min-width:600px){.nav-user-info{display:block;}}
-.nav-user-name{font-size:13px;font-weight:var(--fw-semibold);color:#fff;}
-.nav-user-role{font-size:10.5px;color:rgba(255,255,255,0.55);font-weight:var(--fw-regular);letter-spacing:var(--ls-wide);}
-.nav-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--coral));border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#fff;cursor:pointer;transition:transform var(--t) var(--ease);}
+.nav-user-name{font-size:13px;font-weight:var(--fw-semibold);color:var(--text);}
+.nav-user-role{font-size:10.5px;color:var(--text-muted);font-weight:var(--fw-regular);letter-spacing:var(--ls-wide);}
+.nav-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--coral));border:2px solid var(--surface);box-shadow:0 0 0 1.5px var(--border);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#fff;cursor:pointer;transition:transform var(--t) var(--ease);}
 .nav-avatar:hover{transform:scale(1.08);}
-.sidebar{position:fixed;top:var(--nav-h);left:0;bottom:0;width:var(--sidebar-w);background:linear-gradient(180deg,#20232B 0%,#282B38 50%,#2F3346 100%);padding:16px 10px;overflow-y:auto;z-index:50;display:none;box-shadow:3px 0 12px rgba(35,35,66,0.18);}
+.sidebar{position:fixed;top:var(--nav-h);left:0;bottom:0;width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);padding:16px 10px;overflow-y:auto;z-index:50;display:none;}
 @media(min-width:768px){.sidebar{display:block;}}
-.sidebar-section{font-size:9px;font-weight:var(--fw-semibold);color:rgba(253,216,115,0.5);letter-spacing:var(--ls-wider);text-transform:uppercase;padding:0 10px;margin:16px 0 4px;display:block;}
+.sidebar-section{font-size:9px;font-weight:var(--fw-semibold);color:var(--text-muted);letter-spacing:var(--ls-wider);text-transform:uppercase;padding:0 10px;margin:16px 0 4px;display:block;}
 .sidebar-section:first-child{margin-top:4px;}
-.sidebar-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:var(--r-sm);cursor:pointer;transition:all var(--t-fast) var(--ease);color:rgba(255,255,255,0.65);font-size:12.5px;font-weight:var(--fw-medium);border:none;background:none;font-family:var(--font);width:100%;text-align:left;position:relative;}
-.sidebar-item:hover{background:rgba(255,255,255,0.10);color:#fff;}
-.sidebar-item.active{background:rgba(253,216,115,0.15);color:#FCD34D;}
-.sidebar-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:#FCD34D;border-radius:0 3px 3px 0;}
+.sidebar-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:var(--r-sm);cursor:pointer;transition:all var(--t-fast) var(--ease);color:var(--text-2);font-size:12.5px;font-weight:var(--fw-medium);border:none;background:none;font-family:var(--font);width:100%;text-align:left;position:relative;}
+.sidebar-item:hover{background:var(--surface2);color:var(--text);}
+.sidebar-item.active{background:var(--purple-soft);color:var(--purple-dark);}
+.sidebar-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--purple);border-radius:0 3px 3px 0;}
 .sidebar-icon{width:20px;text-align:center;font-size:15px;flex-shrink:0;}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -4px 20px rgba(67,56,202,0.08);}
 .bnav-item{flex:1;padding:10px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:color var(--t) var(--ease);color:var(--text-muted);font-size:10px;font-weight:600;border:none;background:none;font-family:var(--font);position:relative;}
@@ -404,9 +404,9 @@ tbody tr:hover{background:var(--purple-soft);}
     <div class="nav-brand"><div class="nav-brand-pill">MIRAI</div><div class="nav-brand-sub">IDP Platform</div></div>
     <div class="nav-user">
       <div id="nav-lang-toggle" style="display:none;">
-        <div style="display:inline-flex;border:1.5px solid rgba(255,255,255,0.2);border-radius:20px;overflow:hidden;background:rgba(255,255,255,0.08);">
-          <button id="nav-btn-en" onclick="setLanguage('en')" style="padding:4px 12px;border:none;background:rgba(255,255,255,0.25);color:#fff;font-size:11px;font-weight:700;cursor:pointer;border-radius:20px 0 0 20px;font-family:var(--font);transition:all 0.2s;">EN</button>
-          <button id="nav-btn-id" onclick="setLanguage('id')" style="padding:4px 12px;border:none;background:transparent;color:rgba(255,255,255,0.6);font-size:11px;font-weight:700;cursor:pointer;border-radius:0 20px 20px 0;font-family:var(--font);transition:all 0.2s;">ID</button>
+        <div style="display:inline-flex;border:1.5px solid var(--border);border-radius:20px;overflow:hidden;background:var(--surface2);">
+          <button id="nav-btn-en" onclick="setLanguage('en')" style="padding:4px 12px;border:none;background:var(--purple);color:#fff;font-size:11px;font-weight:700;cursor:pointer;border-radius:20px 0 0 20px;font-family:var(--font);transition:all 0.2s;">EN</button>
+          <button id="nav-btn-id" onclick="setLanguage('id')" style="padding:4px 12px;border:none;background:transparent;color:var(--text-2);font-size:11px;font-weight:700;cursor:pointer;border-radius:0 20px 20px 0;font-family:var(--font);transition:all 0.2s;">ID</button>
         </div>
       </div>
       <div class="nav-user-info"><div class="nav-user-name" id="nav-user-name">—</div><div class="nav-user-role" id="nav-user-role">—</div></div>
@@ -470,7 +470,7 @@ function applyLanguage(){
   if(be&&bi){const on=currentLang==='en';be.style.background=on?'var(--purple)':'transparent';be.style.color=on?'#fff':'var(--text-2)';bi.style.background=on?'transparent':'var(--purple)';bi.style.color=on?'var(--text-2)':'#fff';}
   document.querySelectorAll('[data-i18n]').forEach(e=>{const k=e.getAttribute('data-i18n');if(k)e.textContent=t(k);});
   const ne=el('nav-btn-en'),ni=el('nav-btn-id');
-  if(ne&&ni){const on=currentLang==='en';ne.style.background=on?'rgba(255,255,255,0.25)':'transparent';ne.style.color=on?'#fff':'rgba(255,255,255,0.6)';ni.style.background=on?'transparent':'rgba(255,255,255,0.25)';ni.style.color=on?'rgba(255,255,255,0.6)':'#fff';}
+  if(ne&&ni){const on=currentLang==='en';ne.style.background=on?'var(--purple)':'transparent';ne.style.color=on?'#fff':'var(--text-2)';ni.style.background=on?'transparent':'var(--purple)';ni.style.color=on?'var(--text-2)':'#fff';}
 }
 // ── SESI ───────────────────────────────────────────────────
 // Disimpan di sessionStorage, bukan localStorage. Bedanya penting di
