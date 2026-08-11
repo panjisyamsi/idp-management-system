@@ -1303,7 +1303,7 @@ function renderReskillingForm(data){
       <div style="font-size:12px;color:var(--text-muted);margin-top:1px;">${esc(data.grade)} · Seluruh kompetensi ${esc(data.own_division)} sudah tercapai</div>
     </div><button class="modal-close" onclick="closeReskillingModal()">&times;</button></div>
     <div class="modal-body">
-      <div class="notice notice-sky"><div class="notice-icon">&#127919;</div><div>Karyawan ini sudah menutup seluruh kompetensi wajib departemennya. Kamu bisa mengembangkannya ke kompetensi Job Family dari department lain — centang kompetensi yang relevan, baca indikatornya, lalu tetapkan level awal.</div></div>
+      <div class="notice notice-sky"><div class="notice-icon">&#127919;</div><div>Karyawan ini sudah menutup seluruh kompetensi wajib departemennya. Di bawah ini pilihan kompetensi Job Family dari department lain untuk dikembangkan. <strong>Centang kompetensi yang ingin kamu assign</strong> — yang tidak dicentang tidak akan disimpan. Untuk tiap kompetensi yang dicentang, baca indikator perilakunya sebagai referensi, lalu tetapkan level saat ini karyawan tersebut (umumnya Level 1 karena ini kompetensi baru baginya, kecuali kamu tahu ia sudah punya pengalaman relevan).</div></div>
       ${rows}
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeReskillingModal()">Lewati</button><button class="btn btn-primary btn-lg" onclick="doSaveReskilling()">&#128190; Simpan Reskilling</button></div>
